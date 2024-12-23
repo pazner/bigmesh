@@ -24,6 +24,8 @@
 #include <type_traits>
 #include <initializer_list>
 
+#include <fstream>
+
 namespace mfem
 {
 
@@ -48,9 +50,9 @@ protected:
    /// Pointer to data
    Memory<T> data;
    /// Size of the array
-   int size;
+   int64_t size;
 
-   inline void GrowSize(int minsize);
+   inline void GrowSize(int64_t minsize);
 
    static_assert(std::is_trivial<T>::value, "type T must be trivial");
 
@@ -64,11 +66,11 @@ public:
    inline Array(MemoryType mt) : size(0) { data.Reset(mt); }
 
    /// Creates array of @a asize elements
-   explicit inline Array(int asize)
+   explicit inline Array(int64_t asize)
       : size(asize) { asize > 0 ? data.New(asize) : data.Reset(); }
 
    /// Creates array of @a asize elements with a given MemoryType
-   inline Array(int asize, MemoryType mt)
+   inline Array(int64_t asize, MemoryType mt)
       : size(asize) { asize > 0 ? data.New(asize, mt) : data.Reset(mt); }
 
    /** @brief Creates array using an externally allocated host pointer @a data_
@@ -77,7 +79,7 @@ public:
 
        When @a own_data is true, the pointer @a data_ must be allocated with
        MemoryType given by MemoryManager::GetHostMemoryType(). */
-   inline Array(T *data_, int asize, bool own_data = false)
+   inline Array(T *data_, int64_t asize, bool own_data = false)
    { data.Wrap(data_, asize, own_data); size = asize; }
 
    /// Copy constructor: deep copy from @a src
@@ -89,7 +91,7 @@ public:
    inline Array(const Array<CT> &src);
 
    /// Construct an Array from a C-style array of static length
-   template <typename CT, int N>
+   template <typename CT, int64_t N>
    explicit inline Array(const CT (&values)[N]);
 
    /// Construct an Array from a braced initializer list of convertible type
@@ -143,44 +145,44 @@ public:
    void MakeDataOwner() const { data.SetHostPtrOwner(true); }
 
    /// Return the logical size of the array.
-   inline int Size() const { return size; }
+   inline int64_t Size() const { return size; }
 
    /// Change the logical size of the array, keep existing entries.
-   inline void SetSize(int nsize);
+   inline void SetSize(int64_t nsize);
 
-   /// Same as SetSize(int) plus initialize new entries with 'initval'.
-   inline void SetSize(int nsize, const T &initval);
+   /// Same as SetSize(int64_t) plus initialize new entries with 'initval'.
+   inline void SetSize(int64_t nsize, const T &initval);
 
    /** @brief Resize the array to size @a nsize using MemoryType @a mt. Note
        that unlike the other versions of SetSize(), the current content of the
        array is not preserved. */
-   inline void SetSize(int nsize, MemoryType mt);
+   inline void SetSize(int64_t nsize, MemoryType mt);
 
    /** Maximum number of entries the array can store without allocating more
        memory. */
-   inline int Capacity() const { return data.Capacity(); }
+   inline int64_t Capacity() const { return data.Capacity(); }
 
    /// Ensures that the allocated size is at least the given size.
-   inline void Reserve(int capacity)
+   inline void Reserve(int64_t capacity)
    { if (capacity > Capacity()) { GrowSize(capacity); } }
 
    /// Reference access to the ith element.
-   inline T & operator[](int i);
+   inline T & operator[](int64_t i);
 
    /// Const reference access to the ith element.
-   inline const T &operator[](int i) const;
+   inline const T &operator[](int64_t i) const;
 
    /// Append element 'el' to array, resize if necessary.
-   inline int Append(const T & el);
+   inline int64_t Append(const T & el);
 
    /// Append another array to this array, resize if necessary.
-   inline int Append(const T *els, int nels);
+   inline int64_t Append(const T *els, int64_t nels);
 
    /// Append another array to this array, resize if necessary.
-   inline int Append(const Array<T> &els) { return Append(els, els.Size()); }
+   inline int64_t Append(const Array<T> &els) { return Append(els, els.Size()); }
 
    /// Prepend an 'el' to the array, resize if necessary.
-   inline int Prepend(const T &el);
+   inline int64_t Prepend(const T &el);
 
    /// Return the last element in the array.
    inline T &Last();
@@ -189,13 +191,13 @@ public:
    inline const T &Last() const;
 
    /// Append element when it is not yet in the array, return index.
-   inline int Union(const T & el);
+   inline int64_t Union(const T & el);
 
    /// Return the first index where 'el' is found; return -1 if not found.
-   inline int Find(const T &el) const;
+   inline int64_t Find(const T &el) const;
 
    /// Do bisection search for 'el' in a sorted array; return -1 if not found.
-   inline int FindSorted(const T &el) const;
+   inline int64_t FindSorted(const T &el) const;
 
    /// Delete the last entry of the array.
    inline void DeleteLast() { if (size > 0) { size--; } }
@@ -215,12 +217,12 @@ public:
    /// Make this Array a reference to a pointer.
    /** When @a own_data is true, the pointer @a data_ must be allocated with
        MemoryType given by MemoryManager::GetHostMemoryType(). */
-   inline void MakeRef(T *data_, int size_, bool own_data = false);
+   inline void MakeRef(T *data_, int64_t size_, bool own_data = false);
 
    /// Make this Array a reference to a pointer.
    /** When @a own_data is true, the pointer @a data_ must be allocated with
        MemoryType given by @a mt. */
-   inline void MakeRef(T *data_, int size, MemoryType mt, bool own_data);
+   inline void MakeRef(T *data_, int64_t size, MemoryType mt, bool own_data);
 
    /// Make this Array a reference to 'master'.
    inline void MakeRef(const Array &master);
@@ -239,10 +241,10 @@ public:
    inline void Permute(const I &indices) { Permute(I(indices)); }
 
    /// Copy sub array starting from @a offset out to the provided @a sa.
-   inline void GetSubArray(int offset, int sa_size, Array<T> &sa) const;
+   inline void GetSubArray(int64_t offset, int64_t sa_size, Array<T> &sa) const;
 
    /// Prints array to stream with width elements per row.
-   void Print(std::ostream &out = mfem::out, int width = 4) const;
+   void Print(std::ostream &out = mfem::out, int64_t width = 4) const;
 
    /** @brief Save the Array to the stream @a out using the format @a fmt.
        The format @a fmt can be:
@@ -250,7 +252,7 @@ public:
           0 - write the size followed by all entries
           1 - write only the entries
    */
-   void Save(std::ostream &out, int fmt = 0) const;
+   void Save(std::ostream &out, int64_t fmt = 0) const;
 
    /** @brief Read an Array from the stream @a in using format @a fmt.
        The format @a fmt can be:
@@ -258,11 +260,11 @@ public:
           0 - read the size then the entries
           1 - read Size() entries
    */
-   void Load(std::istream &in, int fmt = 0);
+   void Load(std::istream &in, int64_t fmt = 0);
 
    /** @brief Set the Array size to @a new_size and read that many entries from
        the stream @a in. */
-   void Load(int new_size, std::istream &in)
+   void Load(int64_t new_size, std::istream &in)
    { SetSize(new_size); Load(in, 1); }
 
    /** @brief Find the maximal element in the array, using the comparison
@@ -285,11 +287,11 @@ public:
    void Unique()
    {
       T* end = std::unique((T*)data, data + size);
-      SetSize((int)(end - data));
+      SetSize((int64_t)(end - data));
    }
 
    /// Return 1 if the array is sorted from lowest to highest.  Otherwise return 0.
-   int IsSorted() const;
+   int64_t IsSorted() const;
 
    /// Does the Array have Size zero.
    bool IsEmpty() const { return Size() == 0; }
@@ -361,7 +363,7 @@ template <class T>
 inline bool operator==(const Array<T> &LHS, const Array<T> &RHS)
 {
    if ( LHS.Size() != RHS.Size() ) { return false; }
-   for (int i=0; i<LHS.Size(); i++)
+   for (int64_t i=0; i<LHS.Size(); i++)
    {
       if ( LHS[i] != RHS[i] ) { return false; }
    }
@@ -393,33 +395,33 @@ private:
    friend void Swap<T>(Array2D<T> &, Array2D<T> &);
 
    Array<T> array1d;
-   int M, N; // number of rows and columns
+   int64_t M, N; // number of rows and columns
 
 public:
    Array2D() { M = N = 0; }
-   Array2D(int m, int n) : array1d(m*n) { M = m; N = n; }
+   Array2D(int64_t m, int64_t n) : array1d(m*n) { M = m; N = n; }
 
    Array2D(const Array2D &) = default;
 
-   void SetSize(int m, int n) { array1d.SetSize(m*n); M = m; N = n; }
+   void SetSize(int64_t m, int64_t n) { array1d.SetSize(m*n); M = m; N = n; }
 
-   int NumRows() const { return M; }
-   int NumCols() const { return N; }
+   int64_t NumRows() const { return M; }
+   int64_t NumCols() const { return N; }
 
-   inline const T &operator()(int i, int j) const;
-   inline       T &operator()(int i, int j);
+   inline const T &operator()(int64_t i, int64_t j) const;
+   inline       T &operator()(int64_t i, int64_t j);
 
-   inline const T *operator[](int i) const;
-   inline T       *operator[](int i);
+   inline const T *operator[](int64_t i) const;
+   inline T       *operator[](int64_t i);
 
-   const T *operator()(int i) const { return (*this)[i]; }
-   T       *operator()(int i)       { return (*this)[i]; }
+   const T *operator()(int64_t i) const { return (*this)[i]; }
+   T       *operator()(int64_t i)       { return (*this)[i]; }
 
-   const T *GetRow(int i) const { return (*this)[i]; }
-   T       *GetRow(int i)       { return (*this)[i]; }
+   const T *GetRow(int64_t i) const { return (*this)[i]; }
+   T       *GetRow(int64_t i)       { return (*this)[i]; }
 
    /// Extract a copy of the @a i-th row into the Array @a sa.
-   void GetRow(int i, Array<T> &sa) const
+   void GetRow(int64_t i, Array<T> &sa) const
    {
       sa.SetSize(N);
       sa.Assign(GetRow(i));
@@ -431,7 +433,7 @@ public:
           0 - write the number of rows and columns, followed by all entries
           1 - write only the entries, using row-major layout
    */
-   void Save(std::ostream &os, int fmt = 0) const
+   void Save(std::ostream &os, int64_t fmt = 0) const
    {
       if (fmt == 0) { os << NumRows() << ' ' << NumCols() << '\n'; }
       array1d.Save(os, 1);
@@ -443,18 +445,18 @@ public:
           0 - read the number of rows and columns, then the entries
           1 - read NumRows() x NumCols() entries, using row-major layout
    */
-   void Load(std::istream &in, int fmt = 0)
+   void Load(std::istream &in, int64_t fmt = 0)
    {
       if (fmt == 0) { in >> M >> N; array1d.SetSize(M*N); }
       array1d.Load(in, 1);
    }
 
    /// Read an Array2D from a file
-   void Load(const char *filename, int fmt = 0);
+   void Load(const char *filename, int64_t fmt = 0);
 
    /** @brief Set the Array2D dimensions to @a new_size0 x @a new_size1 and read
        that many entries from the stream @a in. */
-   void Load(int new_size0,int new_size1, std::istream &in)
+   void Load(int64_t new_size0,int64_t new_size1, std::istream &in)
    { SetSize(new_size0,new_size1); Load(in, 1); }
 
    void Copy(Array2D &copy) const
@@ -473,7 +475,7 @@ public:
    inline void DeleteAll() { M = 0; N = 0; array1d.DeleteAll(); }
 
    /// Prints array to stream with width elements per row
-   void Print(std::ostream &out = mfem::out, int width = 4);
+   void Print(std::ostream &out = mfem::out, int64_t width = 4);
 };
 
 
@@ -482,18 +484,18 @@ class Array3D
 {
 private:
    Array<T> array1d;
-   int N2, N3;
+   int64_t N2, N3;
 
 public:
    Array3D() { N2 = N3 = 0; }
-   Array3D(int n1, int n2, int n3)
+   Array3D(int64_t n1, int64_t n2, int64_t n3)
       : array1d(n1*n2*n3) { N2 = n2; N3 = n3; }
 
-   void SetSize(int n1, int n2, int n3)
+   void SetSize(int64_t n1, int64_t n2, int64_t n3)
    { array1d.SetSize(n1*n2*n3); N2 = n2; N3 = n3; }
 
-   inline const T &operator()(int i, int j, int k) const;
-   inline       T &operator()(int i, int j, int k);
+   inline const T &operator()(int64_t i, int64_t j, int64_t k) const;
+   inline       T &operator()(int64_t i, int64_t j, int64_t k);
 
    inline void operator=(const T &a)
    { array1d = a; }
@@ -508,7 +510,7 @@ template<typename T>
 class BlockArray
 {
 public:
-   BlockArray(int block_size = 16*1024);
+   BlockArray(int64_t block_size = 16*1024);
    BlockArray(const BlockArray<T> &other); // deep copy
    BlockArray& operator=(const BlockArray&) = delete; // not supported
    BlockArray(BlockArray<T> &&other) = default;
@@ -516,32 +518,32 @@ public:
    ~BlockArray() { Destroy(); }
 
    /// Allocate and construct a new item in the array, return its index.
-   int Append();
+   int64_t Append();
 
    /// Allocate and copy-construct a new item in the array, return its index.
-   int Append(const T &item);
+   int64_t Append(const T &item);
 
    /// Access item of the array.
-   inline T& At(int index)
+   inline T& At(int64_t index)
    {
       CheckIndex(index);
       return blocks[index >> shift][index & mask];
    }
-   inline const T& At(int index) const
+   inline const T& At(int64_t index) const
    {
       CheckIndex(index);
       return blocks[index >> shift][index & mask];
    }
 
    /// Access item of the array.
-   inline T& operator[](int index) { return At(index); }
-   inline const T& operator[](int index) const { return At(index); }
+   inline T& operator[](int64_t index) { return At(index); }
+   inline const T& operator[](int64_t index) const { return At(index); }
 
    /// Return the number of items actually stored.
-   int Size() const { return size; }
+   int64_t Size() const { return size; }
 
    /// Return the current capacity of the BlockArray.
-   int Capacity() const { return blocks.Size()*(mask+1); }
+   int64_t Capacity() const { return blocks.Size()*(mask+1); }
 
    /// Destroy all items, set size to zero.
    void DeleteAll() { Destroy(); blocks.DeleteAll(); size = 0; }
@@ -559,12 +561,12 @@ protected:
       cT* operator->() const { return ptr; }
 
       bool good() const { return !stop; }
-      int index() const { return (ptr - ref); }
+      int64_t index() const { return (ptr - ref); }
 
    protected:
       cA *array;
       cT *ptr, *b_end, *ref;
-      int b_end_idx;
+      int64_t b_end_idx;
       bool stop;
 
       iterator_base() { }
@@ -643,11 +645,11 @@ public:
 
 protected:
    Array<T*> blocks;
-   int size, shift, mask;
+   int64_t size, shift, mask;
 
-   int Alloc();
+   int64_t Alloc();
 
-   inline void CheckIndex(int index) const
+   inline void CheckIndex(int64_t index) const
    {
       MFEM_ASSERT(index >= 0 && index < size,
                   "Out of bounds access: " << index << ", size = " << size);
@@ -688,7 +690,7 @@ inline Array<T>::Array(const Array<CT> &src)
    : size(src.Size())
 {
    size > 0 ? data.New(size) : data.Reset();
-   for (int i = 0; i < size; i++) { (*this)[i] = T(src[i]); }
+   for (int64_t i = 0; i < size; i++) { (*this)[i] = T(src[i]); }
 }
 
 template <typename T>
@@ -699,16 +701,16 @@ inline Array<T>::Array(std::initializer_list<CT> values) : Array(values.size())
    std::copy(values.begin(), values.end(), begin());
 }
 
-template <typename T> template <typename CT, int N>
+template <typename T> template <typename CT, int64_t N>
 inline Array<T>::Array(const CT (&values)[N]) : Array(N)
 {
    std::copy(values, values + N, begin());
 }
 
 template <class T>
-inline void Array<T>::GrowSize(int minsize)
+inline void Array<T>::GrowSize(int64_t minsize)
 {
-   const int nsize = std::max(minsize, 2 * data.Capacity());
+   const int64_t nsize = std::max(minsize, 2 * data.Capacity());
    Memory<T> p(nsize, data.GetMemoryType());
    p.CopyFrom(data, size);
    p.UseDevice(data.UseDevice());
@@ -731,7 +733,7 @@ template <typename T>
 template <typename I>
 inline void Array<T>::Permute(I &&indices)
 {
-   for (int i = 0; i < size; i++)
+   for (int64_t i = 0; i < size; i++)
    {
       auto current = i;
       while (i != indices[current])
@@ -749,12 +751,12 @@ template <typename T> template <typename CT>
 inline Array<T> &Array<T>::operator=(const Array<CT> &src)
 {
    SetSize(src.Size());
-   for (int i = 0; i < size; i++) { (*this)[i] = T(src[i]); }
+   for (int64_t i = 0; i < size; i++) { (*this)[i] = T(src[i]); }
    return *this;
 }
 
 template <class T>
-inline void Array<T>::SetSize(int nsize)
+inline void Array<T>::SetSize(int64_t nsize)
 {
    MFEM_ASSERT( nsize>=0, "Size must be non-negative.  It is " << nsize );
    if (nsize > Capacity())
@@ -765,7 +767,7 @@ inline void Array<T>::SetSize(int nsize)
 }
 
 template <class T>
-inline void Array<T>::SetSize(int nsize, const T &initval)
+inline void Array<T>::SetSize(int64_t nsize, const T &initval)
 {
    MFEM_ASSERT( nsize>=0, "Size must be non-negative.  It is " << nsize );
    if (nsize > size)
@@ -774,7 +776,7 @@ inline void Array<T>::SetSize(int nsize, const T &initval)
       {
          GrowSize(nsize);
       }
-      for (int i = size; i < nsize; i++)
+      for (int64_t i = size; i < nsize; i++)
       {
          data[i] = initval;
       }
@@ -783,7 +785,7 @@ inline void Array<T>::SetSize(int nsize, const T &initval)
 }
 
 template <class T>
-inline void Array<T>::SetSize(int nsize, MemoryType mt)
+inline void Array<T>::SetSize(int64_t nsize, MemoryType mt)
 {
    MFEM_ASSERT(nsize >= 0, "invalid new size: " << nsize);
    if (mt == data.GetMemoryType())
@@ -810,7 +812,7 @@ inline void Array<T>::SetSize(int nsize, MemoryType mt)
 }
 
 template <class T>
-inline T &Array<T>::operator[](int i)
+inline T &Array<T>::operator[](int64_t i)
 {
    MFEM_ASSERT( i>=0 && i<size,
                 "Access element " << i << " of array, size = " << size );
@@ -818,7 +820,7 @@ inline T &Array<T>::operator[](int i)
 }
 
 template <class T>
-inline const T &Array<T>::operator[](int i) const
+inline const T &Array<T>::operator[](int64_t i) const
 {
    MFEM_ASSERT( i>=0 && i<size,
                 "Access element " << i << " of array, size = " << size );
@@ -826,7 +828,7 @@ inline const T &Array<T>::operator[](int i) const
 }
 
 template <class T>
-inline int Array<T>::Append(const T &el)
+inline int64_t Array<T>::Append(const T &el)
 {
    SetSize(size+1);
    data[size-1] = el;
@@ -834,12 +836,12 @@ inline int Array<T>::Append(const T &el)
 }
 
 template <class T>
-inline int Array<T>::Append(const T *els, int nels)
+inline int64_t Array<T>::Append(const T *els, int64_t nels)
 {
-   const int old_size = size;
+   const int64_t old_size = size;
 
    SetSize(size + nels);
-   for (int i = 0; i < nels; i++)
+   for (int64_t i = 0; i < nels; i++)
    {
       data[old_size+i] = els[i];
    }
@@ -847,10 +849,10 @@ inline int Array<T>::Append(const T *els, int nels)
 }
 
 template <class T>
-inline int Array<T>::Prepend(const T &el)
+inline int64_t Array<T>::Prepend(const T &el)
 {
    SetSize(size+1);
-   for (int i = size-1; i > 0; i--)
+   for (int64_t i = size-1; i > 0; i--)
    {
       data[i] = data[i-1];
    }
@@ -873,9 +875,9 @@ inline const T &Array<T>::Last() const
 }
 
 template <class T>
-inline int Array<T>::Union(const T &el)
+inline int64_t Array<T>::Union(const T &el)
 {
-   int i = 0;
+   int64_t i = 0;
    while ((i < size) && (data[i] != el)) { i++; }
    if (i == size)
    {
@@ -885,9 +887,9 @@ inline int Array<T>::Union(const T &el)
 }
 
 template <class T>
-inline int Array<T>::Find(const T &el) const
+inline int64_t Array<T>::Find(const T &el) const
 {
-   for (int i = 0; i < size; i++)
+   for (int64_t i = 0; i < size; i++)
    {
       if (data[i] == el) { return i; }
    }
@@ -895,18 +897,18 @@ inline int Array<T>::Find(const T &el) const
 }
 
 template <class T>
-inline int Array<T>::FindSorted(const T &el) const
+inline int64_t Array<T>::FindSorted(const T &el) const
 {
    const T *begin = data, *end = begin + size;
    const T* first = std::lower_bound(begin, end, el);
    if (first == end || !(*first == el)) { return  -1; }
-   return (int)(first - begin);
+   return (int64_t)(first - begin);
 }
 
 template <class T>
 inline void Array<T>::DeleteFirst(const T &el)
 {
-   for (int i = 0; i < size; i++)
+   for (int64_t i = 0; i < size; i++)
    {
       if (data[i] == el)
       {
@@ -939,7 +941,7 @@ inline void Array<T>::Copy(Array &copy) const
 }
 
 template <class T>
-inline void Array<T>::MakeRef(T *data_, int size_, bool own_data)
+inline void Array<T>::MakeRef(T *data_, int64_t size_, bool own_data)
 {
    data.Delete();
    data.Wrap(data_, size_, own_data);
@@ -947,7 +949,8 @@ inline void Array<T>::MakeRef(T *data_, int size_, bool own_data)
 }
 
 template <class T>
-inline void Array<T>::MakeRef(T *data_, int size_, MemoryType mt, bool own_data)
+inline void Array<T>::MakeRef(T *data_, int64_t size_, MemoryType mt,
+                              bool own_data)
 {
    data.Delete();
    data.Wrap(data_, size_, mt, own_data);
@@ -963,10 +966,11 @@ inline void Array<T>::MakeRef(const Array &master)
 }
 
 template <class T>
-inline void Array<T>::GetSubArray(int offset, int sa_size, Array<T> &sa) const
+inline void Array<T>::GetSubArray(int64_t offset, int64_t sa_size,
+                                  Array<T> &sa) const
 {
    sa.SetSize(sa_size);
-   for (int i = 0; i < sa_size; i++)
+   for (int64_t i = 0; i < sa_size; i++)
    {
       sa[i] = (*this)[offset+i];
    }
@@ -975,7 +979,7 @@ inline void Array<T>::GetSubArray(int offset, int sa_size, Array<T> &sa) const
 template <class T>
 inline void Array<T>::operator=(const T &a)
 {
-   for (int i = 0; i < size; i++)
+   for (int64_t i = 0; i < size; i++)
    {
       data[i] = a;
    }
@@ -989,7 +993,7 @@ inline void Array<T>::Assign(const T *p)
 
 
 template <class T>
-inline const T &Array2D<T>::operator()(int i, int j) const
+inline const T &Array2D<T>::operator()(int64_t i, int64_t j) const
 {
    MFEM_ASSERT( i>=0 && i< array1d.Size()/N && j>=0 && j<N,
                 "Array2D: invalid access of element (" << i << ',' << j
@@ -999,7 +1003,7 @@ inline const T &Array2D<T>::operator()(int i, int j) const
 }
 
 template <class T>
-inline T &Array2D<T>::operator()(int i, int j)
+inline T &Array2D<T>::operator()(int64_t i, int64_t j)
 {
    MFEM_ASSERT( i>=0 && i< array1d.Size()/N && j>=0 && j<N,
                 "Array2D: invalid access of element (" << i << ',' << j
@@ -1009,7 +1013,7 @@ inline T &Array2D<T>::operator()(int i, int j)
 }
 
 template <class T>
-inline const T *Array2D<T>::operator[](int i) const
+inline const T *Array2D<T>::operator[](int64_t i) const
 {
    MFEM_ASSERT( i>=0 && i< array1d.Size()/N,
                 "Array2D: invalid access of row " << i << " in array with "
@@ -1018,7 +1022,7 @@ inline const T *Array2D<T>::operator[](int i) const
 }
 
 template <class T>
-inline T *Array2D<T>::operator[](int i)
+inline T *Array2D<T>::operator[](int64_t i)
 {
    MFEM_ASSERT( i>=0 && i< array1d.Size()/N,
                 "Array2D: invalid access of row " << i << " in array with "
@@ -1036,7 +1040,7 @@ inline void Swap(Array2D<T> &a, Array2D<T> &b)
 
 
 template <class T>
-inline const T &Array3D<T>::operator()(int i, int j, int k) const
+inline const T &Array3D<T>::operator()(int64_t i, int64_t j, int64_t k) const
 {
    MFEM_ASSERT(i >= 0 && i < array1d.Size() / N2 / N3 && j >= 0 && j < N2
                && k >= 0 && k < N3,
@@ -1047,7 +1051,7 @@ inline const T &Array3D<T>::operator()(int i, int j, int k) const
 }
 
 template <class T>
-inline T &Array3D<T>::operator()(int i, int j, int k)
+inline T &Array3D<T>::operator()(int64_t i, int64_t j, int64_t k)
 {
    MFEM_ASSERT(i >= 0 && i < array1d.Size() / N2 / N3 && j >= 0 && j < N2
                && k >= 0 && k < N3,
@@ -1059,7 +1063,7 @@ inline T &Array3D<T>::operator()(int i, int j, int k)
 
 
 template<typename T>
-BlockArray<T>::BlockArray(int block_size)
+BlockArray<T>::BlockArray(int64_t block_size)
 {
    mask = block_size-1;
    MFEM_VERIFY(!(block_size & mask), "block_size must be a power of two.");
@@ -1077,23 +1081,23 @@ BlockArray<T>::BlockArray(const BlockArray<T> &other)
    shift = other.shift;
    mask = other.mask;
 
-   int bsize = mask+1;
-   for (int i = 0; i < blocks.Size(); i++)
+   int64_t bsize = mask+1;
+   for (int64_t i = 0; i < blocks.Size(); i++)
    {
       blocks[i] = (T*) new char[bsize * sizeof(T)];
    }
 
    // copy all items
-   for (int i = 0; i < size; i++)
+   for (int64_t i = 0; i < size; i++)
    {
       new (&At(i)) T(other[i]);
    }
 }
 
 template<typename T>
-int BlockArray<T>::Alloc()
+int64_t BlockArray<T>::Alloc()
 {
-   int bsize = mask+1;
+   int64_t bsize = mask+1;
    if (size >= blocks.Size() * bsize)
    {
       T* new_block = (T*) new char[bsize * sizeof(T)];
@@ -1103,17 +1107,17 @@ int BlockArray<T>::Alloc()
 }
 
 template<typename T>
-int BlockArray<T>::Append()
+int64_t BlockArray<T>::Append()
 {
-   int index = Alloc();
+   int64_t index = Alloc();
    new (&At(index)) T();
    return index;
 }
 
 template<typename T>
-int BlockArray<T>::Append(const T &item)
+int64_t BlockArray<T>::Append(const T &item)
 {
-   int index = Alloc();
+   int64_t index = Alloc();
    new (&At(index)) T(item);
    return index;
 }
@@ -1136,16 +1140,172 @@ std::size_t BlockArray<T>::MemoryUsage() const
 template<typename T>
 void BlockArray<T>::Destroy()
 {
-   int bsize = size & mask;
-   for (int i = blocks.Size(); i != 0; )
+   int64_t bsize = size & mask;
+   for (int64_t i = blocks.Size(); i != 0; )
    {
       T *block = blocks[--i];
-      for (int j = bsize; j != 0; )
+      for (int64_t j = bsize; j != 0; )
       {
          block[--j].~T();
       }
       delete [] (char*) block;
       bsize = mask+1;
+   }
+}
+
+template <class T>
+void Array<T>::Print(std::ostream &os, int64_t width) const
+{
+   for (int64_t i = 0; i < size; i++)
+   {
+      os << data[i];
+      if ( !((i+1) % width) || i+1 == size )
+      {
+         os << '\n';
+      }
+      else
+      {
+         os << " ";
+      }
+   }
+}
+
+template <class T>
+void Array<T>::Save(std::ostream &os, int64_t fmt) const
+{
+   if (fmt == 0)
+   {
+      os << size << '\n';
+   }
+   for (int64_t i = 0; i < size; i++)
+   {
+      os << operator[](i) << '\n';
+   }
+}
+
+template <class T>
+void Array<T>::Load(std::istream &in, int64_t fmt)
+{
+   if (fmt == 0)
+   {
+      int64_t new_size;
+      in >> new_size;
+      SetSize(new_size);
+   }
+   for (int64_t i = 0; i < size; i++)
+   {
+      in >> operator[](i);
+   }
+}
+
+template <class T>
+T Array<T>::Max() const
+{
+   MFEM_ASSERT(size > 0, "Array is empty with size " << size);
+
+   T max = operator[](0);
+   for (int64_t i = 1; i < size; i++)
+   {
+      if (max < operator[](i))
+      {
+         max = operator[](i);
+      }
+   }
+
+   return max;
+}
+
+template <class T>
+T Array<T>::Min() const
+{
+   MFEM_ASSERT(size > 0, "Array is empty with size " << size);
+
+   T min = operator[](0);
+   for (int64_t i = 1; i < size; i++)
+   {
+      if (operator[](i) < min)
+      {
+         min = operator[](i);
+      }
+   }
+
+   return min;
+}
+
+// Partial Sum
+template <class T>
+void Array<T>::PartialSum()
+{
+   T sum = static_cast<T>(0);
+   for (int64_t i = 0; i < size; i++)
+   {
+      sum+=operator[](i);
+      operator[](i) = sum;
+   }
+}
+
+// Sum
+template <class T>
+T Array<T>::Sum() const
+{
+   T sum = static_cast<T>(0);
+   for (int64_t i = 0; i < size; i++)
+   {
+      sum+=operator[](i);
+   }
+
+   return sum;
+}
+
+template <class T>
+int64_t Array<T>::IsSorted() const
+{
+   T val_prev = operator[](0), val;
+   for (int64_t i = 1; i < size; i++)
+   {
+      val=operator[](i);
+      if (val < val_prev)
+      {
+         return 0;
+      }
+      val_prev = val;
+   }
+
+   return 1;
+}
+
+
+template <class T>
+void Array2D<T>::Load(const char *filename, int64_t fmt)
+{
+   std::ifstream in;
+   in.open(filename, std::ifstream::in);
+   MFEM_VERIFY(in.is_open(), "File " << filename << " does not exist.");
+   Load(in, fmt);
+   in.close();
+}
+
+template <class T>
+void Array2D<T>::Print(std::ostream &os, int64_t width_)
+{
+   int64_t height = this->NumRows();
+   int64_t width  = this->NumCols();
+
+   for (int64_t i = 0; i < height; i++)
+   {
+      os << "[row " << i << "]\n";
+      for (int64_t j = 0; j < width; j++)
+      {
+         os << (*this)(i,j);
+         if ( (j+1) == width_ || (j+1) % width_ == 0 )
+         {
+            os << '\n';
+         }
+         else
+         {
+            os << ' ';
+         }
+      }
    }
 }
 

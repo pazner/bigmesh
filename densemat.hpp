@@ -43,10 +43,10 @@ public:
    DenseMatrix(const DenseMatrix &);
 
    /// Creates square matrix of size s.
-   explicit DenseMatrix(int s);
+   explicit DenseMatrix(int64_t s);
 
    /// Creates rectangular matrix of size m x n.
-   DenseMatrix(int m, int n);
+   DenseMatrix(int64_t m, int64_t n);
 
    /// Creates rectangular matrix equal to the transpose of mat.
    DenseMatrix(const DenseMatrix &mat, char ch);
@@ -54,18 +54,18 @@ public:
    /// Construct a DenseMatrix using an existing data array.
    /** The DenseMatrix does not assume ownership of the data array, i.e. it will
        not delete the array. */
-   DenseMatrix(real_t *d, int h, int w)
+   DenseMatrix(real_t *d, int64_t h, int64_t w)
       : Matrix(h, w) { UseExternalData(d, h, w); }
 
    /// Create a dense matrix using a braced initializer list
    /// The inner lists correspond to rows of the matrix
-   template <int M, int N, typename T = real_t>
+   template <int64_t M, int64_t N, typename T = real_t>
    explicit DenseMatrix(const T (&values)[M][N]) : DenseMatrix(M, N)
    {
       // DenseMatrix is column-major so copies have to be element-wise
-      for (int i = 0; i < M; i++)
+      for (int64_t i = 0; i < M; i++)
       {
-         for (int j = 0; j < N; j++)
+         for (int64_t j = 0; j < N; j++)
          {
             (*this)(i,j) = values[i][j];
          }
@@ -76,7 +76,7 @@ public:
    /** The DenseMatrix does not assume ownership of the data array, i.e. it will
        not delete the data array @a d. This method should not be used with
        DenseMatrix that owns its current data array. */
-   void UseExternalData(real_t *d, int h, int w)
+   void UseExternalData(real_t *d, int64_t h, int64_t w)
    {
       data.Wrap(d, h*w, false);
       height = h; width = w;
@@ -86,7 +86,7 @@ public:
    /** The DenseMatrix does not assume ownership of the data array, i.e. it will
        not delete the new array @a d. This method will delete the current data
        array, if owned. */
-   void Reset(real_t *d, int h, int w)
+   void Reset(real_t *d, int64_t h, int64_t w)
    { if (OwnsData()) { data.Delete(); } UseExternalData(d, h, w); }
 
    /** Clear the data array and the dimensions of the DenseMatrix. This method
@@ -98,13 +98,13 @@ public:
    { if (OwnsData()) { data.Delete(); } ClearExternalData(); }
 
    /// For backward compatibility define Size to be synonym of Width()
-   int Size() const { return Width(); }
+   int64_t Size() const { return Width(); }
 
    /// Change the size of the DenseMatrix to s x s.
-   void SetSize(int s) { SetSize(s, s); }
+   void SetSize(int64_t s) { SetSize(s, s); }
 
    /// Change the size of the DenseMatrix to h x w.
-   void SetSize(int h, int w);
+   void SetSize(int64_t h, int64_t w);
 
    /// Returns the matrix data array.
    inline real_t *Data() const
@@ -120,10 +120,10 @@ public:
    inline bool OwnsData() const { return data.OwnsHostPtr(); }
 
    /// Returns reference to a_{ij}.
-   inline real_t &operator()(int i, int j);
+   inline real_t &operator()(int64_t i, int64_t j);
 
    /// Returns constant reference to a_{ij}.
-   inline const real_t &operator()(int i, int j) const;
+   inline const real_t &operator()(int64_t i, int64_t j) const;
 
    /// Matrix inner product: tr(A^t B)
    real_t operator*(const DenseMatrix &m) const;
@@ -132,10 +132,10 @@ public:
    real_t Trace() const;
 
    /// Returns reference to a_{ij}.
-   real_t &Elem(int i, int j) override;
+   real_t &Elem(int64_t i, int64_t j) override;
 
    /// Returns constant reference to a_{ij}.
-   const real_t &Elem(int i, int j) const override;
+   const real_t &Elem(int64_t i, int64_t j) const override;
 
    /// Matrix vector multiplication.
    void Mult(const real_t *x, real_t *y) const;
@@ -298,34 +298,34 @@ public:
    { Eigensystem(b, ev, &evect); }
 
    void SingularValues(Vector &sv) const;
-   int Rank(real_t tol) const;
+   int64_t Rank(real_t tol) const;
 
    /// Return the i-th singular value (decreasing order) of NxN matrix, N=1,2,3.
-   real_t CalcSingularvalue(const int i) const;
+   real_t CalcSingularvalue(const int64_t i) const;
 
    /** Return the eigenvalues (in increasing order) and eigenvectors of a
        2x2 or 3x3 symmetric matrix. */
    void CalcEigenvalues(real_t *lambda, real_t *vec) const;
 
-   void GetRow(int r, Vector &row) const;
-   void GetColumn(int c, Vector &col) const;
-   real_t *GetColumn(int col) { return data + col*height; }
-   const real_t *GetColumn(int col) const { return data + col*height; }
+   void GetRow(int64_t r, Vector &row) const;
+   void GetColumn(int64_t c, Vector &col) const;
+   real_t *GetColumn(int64_t col) { return data + col*height; }
+   const real_t *GetColumn(int64_t col) const { return data + col*height; }
 
-   void GetColumnReference(int c, Vector &col)
+   void GetColumnReference(int64_t c, Vector &col)
    { col.SetDataAndSize(data + c * height, height); }
 
-   void SetRow(int r, const real_t* row);
-   void SetRow(int r, const Vector &row);
+   void SetRow(int64_t r, const real_t* row);
+   void SetRow(int64_t r, const Vector &row);
 
-   void SetCol(int c, const real_t* col);
-   void SetCol(int c, const Vector &col);
+   void SetCol(int64_t c, const real_t* col);
+   void SetCol(int64_t c, const Vector &col);
 
 
    /// Set all entries of a row to the specified value.
-   void SetRow(int row, real_t value);
+   void SetRow(int64_t row, real_t value);
    /// Set all entries of a column to the specified value.
-   void SetCol(int col, real_t value);
+   void SetCol(int64_t col, real_t value);
 
    /// Returns the diagonal of the matrix
    void GetDiag(Vector &d) const;
@@ -335,9 +335,9 @@ public:
    void GetRowSums(Vector &l) const;
 
    /// Creates n x n diagonal matrix with diagonal elements c
-   void Diag(real_t c, int n);
+   void Diag(real_t c, int64_t n);
    /// Creates n x n diagonal matrix with diagonal given by diag
-   void Diag(real_t *diag, int n);
+   void Diag(real_t *diag, int64_t n);
 
    /// (*this) = (*this)^t
    void Transpose();
@@ -365,101 +365,105 @@ public:
    void GradToDiv(Vector &div);
 
    /// Copy rows row1 through row2 from A to *this
-   void CopyRows(const DenseMatrix &A, int row1, int row2);
+   void CopyRows(const DenseMatrix &A, int64_t row1, int64_t row2);
    /// Copy columns col1 through col2 from A to *this
-   void CopyCols(const DenseMatrix &A, int col1, int col2);
+   void CopyCols(const DenseMatrix &A, int64_t col1, int64_t col2);
    /// Copy the m x n submatrix of A at row/col offsets Aro/Aco to *this
-   void CopyMN(const DenseMatrix &A, int m, int n, int Aro, int Aco);
+   void CopyMN(const DenseMatrix &A, int64_t m, int64_t n, int64_t Aro,
+               int64_t Aco);
    /// Copy matrix A to the location in *this at row_offset, col_offset
-   void CopyMN(const DenseMatrix &A, int row_offset, int col_offset);
+   void CopyMN(const DenseMatrix &A, int64_t row_offset, int64_t col_offset);
    /// Copy matrix A^t to the location in *this at row_offset, col_offset
-   void CopyMNt(const DenseMatrix &A, int row_offset, int col_offset);
+   void CopyMNt(const DenseMatrix &A, int64_t row_offset, int64_t col_offset);
    /** Copy the m x n submatrix of A at row/col offsets Aro/Aco to *this at
        row_offset, col_offset */
-   void CopyMN(const DenseMatrix &A, int m, int n, int Aro, int Aco,
-               int row_offset, int col_offset);
+   void CopyMN(const DenseMatrix &A, int64_t m, int64_t n, int64_t Aro,
+               int64_t Aco,
+               int64_t row_offset, int64_t col_offset);
    /// Copy c on the diagonal of size n to *this at row_offset, col_offset
-   void CopyMNDiag(real_t c, int n, int row_offset, int col_offset);
+   void CopyMNDiag(real_t c, int64_t n, int64_t row_offset, int64_t col_offset);
    /// Copy diag on the diagonal of size n to *this at row_offset, col_offset
-   void CopyMNDiag(real_t *diag, int n, int row_offset, int col_offset);
+   void CopyMNDiag(real_t *diag, int64_t n, int64_t row_offset,
+                   int64_t col_offset);
    /// Copy All rows and columns except m and n from A
-   void CopyExceptMN(const DenseMatrix &A, int m, int n);
+   void CopyExceptMN(const DenseMatrix &A, int64_t m, int64_t n);
 
    /// Perform (ro+i,co+j)+=A(i,j) for 0<=i<A.Height, 0<=j<A.Width
-   void AddMatrix(DenseMatrix &A, int ro, int co);
+   void AddMatrix(DenseMatrix &A, int64_t ro, int64_t co);
    /// Perform (ro+i,co+j)+=a*A(i,j) for 0<=i<A.Height, 0<=j<A.Width
-   void AddMatrix(real_t a, const DenseMatrix &A, int ro, int co);
+   void AddMatrix(real_t a, const DenseMatrix &A, int64_t ro, int64_t co);
 
    /** Get the square submatrix which corresponds to the given indices @a idx.
        Note: the @a A matrix will be resized to accommodate the data */
-   void GetSubMatrix(const Array<int> & idx, DenseMatrix & A) const;
+   void GetSubMatrix(const Array<int64_t> & idx, DenseMatrix & A) const;
 
    /** Get the rectangular submatrix which corresponds to the given indices
       @a idx_i and @a idx_j. Note: the @a A matrix will be resized to
       accommodate the data */
-   void GetSubMatrix(const Array<int> & idx_i, const Array<int> & idx_j,
+   void GetSubMatrix(const Array<int64_t> & idx_i, const Array<int64_t> & idx_j,
                      DenseMatrix & A) const;
 
    /** Get the square submatrix which corresponds to the range
        [ @a ibeg, @a iend ). Note: the @a A matrix will be resized
         to accommodate the data */
-   void GetSubMatrix(int ibeg, int iend, DenseMatrix & A);
+   void GetSubMatrix(int64_t ibeg, int64_t iend, DenseMatrix & A);
 
    /** Get the square submatrix which corresponds to the range
       i ∈ [ @a ibeg, @a iend ) and j ∈ [ @a jbeg, @a jend )
       Note: the @a A matrix will be resized to accommodate the data */
-   void GetSubMatrix(int ibeg, int iend, int jbeg, int jend, DenseMatrix & A);
+   void GetSubMatrix(int64_t ibeg, int64_t iend, int64_t jbeg, int64_t jend,
+                     DenseMatrix & A);
 
    /// Set (*this)(idx[i],idx[j]) = A(i,j)
-   void SetSubMatrix(const Array<int> & idx, const DenseMatrix & A);
+   void SetSubMatrix(const Array<int64_t> & idx, const DenseMatrix & A);
 
    /// Set (*this)(idx_i[i],idx_j[j]) = A(i,j)
-   void SetSubMatrix(const Array<int> & idx_i, const Array<int> & idx_j,
+   void SetSubMatrix(const Array<int64_t> & idx_i, const Array<int64_t> & idx_j,
                      const DenseMatrix & A);
 
    /** Set a submatrix of (this) to the given matrix @a A
        with row and column offset @a ibeg */
-   void SetSubMatrix(int ibeg, const DenseMatrix & A);
+   void SetSubMatrix(int64_t ibeg, const DenseMatrix & A);
 
    /** Set a submatrix of (this) to the given matrix @a A
        with row and column offset @a ibeg and @a jbeg respectively */
-   void SetSubMatrix(int ibeg, int jbeg, const DenseMatrix & A);
+   void SetSubMatrix(int64_t ibeg, int64_t jbeg, const DenseMatrix & A);
 
    /// (*this)(idx[i],idx[j]) += A(i,j)
-   void AddSubMatrix(const Array<int> & idx, const DenseMatrix & A);
+   void AddSubMatrix(const Array<int64_t> & idx, const DenseMatrix & A);
 
    /// (*this)(idx_i[i],idx_j[j]) += A(i,j)
-   void AddSubMatrix(const Array<int> & idx_i, const Array<int> & idx_j,
+   void AddSubMatrix(const Array<int64_t> & idx_i, const Array<int64_t> & idx_j,
                      const DenseMatrix & A);
 
    /** Add the submatrix @a A to this with row and column offset @a ibeg */
-   void AddSubMatrix(int ibeg, const DenseMatrix & A);
+   void AddSubMatrix(int64_t ibeg, const DenseMatrix & A);
 
    /** Add the submatrix @a A to this with row and column offsets
        @a ibeg and @a jbeg respectively */
-   void AddSubMatrix(int ibeg, int jbeg, const DenseMatrix & A);
+   void AddSubMatrix(int64_t ibeg, int64_t jbeg, const DenseMatrix & A);
 
    /// Add the matrix 'data' to the Vector 'v' at the given 'offset'
-   void AddToVector(int offset, Vector &v) const;
+   void AddToVector(int64_t offset, Vector &v) const;
    /// Get the matrix 'data' from the Vector 'v' at the given 'offset'
-   void GetFromVector(int offset, const Vector &v);
+   void GetFromVector(int64_t offset, const Vector &v);
    /** If (dofs[i] < 0 and dofs[j] >= 0) or (dofs[i] >= 0 and dofs[j] < 0)
        then (*this)(i,j) = -(*this)(i,j).  */
-   void AdjustDofDirection(Array<int> &dofs);
+   void AdjustDofDirection(Array<int64_t> &dofs);
 
    /// Replace small entries, abs(a_ij) <= eps, with zero.
    void Threshold(real_t eps);
 
    /** Count the number of entries in the matrix for which isfinite
        is false, i.e. the entry is a NaN or +/-Inf. */
-   int CheckFinite() const { return mfem::CheckFinite(HostRead(), height*width); }
+   int64_t CheckFinite() const { return mfem::CheckFinite(HostRead(), height*width); }
 
    /// Prints matrix to stream out.
-   void Print(std::ostream &out = mfem::out, int width_ = 4) const override;
+   void Print(std::ostream &out = mfem::out, int64_t width_ = 4) const override;
    void PrintMatlab(std::ostream &out = mfem::out) const override;
    virtual void PrintMathematica(std::ostream &out = mfem::out) const;
    /// Prints the transpose matrix to stream out.
-   virtual void PrintT(std::ostream &out = mfem::out, int width_ = 4) const;
+   virtual void PrintT(std::ostream &out = mfem::out, int64_t width_ = 4) const;
 
    /// Invert and print the numerical conditioning of the inversion.
    void TestInversion();
@@ -636,24 +640,24 @@ public:
 
    Factors(real_t *data_) : data(data_) { }
 
-   virtual bool Factor(int m, real_t TOL = 0.0)
+   virtual bool Factor(int64_t m, real_t TOL = 0.0)
    {
       mfem_error("Factors::Factors(...)");
       return false;
    }
 
-   virtual real_t Det(int m) const
+   virtual real_t Det(int64_t m) const
    {
       mfem_error("Factors::Det(...)");
       return 0.;
    }
 
-   virtual void Solve(int m, int n, real_t *X) const
+   virtual void Solve(int64_t m, int64_t n, real_t *X) const
    {
       mfem_error("Factors::Solve(...)");
    }
 
-   virtual void GetInverseMatrix(int m, real_t *X) const
+   virtual void GetInverseMatrix(int64_t m, real_t *X) const
    {
       mfem_error("Factors::GetInverseMatrix(...)");
    }
@@ -667,18 +671,18 @@ public:
 class LUFactors : public Factors
 {
 public:
-   int *ipiv;
+   int64_t *ipiv;
 #ifdef MFEM_USE_LAPACK
-   static const int ipiv_base = 1;
+   static const int64_t ipiv_base = 1;
 #else
-   static const int ipiv_base = 0;
+   static const int64_t ipiv_base = 0;
 #endif
 
    /** With this constructor, the (public) data and ipiv members should be set
        explicitly before calling class methods. */
    LUFactors(): Factors() { }
 
-   LUFactors(real_t *data_, int *ipiv_) : Factors(data_), ipiv(ipiv_) { }
+   LUFactors(real_t *data_, int64_t *ipiv_) : Factors(data_), ipiv(ipiv_) { }
 
    /**
     * @brief Compute the LU factorization of the current matrix
@@ -692,38 +696,38 @@ public:
     *
     * @return status set to true if successful, otherwise, false.
     */
-   bool Factor(int m, real_t TOL = 0.0) override;
+   bool Factor(int64_t m, real_t TOL = 0.0) override;
 
    /** Assuming L.U = P.A factored data of size (m x m), compute |A|
        from the diagonal values of U and the permutation information. */
-   real_t Det(int m) const override;
+   real_t Det(int64_t m) const override;
 
    /** Assuming L.U = P.A factored data of size (m x m), compute X <- A X,
        for a matrix X of size (m x n). */
-   void Mult(int m, int n, real_t *X) const;
+   void Mult(int64_t m, int64_t n, real_t *X) const;
 
    /** Assuming L.U = P.A factored data of size (m x m), compute
        X <- L^{-1} P X, for a matrix X of size (m x n). */
-   void LSolve(int m, int n, real_t *X) const;
+   void LSolve(int64_t m, int64_t n, real_t *X) const;
 
    /** Assuming L.U = P.A factored data of size (m x m), compute
        X <- U^{-1} X, for a matrix X of size (m x n). */
-   void USolve(int m, int n, real_t *X) const;
+   void USolve(int64_t m, int64_t n, real_t *X) const;
 
    /** Assuming L.U = P.A factored data of size (m x m), compute X <- A^{-1} X,
        for a matrix X of size (m x n). */
-   void Solve(int m, int n, real_t *X) const override;
+   void Solve(int64_t m, int64_t n, real_t *X) const override;
 
    /** Assuming L.U = P.A factored data of size (m x m), compute X <- X A^{-1},
        for a matrix X of size (n x m). */
-   void RightSolve(int m, int n, real_t *X) const;
+   void RightSolve(int64_t m, int64_t n, real_t *X) const;
 
    /// Assuming L.U = P.A factored data of size (m x m), compute X <- A^{-1}.
-   void GetInverseMatrix(int m, real_t *X) const override;
+   void GetInverseMatrix(int64_t m, real_t *X) const override;
 
    /** Given an (n x m) matrix A21, compute X2 <- X2 - A21 X1, for matrices X1,
        and X2 of size (m x r) and (n x r), respectively. */
-   static void SubMult(int m, int n, int r, const real_t *A21,
+   static void SubMult(int64_t m, int64_t n, int64_t r, const real_t *A21,
                        const real_t *X1, real_t *X2);
 
    /** Assuming P.A = L.U factored data of size (m x m), compute the 2x2 block
@@ -736,7 +740,8 @@ public:
           A21 <- L21 = A21 U^{-1}
           A22 <- S22 = A22 - L21 U12.
        The block S22 is the Schur complement. */
-   void BlockFactor(int m, int n, real_t *A12, real_t *A21, real_t *A22) const;
+   void BlockFactor(int64_t m, int64_t n, real_t *A12, real_t *A21,
+                    real_t *A22) const;
 
    /** Given BlockFactor()'d data, perform the forward block solve for the
        linear system:
@@ -753,7 +758,7 @@ public:
           B2 <- Y2 = B2 - L21 Y1 = B2 - A21 A^{-1} B1
        The blocks B1/Y1 and B2/Y2 are of size (m x r) and (n x r), respectively.
        The Schur complement system is given by: S22 X2 = Y2. */
-   void BlockForwSolve(int m, int n, int r, const real_t *L21,
+   void BlockForwSolve(int64_t m, int64_t n, int64_t r, const real_t *L21,
                        real_t *B1, real_t *B2) const;
 
    /** Given BlockFactor()'d data, perform the backward block solve in
@@ -762,7 +767,7 @@ public:
        The input is the solution block X2 and the block Y1 resulting from
        BlockForwSolve(). The result block X1 overwrites input block Y1:
           Y1 <- X1 = U^{-1} (Y1 - U12 X2). */
-   void BlockBackSolve(int m, int n, int r, const real_t *U12,
+   void BlockBackSolve(int64_t m, int64_t n, int64_t r, const real_t *U12,
                        const real_t *X2, real_t *Y1) const;
 };
 
@@ -791,38 +796,38 @@ public:
     *
     * @return status set to true if successful, otherwise, false.
     */
-   bool Factor(int m, real_t TOL = 0.0) override;
+   bool Factor(int64_t m, real_t TOL = 0.0) override;
 
    /** Assuming LL^t = A factored data of size (m x m), compute |A|
        from the diagonal values of L */
-   real_t Det(int m) const override;
+   real_t Det(int64_t m) const override;
 
    /** Assuming L.L^t = A factored data of size (m x m), compute X <- L X,
        for a matrix X of size (m x n). */
-   void LMult(int m, int n, real_t *X) const;
+   void LMult(int64_t m, int64_t n, real_t *X) const;
 
    /** Assuming L.L^t = A factored data of size (m x m), compute X <- L^t X,
        for a matrix X of size (m x n). */
-   void UMult(int m, int n, real_t *X) const;
+   void UMult(int64_t m, int64_t n, real_t *X) const;
 
    /** Assuming L L^t = A factored data of size (m x m), compute
        X <- L^{-1} X, for a matrix X of size (m x n). */
-   void LSolve(int m, int n, real_t *X) const;
+   void LSolve(int64_t m, int64_t n, real_t *X) const;
 
    /** Assuming L L^t = A factored data of size (m x m), compute
        X <- L^{-t} X, for a matrix X of size (m x n). */
-   void USolve(int m, int n, real_t *X) const;
+   void USolve(int64_t m, int64_t n, real_t *X) const;
 
    /** Assuming L.L^t = A factored data of size (m x m), compute X <- A^{-1} X,
        for a matrix X of size (m x n). */
-   void Solve(int m, int n, real_t *X) const override;
+   void Solve(int64_t m, int64_t n, real_t *X) const override;
 
    /** Assuming L.L^t = A factored data of size (m x m), compute X <- X A^{-1},
        for a matrix X of size (n x m). */
-   void RightSolve(int m, int n, real_t *X) const;
+   void RightSolve(int64_t m, int64_t n, real_t *X) const;
 
    /// Assuming L.L^t = A factored data of size (m x m), compute X <- A^{-1}.
-   void GetInverseMatrix(int m, real_t *X) const override;
+   void GetInverseMatrix(int64_t m, real_t *X) const override;
 
 };
 
@@ -837,7 +842,7 @@ private:
    Factors * factors = nullptr;
    bool spd = false;
 
-   void Init(int m);
+   void Init(int64_t m);
    bool own_data = false;
 public:
    /// Default constructor.
@@ -851,7 +856,7 @@ public:
    DenseMatrixInverse(const DenseMatrix *mat, bool spd_ = false);
 
    ///  Get the size of the inverse matrix
-   int Size() const { return Width(); }
+   int64_t Size() const { return Width(); }
 
    /// Factor the current DenseMatrix, *a
    void Factor();
@@ -896,10 +901,10 @@ class DenseMatrixEigensystem
    Vector      EVal;
    DenseMatrix EVect;
    Vector ev;
-   int n;
+   int64_t n;
    real_t *work;
    char jobz, uplo;
-   int lwork, info;
+   int64_t lwork, info;
 public:
 
    DenseMatrixEigensystem(DenseMatrix &m);
@@ -907,8 +912,8 @@ public:
    void Eval();
    Vector &Eigenvalues() { return EVal; }
    DenseMatrix &Eigenvectors() { return EVect; }
-   real_t Eigenvalue(int i) { return EVal(i); }
-   const Vector &Eigenvector(int i)
+   real_t Eigenvalue(int64_t i) { return EVal(i); }
+   const Vector &Eigenvector(int64_t i)
    {
       ev.SetData(EVect.Data() + i * EVect.Height());
       return ev;
@@ -926,14 +931,14 @@ class DenseMatrixGeneralizedEigensystem
    Vector evalues_i;
    DenseMatrix Vr;
    DenseMatrix Vl;
-   int n;
+   int64_t n;
 
    real_t *alphar;
    real_t *alphai;
    real_t *beta;
    real_t *work;
    char jobvl, jobvr;
-   int lwork, info;
+   int64_t lwork, info;
 
 public:
 
@@ -943,8 +948,8 @@ public:
    void Eval();
    Vector &EigenvaluesRealPart() { return evalues_r; }
    Vector &EigenvaluesImagPart() { return evalues_i; }
-   real_t EigenvalueRealPart(int i) { return evalues_r(i); }
-   real_t EigenvalueImagPart(int i) { return evalues_i(i); }
+   real_t EigenvalueRealPart(int64_t i) { return evalues_r(i); }
+   real_t EigenvalueImagPart(int64_t i) { return evalues_i(i); }
    DenseMatrix &LeftEigenvectors() { return Vl; }
    DenseMatrix &RightEigenvectors() { return Vr; }
    ~DenseMatrixGeneralizedEigensystem();
@@ -961,12 +966,12 @@ class DenseMatrixSVD
    DenseMatrix Mc;
    Vector sv;
    DenseMatrix U,Vt;
-   int m, n;
+   int64_t m, n;
 
 #ifdef MFEM_USE_LAPACK
    real_t *work;
    char jobu, jobvt;
-   int lwork, info;
+   int64_t lwork, info;
 #endif
 
    void Init();
@@ -1003,7 +1008,7 @@ public:
     @param [in] right_singular_vectors optional parameter to define if first
     right singular vectors should be computed
     */
-   MFEM_DEPRECATED DenseMatrixSVD(int h, int w,
+   MFEM_DEPRECATED DenseMatrixSVD(int64_t h, int64_t w,
                                   bool left_singular_vectors=false,
                                   bool right_singular_vectors=false);
 
@@ -1054,7 +1059,7 @@ public:
 
     'N': No singular vectors are computed
     */
-   DenseMatrixSVD(int h, int w,
+   DenseMatrixSVD(int64_t h, int64_t w,
                   char left_singular_vectors='A',
                   char right_singular_vectors='A');
 
@@ -1080,7 +1085,7 @@ public:
 
     @return sv(i) i-th singular value
     */
-   real_t Singularvalue(int i) { return sv(i); }
+   real_t Singularvalue(int64_t i) { return sv(i); }
 
    /**
     @brief Return left singular vectors
@@ -1109,7 +1114,7 @@ class DenseTensor
 private:
    mutable DenseMatrix Mk;
    Memory<real_t> tdata;
-   int nk;
+   int64_t nk;
 
 public:
    DenseTensor()
@@ -1117,21 +1122,21 @@ public:
       nk = 0;
    }
 
-   DenseTensor(int i, int j, int k)
+   DenseTensor(int64_t i, int64_t j, int64_t k)
       : Mk(NULL, i, j)
    {
       nk = k;
       tdata.New(i*j*k);
    }
 
-   DenseTensor(real_t *d, int i, int j, int k)
+   DenseTensor(real_t *d, int64_t i, int64_t j, int64_t k)
       : Mk(NULL, i, j)
    {
       nk = k;
       tdata.Wrap(d, i*j*k, false);
    }
 
-   DenseTensor(int i, int j, int k, MemoryType mt)
+   DenseTensor(int64_t i, int64_t j, int64_t k, MemoryType mt)
       : Mk(NULL, i, j)
    {
       nk = k;
@@ -1142,7 +1147,7 @@ public:
    DenseTensor(const DenseTensor &other)
       : Mk(NULL, other.Mk.height, other.Mk.width), nk(other.nk)
    {
-      const int size = Mk.Height()*Mk.Width()*nk;
+      const int64_t size = Mk.Height()*Mk.Width()*nk;
       if (size > 0)
       {
          tdata.New(size, other.tdata.GetMemoryType());
@@ -1150,13 +1155,14 @@ public:
       }
    }
 
-   int SizeI() const { return Mk.Height(); }
-   int SizeJ() const { return Mk.Width(); }
-   int SizeK() const { return nk; }
+   int64_t SizeI() const { return Mk.Height(); }
+   int64_t SizeJ() const { return Mk.Width(); }
+   int64_t SizeK() const { return nk; }
 
-   int TotalSize() const { return SizeI()*SizeJ()*SizeK(); }
+   int64_t TotalSize() const { return SizeI()*SizeJ()*SizeK(); }
 
-   void SetSize(int i, int j, int k, MemoryType mt_ = MemoryType::PRESERVE)
+   void SetSize(int64_t i, int64_t j, int64_t k,
+                MemoryType mt_ = MemoryType::PRESERVE)
    {
       const MemoryType mt = mt_ == MemoryType::PRESERVE ? tdata.GetMemoryType() : mt_;
       tdata.Delete();
@@ -1165,7 +1171,7 @@ public:
       tdata.New(i*j*k, mt);
    }
 
-   void UseExternalData(real_t *ext_data, int i, int j, int k)
+   void UseExternalData(real_t *ext_data, int64_t i, int64_t j, int64_t k)
    {
       tdata.Delete();
       Mk.UseExternalData(NULL, i, j);
@@ -1182,7 +1188,8 @@ public:
    /// Note that when @a own_mem is true, the @a mem object can be destroyed
    /// immediately by the caller but `mem.Delete()` should NOT be called since
    /// the DenseTensor object takes ownership of all pointers owned by @a mem.
-   void NewMemoryAndSize(const Memory<real_t> &mem, int i, int j, int k,
+   void NewMemoryAndSize(const Memory<real_t> &mem, int64_t i, int64_t j,
+                         int64_t k,
                          bool own_mem)
    {
       tdata.Delete();
@@ -1204,13 +1211,13 @@ public:
    /// Copy assignment operator (performs a deep copy)
    DenseTensor &operator=(const DenseTensor &other);
 
-   DenseMatrix &operator()(int k)
+   DenseMatrix &operator()(int64_t k)
    {
       MFEM_ASSERT_INDEX_IN_RANGE(k, 0, SizeK());
       Mk.data = Memory<real_t>(GetData(k), SizeI()*SizeJ(), false);
       return Mk;
    }
-   const DenseMatrix &operator()(int k) const
+   const DenseMatrix &operator()(int64_t k) const
    {
       MFEM_ASSERT_INDEX_IN_RANGE(k, 0, SizeK());
       Mk.data = Memory<real_t>(const_cast<real_t*>(GetData(k)), SizeI()*SizeJ(),
@@ -1218,7 +1225,7 @@ public:
       return Mk;
    }
 
-   real_t &operator()(int i, int j, int k)
+   real_t &operator()(int64_t i, int64_t j, int64_t k)
    {
       MFEM_ASSERT_INDEX_IN_RANGE(i, 0, SizeI());
       MFEM_ASSERT_INDEX_IN_RANGE(j, 0, SizeJ());
@@ -1226,7 +1233,7 @@ public:
       return tdata[i+SizeI()*(j+SizeJ()*k)];
    }
 
-   const real_t &operator()(int i, int j, int k) const
+   const real_t &operator()(int64_t i, int64_t j, int64_t k) const
    {
       MFEM_ASSERT_INDEX_IN_RANGE(i, 0, SizeI());
       MFEM_ASSERT_INDEX_IN_RANGE(j, 0, SizeJ());
@@ -1234,13 +1241,13 @@ public:
       return tdata[i+SizeI()*(j+SizeJ()*k)];
    }
 
-   real_t *GetData(int k)
+   real_t *GetData(int64_t k)
    {
       MFEM_ASSERT_INDEX_IN_RANGE(k, 0, SizeK());
       return tdata+k*Mk.Height()*Mk.Width();
    }
 
-   const real_t *GetData(int k) const
+   const real_t *GetData(int64_t k) const
    {
       MFEM_ASSERT_INDEX_IN_RANGE(k, 0, SizeK());
       return tdata+k*Mk.Height()*Mk.Width();
@@ -1306,7 +1313,7 @@ public:
     @param [in, out] Mlu batch of square matrices - dimension m x m x n.
     @param [out] P array storing pivot information - dimension m x n.
     @param [in] TOL optional fuzzy comparison tolerance. Defaults to 0.0. */
-void BatchLUFactor(DenseTensor &Mlu, Array<int> &P, const real_t TOL = 0.0);
+void BatchLUFactor(DenseTensor &Mlu, Array<int64_t> &P, const real_t TOL = 0.0);
 
 /** @brief Solve batch linear systems. Calls BatchedLinAlg::LUSolve.
 
@@ -1317,18 +1324,18 @@ void BatchLUFactor(DenseTensor &Mlu, Array<int> &P, const real_t TOL = 0.0);
     @param [in] P array storing pivot information - dimension m x n.
     @param [in, out] X vector storing right-hand side and then solution -
     dimension m x n. */
-void BatchLUSolve(const DenseTensor &Mlu, const Array<int> &P, Vector &X);
+void BatchLUSolve(const DenseTensor &Mlu, const Array<int64_t> &P, Vector &X);
 
 
 // Inline methods
 
-inline real_t &DenseMatrix::operator()(int i, int j)
+inline real_t &DenseMatrix::operator()(int64_t i, int64_t j)
 {
    MFEM_ASSERT(data && i >= 0 && i < height && j >= 0 && j < width, "");
    return data[i+j*height];
 }
 
-inline const real_t &DenseMatrix::operator()(int i, int j) const
+inline const real_t &DenseMatrix::operator()(int64_t i, int64_t j) const
 {
    MFEM_ASSERT(data && i >= 0 && i < height && j >= 0 && j < width, "");
    return data[i+j*height];

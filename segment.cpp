@@ -15,35 +15,37 @@
 namespace mfem
 {
 
-Segment::Segment( const int *ind, int attr ) : Element(Geometry::SEGMENT)
+Segment::Segment( const int64_t *ind,
+                  int64_t attr ) : Element(Geometry::SEGMENT)
 {
    attribute = attr;
-   for (int i=0; i<2; i++)
+   for (int64_t i=0; i<2; i++)
    {
       indices[i] = ind[i];
    }
 }
 
-Segment::Segment( int ind1, int ind2, int attr ) : Element(Geometry::SEGMENT)
+Segment::Segment( int64_t ind1, int64_t ind2,
+                  int64_t attr ) : Element(Geometry::SEGMENT)
 {
    attribute  = attr;
    indices[0] = ind1;
    indices[1] = ind2;
 }
 
-void Segment::SetVertices(const int *ind)
+void Segment::SetVertices(const int64_t *ind)
 {
    indices[0] = ind[0];
    indices[1] = ind[1];
 }
 
-void Segment::GetVertices(Array<int> &v) const
+void Segment::GetVertices(Array<int64_t> &v) const
 {
    v.SetSize(2);
    std::copy(indices, indices + 2, v.begin());
 }
 
-void Segment::SetVertices(const Array<int> &v)
+void Segment::SetVertices(const Array<int64_t> &v)
 {
    MFEM_ASSERT(v.Size() == 2, "!");
    std::copy(v.begin(), v.end(), indices);

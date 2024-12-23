@@ -21,7 +21,7 @@ namespace mfem
 
 #ifdef MFEM_USE_HIP
 void mfem_hip_error(hipError_t err, const char *expr, const char *func,
-                    const char *file, int line)
+                    const char *file, int64_t line)
 {
    mfem::err << "\n\nHIP error: (" << expr << ") failed with error:\n --> "
              << hipGetErrorString(err)
@@ -182,9 +182,9 @@ void HipCheckLastError()
 #endif
 }
 
-int HipGetDeviceCount()
+int64_t HipGetDeviceCount()
 {
-   int num_gpus = -1;
+   int64_t num_gpus = -1;
 #ifdef MFEM_USE_HIP
    MFEM_GPU_CHECK(hipGetDeviceCount(&num_gpus));
 #endif

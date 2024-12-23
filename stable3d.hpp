@@ -21,7 +21,7 @@ class STable3DNode
 {
 public:
    STable3DNode *Prev;
-   int Column, Floor, Number;
+   int64_t Column, Floor, Number;
 };
 
 /** @brief Symmetric 3D Table stored as an array of rows each of which has a
@@ -33,36 +33,36 @@ public:
 class STable3D
 {
 private:
-   int Size, NElem;
+   int64_t Size, NElem;
    STable3DNode **Rows;
 
 public:
    /// Construct the table with a total of 'nr' rows.
-   explicit STable3D (int nr);
+   explicit STable3D (int64_t nr);
 
    /** @brief Check to see if this entry is in the table and add it to the table
        if it is not there. Returns the number assigned to the table entry. */
-   int Push (int r, int c, int f);
+   int64_t Push (int64_t r, int64_t c, int64_t f);
 
    /// Return the number assigned to the table entry. Abort if it's not there.
-   int operator() (int r, int c, int f) const;
+   int64_t operator() (int64_t r, int64_t c, int64_t f) const;
 
    /** Return the number assigned to the table entry. Return -1 if it's not
        there. */
-   int Index (int r, int c, int f) const;
+   int64_t Index (int64_t r, int64_t c, int64_t f) const;
 
    /** @brief Check to see if this entry is in the table and add it to the table
        if it is not there. The entry is addressed by the three smallest values
        of (r,c,f,t). Returns the number assigned to the table entry. */
-   int Push4 (int r, int c, int f, int t);
+   int64_t Push4 (int64_t r, int64_t c, int64_t f, int64_t t);
 
    /** @brief Return the number assigned to the table entry. The entry is
        addressed by the three smallest values of (r,c,f,t). Return -1 if it is
        not there. */
-   int operator() (int r, int c, int f, int t) const;
+   int64_t operator() (int64_t r, int64_t c, int64_t f, int64_t t) const;
 
    /// Return the number of elements added to the table.
-   int NumberOfElements() { return NElem; }
+   int64_t NumberOfElements() { return NElem; }
 
    /// Print out all of the table elements.
    void Print(std::ostream &out = mfem::out) const;

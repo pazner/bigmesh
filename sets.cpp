@@ -15,10 +15,10 @@
 namespace mfem
 {
 
-int IntegerSet::PickRandomElement() const
+int64_t IntegerSet::PickRandomElement() const
 {
-   int i, size = Size();
-   unsigned int seed = 0;
+   int64_t i, size = Size();
+   uint64_t seed = 0;
 
    for (i = 0; i < size; i++)
    {
@@ -30,9 +30,9 @@ int IntegerSet::PickRandomElement() const
    return data[rand()/(RAND_MAX/size)];
 }
 
-void IntegerSet::Recreate(const int n, const int *p)
+void IntegerSet::Recreate(const int64_t n, const int64_t *p)
 {
-   int i, j;
+   int64_t i, j;
 
    SetSize(n);
 
@@ -53,9 +53,9 @@ void IntegerSet::Recreate(const int n, const int *p)
 }
 
 
-int ListOfIntegerSets::Insert(const IntegerSet &s)
+int64_t ListOfIntegerSets::Insert(const IntegerSet &s)
 {
-   for (int i = 0; i < TheList.Size(); i++)
+   for (int64_t i = 0; i < TheList.Size(); i++)
       if (*TheList[i] == s)
       {
          return i;
@@ -66,9 +66,9 @@ int ListOfIntegerSets::Insert(const IntegerSet &s)
    return TheList.Size()-1;
 }
 
-int ListOfIntegerSets::Lookup(const IntegerSet &s) const
+int64_t ListOfIntegerSets::Lookup(const IntegerSet &s) const
 {
-   for (int i = 0; i < TheList.Size(); i++)
+   for (int64_t i = 0; i < TheList.Size(); i++)
       if (*TheList[i] == s)
       {
          return i;
@@ -80,7 +80,7 @@ int ListOfIntegerSets::Lookup(const IntegerSet &s) const
 
 void ListOfIntegerSets::AsTable(Table & t) const
 {
-   int i;
+   int64_t i;
 
    t.MakeI(Size());
 
@@ -93,7 +93,7 @@ void ListOfIntegerSets::AsTable(Table & t) const
 
    for (i = 0; i < Size(); i++)
    {
-      Array<int> &row = *TheList[i];
+      Array<int64_t> &row = *TheList[i];
       t.AddConnections(i, row.GetData(), row.Size());
    }
 
@@ -102,7 +102,7 @@ void ListOfIntegerSets::AsTable(Table & t) const
 
 ListOfIntegerSets::~ListOfIntegerSets()
 {
-   for (int i = 0; i < TheList.Size(); i++)
+   for (int64_t i = 0; i < TheList.Size(); i++)
    {
       delete TheList[i];
    }

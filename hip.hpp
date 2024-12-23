@@ -47,7 +47,7 @@
 #define MFEM_THREAD_ID(k) hipThreadIdx_ ##k
 #define MFEM_THREAD_SIZE(k) hipBlockDim_ ##k
 #define MFEM_FOREACH_THREAD(i,k,N) \
-    for(int i=hipThreadIdx_ ##k; i<N; i+=hipBlockDim_ ##k)
+    for(int64_t i=hipThreadIdx_ ##k; i<N; i+=hipBlockDim_ ##k)
 #endif
 
 namespace mfem
@@ -56,7 +56,7 @@ namespace mfem
 #ifdef MFEM_USE_HIP
 // Function used by the macro MFEM_GPU_CHECK.
 void mfem_hip_error(hipError_t err, const char *expr, const char *func,
-                    const char *file, int line);
+                    const char *file, int64_t line);
 #endif
 
 /// Allocates device memory
@@ -96,7 +96,7 @@ void* HipMemcpyDtoHAsync(void *h_dst, const void *d_src, size_t bytes);
 void HipCheckLastError();
 
 /// Get the number of HIP devices
-int HipGetDeviceCount();
+int64_t HipGetDeviceCount();
 
 } // namespace mfem
 

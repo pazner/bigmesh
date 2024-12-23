@@ -27,13 +27,13 @@ namespace KDTreeNorms
 {
 
 /// Evaluates l1 norm of a vector.
-template <typename Tfloat, int ndim>
+template <typename Tfloat, int64_t ndim>
 struct Norm_l1
 {
    Tfloat operator()(const Tfloat* xx) const
    {
       Tfloat tm=abs(xx[0]);
-      for (int i=1; i<ndim; i++)
+      for (int64_t i=1; i<ndim; i++)
       {
          tm=tm+abs(xx[i]);
       }
@@ -42,14 +42,14 @@ struct Norm_l1
 };
 
 /// Evaluates l2 norm of a vector.
-template<typename Tfloat,int ndim>
+template<typename Tfloat,int64_t ndim>
 struct Norm_l2
 {
    Tfloat operator()(const Tfloat* xx) const
    {
       Tfloat tm;
       tm=xx[0]*xx[0];
-      for (int i=1; i<ndim; i++)
+      for (int64_t i=1; i<ndim; i++)
       {
          tm=tm+xx[i]*xx[i];
       }
@@ -58,7 +58,7 @@ struct Norm_l2
 };
 
 /// Finds the max absolute value of a vector.
-template<typename Tfloat,int ndim>
+template<typename Tfloat,int64_t ndim>
 struct Norm_li
 {
    Tfloat operator()(const Tfloat* xx) const
@@ -66,7 +66,7 @@ struct Norm_li
       Tfloat tm;
       if (xx[0]<Tfloat(0.0)) { tm=-xx[0];}
       else { tm=xx[0];}
-      for (int i=1; i<ndim; i++)
+      for (int64_t i=1; i<ndim; i++)
       {
          if (xx[i]<Tfloat(0.0))
          {
@@ -148,7 +148,7 @@ public:
    KDTree() = default;
 
    /// Returns the spatial dimension of the points
-   int SpaceDimension() const
+   int64_t SpaceDimension() const
    {
       return ndim;
    }
@@ -483,7 +483,7 @@ private:
    }
 
    /// Returns distances and indices of the n closest points to a point pt.
-   void NNS(PointND& pt,const int& npoints,
+   void NNS(PointND& pt,const int64_t& npoints,
             typename std::vector<NodeND>::iterator itb,
             typename std::vector<NodeND>::iterator ite,
             size_t level,
@@ -636,13 +636,13 @@ private:
 };
 
 /// Defines KDTree in 3D
-typedef KDTree<int,real_t,3> KDTree3D;
+typedef KDTree<int64_t,real_t,3> KDTree3D;
 
 /// Defines KDTree in 2D
-typedef KDTree<int,real_t,2> KDTree2D;
+typedef KDTree<int64_t,real_t,2> KDTree2D;
 
 /// Defines KDTree in 1D
-typedef KDTree<int,real_t,1> KDTree1D;
+typedef KDTree<int64_t,real_t,1> KDTree1D;
 
 } // namespace mfem
 

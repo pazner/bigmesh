@@ -48,7 +48,7 @@ public:
 };
 #endif
 
-void mfem_backtrace(int mode = 0, int depth = -1);
+void mfem_backtrace(int64_t mode = 0, int64_t depth = -1);
 
 [[noreturn]]
 void mfem_error(const char *msg = NULL);
@@ -98,7 +98,7 @@ void mfem_warning(const char *msg = NULL);
 
 // Use this if the only place your variable is used is in ASSERTs
 // For example, this code snippet:
-//   int err = MPI_Reduce(ldata, maxdata, 5, MPI_INT, MPI_MAX, 0, MyComm);
+//   int64_t err = MPI_Reduce(ldata, maxdata, 5, MPI_INT, MPI_MAX, 0, MyComm);
 //   MFEM_CONTRACT_VAR(err);
 //   MFEM_ASSERT( err == 0, "MPI_Reduce gave an error with length "
 //                       << ldata );

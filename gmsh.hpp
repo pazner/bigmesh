@@ -12,6 +12,8 @@
 #ifndef MFEM_GMSH
 #define MFEM_GMSH
 
+#include <cstdint>
+
 namespace mfem
 {
 
@@ -28,25 +30,25 @@ namespace mfem
 ///@{
 
 /// @brief Generate Gmsh vertex mapping for a Segment
-void GmshHOSegmentMapping(int order, int *map);
+void GmshHOSegmentMapping(int64_t order, int64_t *map);
 
 /// @brief Generate Gmsh vertex mapping for a Triangle
-void GmshHOTriangleMapping(int order, int *map);
+void GmshHOTriangleMapping(int64_t order, int64_t *map);
 
 /// @brief Generate Gmsh vertex mapping for a Quadrilateral
-void GmshHOQuadrilateralMapping(int order, int *map);
+void GmshHOQuadrilateralMapping(int64_t order, int64_t *map);
 
 /// @brief Generate Gmsh vertex mapping for a Tetrahedron
-void GmshHOTetrahedronMapping(int order, int *map);
+void GmshHOTetrahedronMapping(int64_t order, int64_t *map);
 
 /// @brief Generate Gmsh vertex mapping for a Hexahedron
-void GmshHOHexahedronMapping(int order, int *map);
+void GmshHOHexahedronMapping(int64_t order, int64_t *map);
 
 /// @brief Generate Gmsh vertex mapping for a Wedge
-void GmshHOWedgeMapping(int order, int *map);
+void GmshHOWedgeMapping(int64_t order, int64_t *map);
 
 /// @brief Generate Gmsh vertex mapping for a Pyramid
-void GmshHOPyramidMapping(int order, int *map);
+void GmshHOPyramidMapping(int64_t order, int64_t *map);
 
 ///@}
 

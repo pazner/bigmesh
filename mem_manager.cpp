@@ -98,19 +98,19 @@ bool MemoryClassContainsType(MemoryClass mc, MemoryType mt)
 
 static void MFEM_VERIFY_TYPES(const MemoryType h_mt, const MemoryType d_mt)
 {
-   MFEM_VERIFY(IsHostMemory(h_mt), "h_mt = " << (int)h_mt);
+   MFEM_VERIFY(IsHostMemory(h_mt), "h_mt = " << (int64_t)h_mt);
    MFEM_VERIFY(IsDeviceMemory(d_mt) || d_mt == MemoryType::DEFAULT,
-               "d_mt = " << (int)d_mt);
+               "d_mt = " << (int64_t)d_mt);
    // If h_mt == MemoryType::HOST_DEBUG, then d_mt == MemoryType::DEVICE_DEBUG
    //                                      or d_mt == MemoryType::DEFAULT
    MFEM_VERIFY(h_mt != MemoryType::HOST_DEBUG ||
                d_mt == MemoryType::DEVICE_DEBUG ||
                d_mt == MemoryType::DEFAULT,
-               "d_mt = " << MemoryTypeName[(int)d_mt]);
+               "d_mt = " << MemoryTypeName[(int64_t)d_mt]);
    // If d_mt == MemoryType::DEVICE_DEBUG, then h_mt != MemoryType::MANAGED
    MFEM_VERIFY(d_mt != MemoryType::DEVICE_DEBUG ||
                h_mt != MemoryType::MANAGED,
-               "h_mt = " << MemoryTypeName[(int)h_mt]);
+               "h_mt = " << MemoryTypeName[(int64_t)h_mt]);
 #if 0
    const bool sync =
       (h_mt == MemoryType::HOST_PINNED && d_mt == MemoryType::DEVICE) ||
@@ -148,13 +148,13 @@ MemoryClass operator*(MemoryClass mc1, MemoryClass mc2)
 }
 
 
-// Instantiate Memory<T>::PrintFlags for T = int and T = real_t.
-template void Memory<int>::PrintFlags() const;
+// Instantiate Memory<T>::PrintFlags for T = int64_t and T = real_t.
+template void Memory<int64_t>::PrintFlags() const;
 template void Memory<real_t>::PrintFlags() const;
 
-// Instantiate Memory<T>::CompareHostAndDevice for T = int and T = real_t.
-template int Memory<int>::CompareHostAndDevice(int size) const;
-template int Memory<real_t>::CompareHostAndDevice(int size) const;
+// Instantiate Memory<T>::CompareHostAndDevice for T = int64_t and T = real_t.
+template int64_t Memory<int64_t>::CompareHostAndDevice(int64_t size) const;
+template int64_t Memory<real_t>::CompareHostAndDevice(int64_t size) const;
 
 
 namespace internal
@@ -370,7 +370,7 @@ inline void MmuProtect(const void *ptr, const size_t bytes)
 /// MMU un-protection, through ::mprotect with read/write accesses
 inline void MmuAllow(const void *ptr, const size_t bytes)
 {
-   const int RW = PROT_READ | PROT_WRITE;
+   const int64_t RW = PROT_READ | PROT_WRITE;
    static const bool mmu_protect_error = getenv("MFEM_MMU_PROTECT_ERROR");
    if (!::mprotect(const_cast<void*>(ptr), bytes, RW)) { return; }
    if (mmu_protect_error) { mfem_error("MMU protection (R/W) error"); }
@@ -691,35 +691,35 @@ public:
       // Filling the host memory backends
       // HOST, HOST_32 & HOST_64 are always ready
       // MFEM_USE_UMPIRE will set either [No/Umpire] HostMemorySpace
-      host[static_cast<int>(MT::HOST)] = new StdHostMemorySpace();
-      host[static_cast<int>(MT::HOST_32)] = new Aligned32HostMemorySpace();
-      host[static_cast<int>(MT::HOST_64)] = new Aligned64HostMemorySpace();
+      host[static_cast<int64_t>(MT::HOST)] = new StdHostMemorySpace();
+      host[static_cast<int64_t>(MT::HOST_32)] = new Aligned32HostMemorySpace();
+      host[static_cast<int64_t>(MT::HOST_64)] = new Aligned64HostMemorySpace();
       // HOST_DEBUG is delayed, as it reroutes signals
-      host[static_cast<int>(MT::HOST_DEBUG)] = nullptr;
-      host[static_cast<int>(MT::HOST_UMPIRE)] = nullptr;
-      host[static_cast<int>(MT::MANAGED)] = new UvmHostMemorySpace();
+      host[static_cast<int64_t>(MT::HOST_DEBUG)] = nullptr;
+      host[static_cast<int64_t>(MT::HOST_UMPIRE)] = nullptr;
+      host[static_cast<int64_t>(MT::MANAGED)] = new UvmHostMemorySpace();
 
       // Filling the device memory backends, shifting with the device size
-      constexpr int shift = DeviceMemoryType;
+      constexpr int64_t shift = DeviceMemoryType;
 #if defined(MFEM_USE_CUDA)
-      device[static_cast<int>(MT::MANAGED)-shift] = new UvmCudaMemorySpace();
+      device[static_cast<int64_t>(MT::MANAGED)-shift] = new UvmCudaMemorySpace();
 #elif defined(MFEM_USE_HIP)
-      device[static_cast<int>(MT::MANAGED)-shift] = new UvmHipMemorySpace();
+      device[static_cast<int64_t>(MT::MANAGED)-shift] = new UvmHipMemorySpace();
 #else
       // this re-creates the original behavior, but should this be nullptr instead?
-      device[static_cast<int>(MT::MANAGED)-shift] = new UvmCudaMemorySpace();
+      device[static_cast<int64_t>(MT::MANAGED)-shift] = new UvmCudaMemorySpace();
 #endif
 
       // All other devices controllers are delayed
-      device[static_cast<int>(MemoryType::DEVICE)-shift] = nullptr;
-      device[static_cast<int>(MT::DEVICE_DEBUG)-shift] = nullptr;
-      device[static_cast<int>(MT::DEVICE_UMPIRE)-shift] = nullptr;
-      device[static_cast<int>(MT::DEVICE_UMPIRE_2)-shift] = nullptr;
+      device[static_cast<int64_t>(MemoryType::DEVICE)-shift] = nullptr;
+      device[static_cast<int64_t>(MT::DEVICE_DEBUG)-shift] = nullptr;
+      device[static_cast<int64_t>(MT::DEVICE_UMPIRE)-shift] = nullptr;
+      device[static_cast<int64_t>(MT::DEVICE_UMPIRE_2)-shift] = nullptr;
    }
 
    HostMemorySpace* Host(const MemoryType mt)
    {
-      const int mt_i = static_cast<int>(mt);
+      const int64_t mt_i = static_cast<int64_t>(mt);
       // Delayed host controllers initialization
       if (!host[mt_i]) { host[mt_i] = NewHostCtrl(mt); }
       MFEM_ASSERT(host[mt_i], "Host memory controller is not configured!");
@@ -728,7 +728,7 @@ public:
 
    DeviceMemorySpace* Device(const MemoryType mt)
    {
-      const int mt_i = static_cast<int>(mt) - DeviceMemoryType;
+      const int64_t mt_i = static_cast<int64_t>(mt) - DeviceMemoryType;
       MFEM_ASSERT(mt_i >= 0,"");
       // Lazy device controller initializations
       if (!device[mt_i]) { device[mt_i] = NewDeviceCtrl(mt); }
@@ -738,10 +738,10 @@ public:
 
    ~Ctrl()
    {
-      constexpr int mt_h = HostMemoryType;
-      constexpr int mt_d = DeviceMemoryType;
-      for (int mt = mt_h; mt < HostMemoryTypeSize; mt++) { delete host[mt]; }
-      for (int mt = mt_d; mt < MemoryTypeSize; mt++) { delete device[mt-mt_d]; }
+      constexpr int64_t mt_h = HostMemoryType;
+      constexpr int64_t mt_d = DeviceMemoryType;
+      for (int64_t mt = mt_h; mt < HostMemoryTypeSize; mt++) { delete host[mt]; }
+      for (int64_t mt = mt_d; mt < MemoryTypeSize; mt++) { delete device[mt-mt_d]; }
    }
 
 private:
@@ -969,7 +969,7 @@ void MemoryManager::Delete_(void *h_ptr, MemoryType h_mt, unsigned flags)
    const bool owns_host = flags & Mem::OWNS_HOST;
    const bool owns_device = flags & Mem::OWNS_DEVICE;
    const bool owns_internal = flags & Mem::OWNS_INTERNAL;
-   MFEM_ASSERT(IsHostMemory(h_mt), "invalid h_mt = " << (int)h_mt);
+   MFEM_ASSERT(IsHostMemory(h_mt), "invalid h_mt = " << (int64_t)h_mt);
    // MFEM_ASSERT(registered || IsHostMemory(h_mt),"");
    MFEM_ASSERT(!owns_device || owns_internal, "invalid Memory state");
    // If at least one of the 'own_*' flags is true then 'registered' must be
@@ -1598,15 +1598,15 @@ void MemoryManager::SetDualMemoryType(MemoryType mt, MemoryType dual_mt)
 
 void MemoryManager::UpdateDualMemoryType(MemoryType mt, MemoryType dual_mt)
 {
-   MFEM_VERIFY((int)mt < MemoryTypeSize,
-               "invalid MemoryType, mt = " << (int)mt);
-   MFEM_VERIFY((int)dual_mt < MemoryTypeSize,
-               "invalid dual MemoryType, dual_mt = " << (int)dual_mt);
+   MFEM_VERIFY((int64_t)mt < MemoryTypeSize,
+               "invalid MemoryType, mt = " << (int64_t)mt);
+   MFEM_VERIFY((int64_t)dual_mt < MemoryTypeSize,
+               "invalid dual MemoryType, dual_mt = " << (int64_t)dual_mt);
 
    if ((IsHostMemory(mt) && IsDeviceMemory(dual_mt)) ||
        (IsDeviceMemory(mt) && IsHostMemory(dual_mt)))
    {
-      dual_map[(int)mt] = dual_mt;
+      dual_map[(int64_t)mt] = dual_mt;
    }
    else
    {
@@ -1615,8 +1615,8 @@ void MemoryManager::UpdateDualMemoryType(MemoryType mt, MemoryType dual_mt)
       // actually update the dual
       MFEM_VERIFY(mt == dual_mt && IsHostMemory(mt),
                   "invalid (mt, dual_mt) pair: ("
-                  << MemoryTypeName[(int)mt] << ", "
-                  << MemoryTypeName[(int)dual_mt] << ')');
+                  << MemoryTypeName[(int64_t)mt] << ", "
+                  << MemoryTypeName[(int64_t)dual_mt] << ')');
    }
 }
 
@@ -1627,7 +1627,8 @@ void MemoryManager::Configure(const MemoryType host_mt,
    MemoryManager::UpdateDualMemoryType(device_mt, host_mt);
    if (device_mt == MemoryType::DEVICE_DEBUG)
    {
-      for (int mt = (int)MemoryType::HOST; mt < (int)MemoryType::MANAGED; mt++)
+      for (int64_t mt = (int64_t)MemoryType::HOST; mt < (int64_t)MemoryType::MANAGED;
+           mt++)
       {
          MemoryManager::UpdateDualMemoryType(
             (MemoryType)mt, MemoryType::DEVICE_DEBUG);
@@ -1685,9 +1686,9 @@ void MemoryManager::RegisterCheck(void *ptr)
    }
 }
 
-int MemoryManager::PrintPtrs(std::ostream &os)
+int64_t MemoryManager::PrintPtrs(std::ostream &os)
 {
-   int n_out = 0;
+   int64_t n_out = 0;
    for (const auto& n : maps->memories)
    {
       const internal::Memory &mem = n.second;
@@ -1700,9 +1701,9 @@ int MemoryManager::PrintPtrs(std::ostream &os)
    return n_out;
 }
 
-int MemoryManager::PrintAliases(std::ostream &os)
+int64_t MemoryManager::PrintAliases(std::ostream &os)
 {
-   int n_out = 0;
+   int64_t n_out = 0;
    for (const auto& n : maps->aliases)
    {
       const internal::Alias &alias = n.second;
@@ -1716,8 +1717,8 @@ int MemoryManager::PrintAliases(std::ostream &os)
    return n_out;
 }
 
-int MemoryManager::CompareHostAndDevice_(void *h_ptr, size_t size,
-                                         unsigned flags)
+int64_t MemoryManager::CompareHostAndDevice_(void *h_ptr, size_t size,
+                                             unsigned flags)
 {
    void *d_ptr = (flags & Mem::ALIAS) ?
                  mm.GetAliasDevicePtr(h_ptr, size, false) :
@@ -1730,7 +1731,7 @@ int MemoryManager::CompareHostAndDevice_(void *h_ptr, size_t size,
 #else
    std::memcpy(h_buf, d_ptr, size);
 #endif
-   int res = std::memcmp(h_ptr, h_buf, size);
+   int64_t res = std::memcmp(h_ptr, h_buf, size);
    delete [] h_buf;
    return res;
 }
@@ -1738,7 +1739,7 @@ int MemoryManager::CompareHostAndDevice_(void *h_ptr, size_t size,
 
 void MemoryPrintFlags(unsigned flags)
 {
-   typedef Memory<int> Mem;
+   typedef Memory<int64_t> Mem;
    mfem::out
          << "\n   registered    = " << bool(flags & Mem::Registered)
          << "\n   owns host     = " << bool(flags & Mem::OWNS_HOST)

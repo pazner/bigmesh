@@ -128,8 +128,8 @@ private:
    static Device device_singleton;
 
    MODES mode = Device::SEQUENTIAL;
-   int dev = 0;   ///< Device ID of the configured device.
-   int ngpu = -1; ///< Number of detected devices; -1: not initialized.
+   int64_t dev = 0;   ///< Device ID of the configured device.
+   int64_t ngpu = -1; ///< Number of detected devices; -1: not initialized.
    /// Bitwise-OR of all configured backends.
    unsigned long backends = Backend::CPU;
    /// Set to true during configuration, except in 'device_singleton'.
@@ -150,7 +150,7 @@ private:
    static Device& Get() { return device_singleton; }
 
    /// Setup switcher based on configuration settings
-   void Setup(const int device_id = 0);
+   void Setup(const int64_t device_id = 0);
 
    void MarkBackend(Backend::Id b) { backends |= b; }
 
@@ -182,7 +182,7 @@ public:
        a program.
        @note This object should be destroyed after all other MFEM objects that
        use the Device are destroyed. */
-   Device(const std::string &device, const int dev = 0)
+   Device(const std::string &device, const int64_t dev = 0)
    { Configure(device, dev); }
 
    /// Destructor.
@@ -220,7 +220,7 @@ public:
          transfers between host and device.
        * The 'debug' backend should not be combined with other device backends.
    */
-   void Configure(const std::string &device, const int dev = 0);
+   void Configure(const std::string &device, const int64_t dev = 0);
 
    /// Set the default host and device MemoryTypes, @a h_mt and @a d_mt.
    /** The host and device MemoryTypes are also set to be dual to each other.
@@ -249,7 +249,7 @@ public:
    static inline bool IsDisabled() { return !IsEnabled(); }
 
    /// Get the device id of the configured device.
-   static inline int GetId() { return Get().dev; }
+   static inline int64_t GetId() { return Get().dev; }
 
    /** @brief Return true if any of the backends in the backend mask, @a b_mask,
        are allowed. */
@@ -316,14 +316,14 @@ MemoryClass GetMemoryClass(const Memory<T> &mem, bool on_dev)
     HostMemoryClass, otherwise. */
 /** Also, if @a on_dev = true, the device flag of @a mem will be set. */
 template <typename T>
-inline const T *Read(const Memory<T> &mem, int size, bool on_dev = true)
+inline const T *Read(const Memory<T> &mem, int64_t size, bool on_dev = true)
 {
    return mem.Read(GetMemoryClass(mem, on_dev), size);
 }
 
-/** @brief Shortcut to Read(const Memory<T> &mem, int size, false) */
+/** @brief Shortcut to Read(const Memory<T> &mem, int64_t size, false) */
 template <typename T>
-inline const T *HostRead(const Memory<T> &mem, int size)
+inline const T *HostRead(const Memory<T> &mem, int64_t size)
 {
    return mfem::Read(mem, size, false);
 }
@@ -333,14 +333,14 @@ inline const T *HostRead(const Memory<T> &mem, int size)
     HostMemoryClass, otherwise. */
 /** Also, if @a on_dev = true, the device flag of @a mem will be set. */
 template <typename T>
-inline T *Write(Memory<T> &mem, int size, bool on_dev = true)
+inline T *Write(Memory<T> &mem, int64_t size, bool on_dev = true)
 {
    return mem.Write(GetMemoryClass(mem, on_dev), size);
 }
 
-/** @brief Shortcut to Write(const Memory<T> &mem, int size, false) */
+/** @brief Shortcut to Write(const Memory<T> &mem, int64_t size, false) */
 template <typename T>
-inline T *HostWrite(Memory<T> &mem, int size)
+inline T *HostWrite(Memory<T> &mem, int64_t size)
 {
    return mfem::Write(mem, size, false);
 }
@@ -350,14 +350,14 @@ inline T *HostWrite(Memory<T> &mem, int size)
     HostMemoryClass, otherwise. */
 /** Also, if @a on_dev = true, the device flag of @a mem will be set. */
 template <typename T>
-inline T *ReadWrite(Memory<T> &mem, int size, bool on_dev = true)
+inline T *ReadWrite(Memory<T> &mem, int64_t size, bool on_dev = true)
 {
    return mem.ReadWrite(GetMemoryClass(mem, on_dev), size);
 }
 
-/** @brief Shortcut to ReadWrite(Memory<T> &mem, int size, false) */
+/** @brief Shortcut to ReadWrite(Memory<T> &mem, int64_t size, false) */
 template <typename T>
-inline T *HostReadWrite(Memory<T> &mem, int size)
+inline T *HostReadWrite(Memory<T> &mem, int64_t size)
 {
    return mfem::ReadWrite(mem, size, false);
 }

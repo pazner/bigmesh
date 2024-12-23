@@ -15,12 +15,12 @@
 namespace mfem
 {
 
-int BarycentricToGmshTet(int *b, int ref)
+int64_t BarycentricToGmshTet(int64_t *b, int64_t ref)
 {
-   int i = b[0];
-   int j = b[1];
-   int k = b[2];
-   int l = b[3];
+   int64_t i = b[0];
+   int64_t j = b[1];
+   int64_t k = b[2];
+   int64_t l = b[3];
    bool ibdr = (i == 0);
    bool jbdr = (j == 0);
    bool kbdr = (k == 0);
@@ -41,7 +41,7 @@ int BarycentricToGmshTet(int *b, int ref)
    {
       return 3;
    }
-   int offset = 4;
+   int64_t offset = 4;
    if (jbdr && kbdr) // Edge DOF on j == 0 and k == 0
    {
       return offset + i - 1;
@@ -71,7 +71,7 @@ int BarycentricToGmshTet(int *b, int ref)
    offset += 6 * (ref - 1);
    if (kbdr)
    {
-      int b_out[3];
+      int64_t b_out[3];
       b_out[0] = j-1;
       b_out[1] = i-1;
       b_out[2] = ref - i - j - 1;
@@ -79,7 +79,7 @@ int BarycentricToGmshTet(int *b, int ref)
    }
    else if (jbdr)
    {
-      int b_out[3];
+      int64_t b_out[3];
       b_out[0] = i-1;
       b_out[1] = k-1;
       b_out[2] = ref - i - k - 1;
@@ -88,7 +88,7 @@ int BarycentricToGmshTet(int *b, int ref)
    }
    else if (ibdr)
    {
-      int b_out[3];
+      int64_t b_out[3];
       b_out[0] = k-1;
       b_out[1] = j-1;
       b_out[2] = ref - j - k - 1;
@@ -97,7 +97,7 @@ int BarycentricToGmshTet(int *b, int ref)
    }
    else if (lbdr)
    {
-      int b_out[3];
+      int64_t b_out[3];
       b_out[0] = ref-j-k-1;
       b_out[1] = j-1;
       b_out[2] = k-1;
@@ -107,7 +107,7 @@ int BarycentricToGmshTet(int *b, int ref)
 
    // Recursive numbering for interior
    {
-      int b_out[4];
+      int64_t b_out[4];
       b_out[0] = i-1;
       b_out[1] = j-1;
       b_out[2] = k-1;
@@ -117,10 +117,10 @@ int BarycentricToGmshTet(int *b, int ref)
    }
 }
 
-int CartesianToGmshQuad(int idx_in[], int ref)
+int64_t CartesianToGmshQuad(int64_t idx_in[], int64_t ref)
 {
-   int i = idx_in[0];
-   int j = idx_in[1];
+   int64_t i = idx_in[0];
+   int64_t j = idx_in[1];
    // Do we lie on any of the edges
    bool ibdr = (i == 0 || i == ref);
    bool jbdr = (j == 0 || j == ref);
@@ -128,7 +128,7 @@ int CartesianToGmshQuad(int idx_in[], int ref)
    {
       return (i ? (j ? 2 : 1) : (j ? 3 : 0));
    }
-   int offset = 4;
+   int64_t offset = 4;
    if (jbdr) // Edge DOF on j==0 or j==ref
    {
       return offset + (j ? 3*ref - 3 - i : i - 1);
@@ -139,7 +139,7 @@ int CartesianToGmshQuad(int idx_in[], int ref)
    }
    else // Recursive numbering for interior
    {
-      int idx_out[2];
+      int64_t idx_out[2];
       idx_out[0] = i-1;
       idx_out[1] = j-1;
       offset += 4 * (ref - 1);
@@ -147,11 +147,11 @@ int CartesianToGmshQuad(int idx_in[], int ref)
    }
 }
 
-int CartesianToGmshHex(int idx_in[], int ref)
+int64_t CartesianToGmshHex(int64_t idx_in[], int64_t ref)
 {
-   int i = idx_in[0];
-   int j = idx_in[1];
-   int k = idx_in[2];
+   int64_t i = idx_in[0];
+   int64_t j = idx_in[1];
+   int64_t k = idx_in[2];
    // Do we lie on any of the edges
    bool ibdr = (i == 0 || i == ref);
    bool jbdr = (j == 0 || j == ref);
@@ -161,7 +161,7 @@ int CartesianToGmshHex(int idx_in[], int ref)
       return (i ? (j ? (k ? 6 : 2) : (k ? 5 : 1)) :
               (j ? (k ? 7 : 3) : (k ? 4 : 0)));
    }
-   int offset = 8;
+   int64_t offset = 8;
    if (jbdr && kbdr) // Edge DOF on x-directed edge
    {
       return offset + (j ? (k ? 12*ref-12-i: 6*ref-6-i) :
@@ -179,7 +179,7 @@ int CartesianToGmshHex(int idx_in[], int ref)
    }
    else if (ibdr) // Face DOF on x-directed face
    {
-      int idx_out[2];
+      int64_t idx_out[2];
       idx_out[0] = i ? j-1 : k-1;
       idx_out[1] = i ? k-1 : j-1;
       offset += (12 + (i ? 3 : 2) * (ref - 1)) * (ref - 1);
@@ -187,7 +187,7 @@ int CartesianToGmshHex(int idx_in[], int ref)
    }
    else if (jbdr) // Face DOF on y-directed face
    {
-      int idx_out[2];
+      int64_t idx_out[2];
       idx_out[0] = j ? ref-i-1 : i-1;
       idx_out[1] = j ? k-1 : k-1;
       offset += (12 + (j ? 4 : 1) * (ref - 1)) * (ref - 1);
@@ -195,7 +195,7 @@ int CartesianToGmshHex(int idx_in[], int ref)
    }
    else if (kbdr) // Face DOF on z-directed face
    {
-      int idx_out[2];
+      int64_t idx_out[2];
       idx_out[0] = k ? i-1 : j-1;
       idx_out[1] = k ? j-1 : i-1;
       offset += (12 + (k ? 5 : 0) * (ref - 1)) * (ref - 1);
@@ -203,7 +203,7 @@ int CartesianToGmshHex(int idx_in[], int ref)
    }
    else // Recursive numbering for interior
    {
-      int idx_out[3];
+      int64_t idx_out[3];
       idx_out[0] = i-1;
       idx_out[1] = j-1;
       idx_out[2] = k-1;
@@ -213,12 +213,12 @@ int CartesianToGmshHex(int idx_in[], int ref)
    }
 }
 
-int WedgeToGmshPri(int idx_in[], int ref)
+int64_t WedgeToGmshPri(int64_t idx_in[], int64_t ref)
 {
-   int i = idx_in[0];
-   int j = idx_in[1];
-   int k = idx_in[2];
-   int l = ref - i -j;
+   int64_t i = idx_in[0];
+   int64_t j = idx_in[1];
+   int64_t k = idx_in[2];
+   int64_t l = ref - i -j;
    bool ibdr = (i == 0);
    bool jbdr = (j == 0);
    bool kbdr = (k == 0 || k == ref);
@@ -235,7 +235,7 @@ int WedgeToGmshPri(int idx_in[], int ref)
    {
       return k ? 5 : 2;
    }
-   int offset = 6;
+   int64_t offset = 6;
    if (jbdr && kbdr)
    {
       return offset + (k ? 6 * (ref - 1) + i - 1: i - 1);
@@ -263,7 +263,7 @@ int WedgeToGmshPri(int idx_in[], int ref)
    offset += 9 * (ref-1);
    if (kbdr) // Triangular faces at k=0 and k=ref
    {
-      int b_out[3];
+      int64_t b_out[3];
       b_out[0] = k ? i-1 : j-1;
       b_out[1] = k ? j-1 : i-1;
       b_out[2] = ref - i - j - 1;
@@ -273,14 +273,14 @@ int WedgeToGmshPri(int idx_in[], int ref)
    offset += (ref-1)*(ref-2);
    if (jbdr) // Quadrilateral face at j=0
    {
-      int idx_out[2];
+      int64_t idx_out[2];
       idx_out[0] = i-1;
       idx_out[1] = k-1;
       return offset + CartesianToGmshQuad(idx_out, ref-2);
    }
    else if (ibdr) // Quadrilateral face at i=0
    {
-      int idx_out[2];
+      int64_t idx_out[2];
       idx_out[0] = k-1;
       idx_out[1] = j-1;
       offset += (ref-1)*(ref-1);
@@ -288,7 +288,7 @@ int WedgeToGmshPri(int idx_in[], int ref)
    }
    else if (lbdr) // Quadrilateral face at l=ref-i-j=0
    {
-      int idx_out[2];
+      int64_t idx_out[2];
       idx_out[0] = j-1;
       idx_out[1] = k-1;
       offset += 2*(ref-1)*(ref-1);
@@ -298,21 +298,21 @@ int WedgeToGmshPri(int idx_in[], int ref)
    // The Gmsh Prism interiors are a tensor product of segments of order ref-2
    // and triangles of order ref-3
    {
-      int b_out[3];
+      int64_t b_out[3];
       b_out[0] = i-1;
       b_out[1] = j-1;
       b_out[2] = ref - i - j - 1;
-      int ot = BarycentricToVTKTriangle(b_out, ref-3);
-      int os = (k==1) ? 0 : (k == ref-1 ? 1 : k);
+      int64_t ot = BarycentricToVTKTriangle(b_out, ref-3);
+      int64_t os = (k==1) ? 0 : (k == ref-1 ? 1 : k);
       return offset + (ref-1) * ot + os;
    }
 }
 
-int CartesianToGmshPyramid(int idx_in[], int ref)
+int64_t CartesianToGmshPyramid(int64_t idx_in[], int64_t ref)
 {
-   int i = idx_in[0];
-   int j = idx_in[1];
-   int k = idx_in[2];
+   int64_t i = idx_in[0];
+   int64_t j = idx_in[1];
+   int64_t k = idx_in[2];
    // Do we lie on any of the edges
    bool ibdr = (i == 0 || i == ref-k);
    bool jbdr = (j == 0 || j == ref-k);
@@ -325,7 +325,7 @@ int CartesianToGmshPyramid(int idx_in[], int ref)
    {
       return 4;
    }
-   int offset = 5;
+   int64_t offset = 5;
    if (jbdr && kbdr)
    {
       return offset + (j ? (6 * ref - 6 - i) : (i - 1));
@@ -341,7 +341,7 @@ int CartesianToGmshPyramid(int idx_in[], int ref)
    offset += 8*(ref-1);
    if (jbdr)
    {
-      int b_out[3];
+      int64_t b_out[3];
       b_out[0] = j ? ref - i - k - 1 : i - 1;
       b_out[1] = k - 1;
       b_out[2] = (j ? i - 1 : ref - i - k - 1);
@@ -350,7 +350,7 @@ int CartesianToGmshPyramid(int idx_in[], int ref)
    }
    else if (ibdr)
    {
-      int b_out[3];
+      int64_t b_out[3];
       b_out[0] = i ? j - 1: ref - j - k - 1;
       b_out[1] = k - 1;
       b_out[2] = (i ? ref - j - k - 1: j - 1);
@@ -359,7 +359,7 @@ int CartesianToGmshPyramid(int idx_in[], int ref)
    }
    else if (kbdr)
    {
-      int idx_out[2];
+      int64_t idx_out[2];
       idx_out[0] = k ? i-1 : j-1;
       idx_out[1] = k ? j-1 : i-1;
       offset += 2 * (ref - 1) * (ref - 2);
@@ -367,7 +367,7 @@ int CartesianToGmshPyramid(int idx_in[], int ref)
    }
    offset += (2 * (ref - 2) + (ref - 1)) * (ref - 1) ;
    {
-      int idx_out[3];
+      int64_t idx_out[3];
       idx_out[0] = i-1;
       idx_out[1] = j-1;
       idx_out[2] = k-1;
@@ -375,20 +375,20 @@ int CartesianToGmshPyramid(int idx_in[], int ref)
    }
 }
 
-void GmshHOSegmentMapping(int order, int *map)
+void GmshHOSegmentMapping(int64_t order, int64_t *map)
 {
    map[0] = 0;
    map[order] = 1;
-   for (int i=1; i<order; i++)
+   for (int64_t i=1; i<order; i++)
    {
       map[i] = i + 1;
    }
 }
 
-void GmshHOTriangleMapping(int order, int *map)
+void GmshHOTriangleMapping(int64_t order, int64_t *map)
 {
-   int b[3];
-   int o = 0;
+   int64_t b[3];
+   int64_t o = 0;
    for (b[1]=0; b[1]<=order; ++b[1])
    {
       for (b[0]=0; b[0]<=order-b[1]; ++b[0])
@@ -400,10 +400,10 @@ void GmshHOTriangleMapping(int order, int *map)
    }
 }
 
-void GmshHOQuadrilateralMapping(int order, int *map)
+void GmshHOQuadrilateralMapping(int64_t order, int64_t *map)
 {
-   int b[2];
-   int o = 0;
+   int64_t b[2];
+   int64_t o = 0;
    for (b[1]=0; b[1]<=order; b[1]++)
    {
       for (b[0]=0; b[0]<=order; b[0]++)
@@ -414,10 +414,10 @@ void GmshHOQuadrilateralMapping(int order, int *map)
    }
 }
 
-void GmshHOTetrahedronMapping(int order, int *map)
+void GmshHOTetrahedronMapping(int64_t order, int64_t *map)
 {
-   int b[4];
-   int o = 0;
+   int64_t b[4];
+   int64_t o = 0;
    for (b[2]=0; b[2]<=order; ++b[2])
    {
 
@@ -433,10 +433,10 @@ void GmshHOTetrahedronMapping(int order, int *map)
    }
 }
 
-void GmshHOHexahedronMapping(int order, int *map)
+void GmshHOHexahedronMapping(int64_t order, int64_t *map)
 {
-   int b[3];
-   int o = 0;
+   int64_t b[3];
+   int64_t o = 0;
    for (b[2]=0; b[2]<=order; b[2]++)
    {
       for (b[1]=0; b[1]<=order; b[1]++)
@@ -450,10 +450,10 @@ void GmshHOHexahedronMapping(int order, int *map)
    }
 }
 
-void GmshHOWedgeMapping(int order, int *map)
+void GmshHOWedgeMapping(int64_t order, int64_t *map)
 {
-   int b[3];
-   int o = 0;
+   int64_t b[3];
+   int64_t o = 0;
    for (b[2]=0; b[2]<=order; b[2]++)
    {
       for (b[1]=0; b[1]<=order; b[1]++)
@@ -467,10 +467,10 @@ void GmshHOWedgeMapping(int order, int *map)
    }
 }
 
-void GmshHOPyramidMapping(int order, int *map)
+void GmshHOPyramidMapping(int64_t order, int64_t *map)
 {
-   int b[3];
-   int o = 0;
+   int64_t b[3];
+   int64_t o = 0;
    for (b[2]=0; b[2]<=order; b[2]++)
    {
       for (b[1]=0; b[1]<=order - b[2]; b[1]++)

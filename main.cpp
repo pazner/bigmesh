@@ -10,7 +10,7 @@ using namespace std;
 using namespace mfem;
 
 void SavePartitionedMesh(const string &prefix, Mesh &mesh, int np,
-                         int *partitioning)
+                         int64_t *partitioning)
 {
    MeshPartitioner partitioner(mesh, np, partitioning);
    MeshPart mesh_part;
@@ -51,7 +51,8 @@ int main(int argc, char *argv[])
    // Partition the fine mesh
    tic_toc.Restart();
    cout << "Partitioning... " << flush;
-   Array<int> partitioning(mesh->GeneratePartitioning(np), mesh->GetNE(), true);
+   Array<int64_t> partitioning(mesh->GeneratePartitioning(np), mesh->GetNE(),
+                               true);
    cout << "Done. " << tic_toc.RealTime() << endl;
 
    cout << "Saving..." << endl;

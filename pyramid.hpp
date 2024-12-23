@@ -21,7 +21,7 @@ namespace mfem
 class Pyramid : public Element
 {
 protected:
-   int indices[5];
+   int64_t indices[5];
 
 public:
    typedef Geometry::Constants<Geometry::PYRAMID> geom_t;
@@ -29,40 +29,40 @@ public:
    Pyramid() : Element(Geometry::PYRAMID) { }
 
    /// Constructs pyramid by specifying the indices and the attribute.
-   Pyramid(const int *ind, int attr = 1);
+   Pyramid(const int64_t *ind, int64_t attr = 1);
 
    /// Constructs pyramid by specifying the indices and the attribute.
-   Pyramid(int ind1, int ind2, int ind3, int ind4, int ind5,
-           int attr = 1);
+   Pyramid(int64_t ind1, int64_t ind2, int64_t ind3, int64_t ind4, int64_t ind5,
+           int64_t attr = 1);
 
    /// Return element's type.
    Type GetType() const override { return Element::PYRAMID; }
 
    /// Get the indices defining the vertices.
-   void GetVertices(Array<int> &v) const override;
+   void GetVertices(Array<int64_t> &v) const override;
 
    /// Set the indices defining the vertices.
-   void SetVertices(const Array<int> &v) override;
+   void SetVertices(const Array<int64_t> &v) override;
 
    /// @note The returned array should NOT be deleted by the caller.
-   int * GetVertices () override { return indices; }
+   int64_t * GetVertices () override { return indices; }
 
    /// Set the indices defining the vertices.
-   void SetVertices(const int *ind) override;
+   void SetVertices(const int64_t *ind) override;
 
-   int GetNVertices() const override { return 5; }
+   int64_t GetNVertices() const override { return 5; }
 
-   int GetNEdges() const override { return 8; }
+   int64_t GetNEdges() const override { return 8; }
 
-   const int *GetEdgeVertices(int ei) const override
+   const int64_t *GetEdgeVertices(int64_t ei) const override
    { return geom_t::Edges[ei]; }
 
-   int GetNFaces() const override { return 5; }
+   int64_t GetNFaces() const override { return 5; }
 
-   int GetNFaceVertices(int fi) const override
+   int64_t GetNFaceVertices(int64_t fi) const override
    { return ( ( fi < 1 ) ? 4 : 3); }
 
-   const int *GetFaceVertices(int fi) const override
+   const int64_t *GetFaceVertices(int64_t fi) const override
    { return geom_t::FaceVert[fi]; }
 
    Element *Duplicate(Mesh *m) const override

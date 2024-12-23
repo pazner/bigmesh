@@ -15,9 +15,9 @@
 namespace mfem
 {
 
-Vertex::Vertex (real_t *xx, int dim)
+Vertex::Vertex (real_t *xx, int64_t dim)
 {
-   for (int i = 0; i < dim; i++)
+   for (int64_t i = 0; i < dim; i++)
    {
       coord[i] = xx[i];
    }

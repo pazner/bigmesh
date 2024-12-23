@@ -37,7 +37,7 @@ namespace mfem
 
 bool Mesh::remove_unused_vertices = true;
 
-void Mesh::ReadMFEMMesh(std::istream &input, int version, int &curved)
+void Mesh::ReadMFEMMesh(std::istream &input, int64_t version, int64_t &curved)
 {
    // Read MFEM mesh v1.0, v1.2, or v1.3 format
    MFEM_VERIFY(version == 10 || version == 12 || version == 13,
@@ -58,7 +58,7 @@ void Mesh::ReadMFEMMesh(std::istream &input, int version, int &curved)
    MFEM_VERIFY(ident == "elements", "invalid mesh file");
    input >> NumOfElements;
    elements.SetSize(NumOfElements);
-   for (int j = 0; j < NumOfElements; j++)
+   for (int64_t j = 0; j < NumOfElements; j++)
    {
       elements[j] = ReadElement(input);
    }
@@ -81,7 +81,7 @@ void Mesh::ReadMFEMMesh(std::istream &input, int version, int &curved)
    MFEM_VERIFY(ident == "boundary", "invalid mesh file");
    input >> NumOfBdrElements;
    boundary.SetSize(NumOfBdrElements);
-   for (int j = 0; j < NumOfBdrElements; j++)
+   for (int64_t j = 0; j < NumOfBdrElements; j++)
    {
       boundary[j] = ReadElement(input);
    }
@@ -110,9 +110,9 @@ void Mesh::ReadMFEMMesh(std::istream &input, int version, int &curved)
    {
       // read the vertices
       spaceDim = atoi(ident.c_str());
-      for (int j = 0; j < NumOfVertices; j++)
+      for (int64_t j = 0; j < NumOfVertices; j++)
       {
-         for (int i = 0; i < spaceDim; i++)
+         for (int64_t i = 0; i < spaceDim; i++)
          {
             input >> vertices[j](i);
          }
@@ -132,7 +132,7 @@ void Mesh::ReadMFEMMesh(std::istream &input, int version, int &curved)
 
 void Mesh::ReadLineMesh(std::istream &input)
 {
-   int j,p1,p2,a;
+   int64_t j,p1,p2,a;
 
    Dim = 1;
 
@@ -153,7 +153,7 @@ void Mesh::ReadLineMesh(std::istream &input)
       elements[j] = new Segment(p1-1, p2-1, a);
    }
 
-   int ind[1];
+   int64_t ind[1];
    input >> NumOfBdrElements;
    boundary.SetSize(NumOfBdrElements);
    for (j = 0; j < NumOfBdrElements; j++)
@@ -164,9 +164,9 @@ void Mesh::ReadLineMesh(std::istream &input)
    }
 }
 
-void Mesh::ReadNetgen2DMesh(std::istream &input, int &curved)
+void Mesh::ReadNetgen2DMesh(std::istream &input, int64_t &curved)
 {
-   int ints[32], attr, n;
+   int64_t ints[32], attr, n;
 
    // Read planar mesh in Netgen format.
    Dim = 2;
@@ -174,7 +174,7 @@ void Mesh::ReadNetgen2DMesh(std::istream &input, int &curved)
    // Read the boundary elements.
    input >> NumOfBdrElements;
    boundary.SetSize(NumOfBdrElements);
-   for (int i = 0; i < NumOfBdrElements; i++)
+   for (int64_t i = 0; i < NumOfBdrElements; i++)
    {
       input >> attr
             >> ints[0] >> ints[1];
@@ -185,10 +185,10 @@ void Mesh::ReadNetgen2DMesh(std::istream &input, int &curved)
    // Read the elements.
    input >> NumOfElements;
    elements.SetSize(NumOfElements);
-   for (int i = 0; i < NumOfElements; i++)
+   for (int64_t i = 0; i < NumOfElements; i++)
    {
       input >> attr >> n;
-      for (int j = 0; j < n; j++)
+      for (int64_t j = 0; j < n; j++)
       {
          input >> ints[j];
          ints[j]--;
@@ -212,8 +212,8 @@ void Mesh::ReadNetgen2DMesh(std::istream &input, int &curved)
       // Read the vertices.
       input >> NumOfVertices;
       vertices.SetSize(NumOfVertices);
-      for (int i = 0; i < NumOfVertices; i++)
-         for (int j = 0; j < Dim; j++)
+      for (int64_t i = 0; i < NumOfVertices; i++)
+         for (int64_t j = 0; j < Dim; j++)
          {
             input >> vertices[i](j);
          }
@@ -228,7 +228,7 @@ void Mesh::ReadNetgen2DMesh(std::istream &input, int &curved)
 
 void Mesh::ReadNetgen3DMesh(std::istream &input)
 {
-   int ints[32], attr;
+   int64_t ints[32], attr;
 
    // Read a Netgen format mesh of tetrahedra.
    Dim = 3;
@@ -237,8 +237,8 @@ void Mesh::ReadNetgen3DMesh(std::istream &input)
    input >> NumOfVertices;
 
    vertices.SetSize(NumOfVertices);
-   for (int i = 0; i < NumOfVertices; i++)
-      for (int j = 0; j < Dim; j++)
+   for (int64_t i = 0; i < NumOfVertices; i++)
+      for (int64_t j = 0; j < Dim; j++)
       {
          input >> vertices[i](j);
       }
@@ -246,10 +246,10 @@ void Mesh::ReadNetgen3DMesh(std::istream &input)
    // Read the elements
    input >> NumOfElements;
    elements.SetSize(NumOfElements);
-   for (int i = 0; i < NumOfElements; i++)
+   for (int64_t i = 0; i < NumOfElements; i++)
    {
       input >> attr;
-      for (int j = 0; j < 4; j++)
+      for (int64_t j = 0; j < 4; j++)
       {
          input >> ints[j];
          ints[j]--;
@@ -260,10 +260,10 @@ void Mesh::ReadNetgen3DMesh(std::istream &input)
    // Read the boundary information.
    input >> NumOfBdrElements;
    boundary.SetSize(NumOfBdrElements);
-   for (int i = 0; i < NumOfBdrElements; i++)
+   for (int64_t i = 0; i < NumOfBdrElements; i++)
    {
       input >> attr;
-      for (int j = 0; j < 3; j++)
+      for (int64_t j = 0; j < 3; j++)
       {
          input >> ints[j];
          ints[j]--;
@@ -274,8 +274,8 @@ void Mesh::ReadNetgen3DMesh(std::istream &input)
 
 void Mesh::ReadTrueGridMesh(std::istream &input)
 {
-   int i, j, ints[32], attr;
-   const int buflen = 1024;
+   int64_t i, j, ints[32], attr;
+   const int64_t buflen = 1024;
    char buf[buflen];
 
    // TODO: find the actual dimension
@@ -283,7 +283,7 @@ void Mesh::ReadTrueGridMesh(std::istream &input)
 
    if (Dim == 2)
    {
-      int vari;
+      int64_t vari;
       real_t varf;
 
       input >> vari >> NumOfVertices >> vari >> vari >> NumOfElements;
@@ -319,7 +319,7 @@ void Mesh::ReadTrueGridMesh(std::istream &input)
    }
    else if (Dim == 3)
    {
-      int vari;
+      int64_t vari;
       real_t varf;
       input >> vari >> NumOfVertices >> NumOfElements;
       input.getline(buf, buflen);
@@ -366,44 +366,44 @@ void Mesh::ReadTrueGridMesh(std::istream &input)
 }
 
 // see Tetrahedron::edges
-const int Mesh::vtk_quadratic_tet[10] =
+const int64_t Mesh::vtk_quadratic_tet[10] =
 { 0, 1, 2, 3, 4, 7, 5, 6, 8, 9 };
 
 // see Pyramid::edges & Mesh::GenerateFaces
 // https://www.vtk.org/doc/nightly/html/classvtkBiQuadraticQuadraticWedge.html
-const int Mesh::vtk_quadratic_pyramid[13] =
+const int64_t Mesh::vtk_quadratic_pyramid[13] =
 { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
 
 // see Wedge::edges & Mesh::GenerateFaces
 // https://www.vtk.org/doc/nightly/html/classvtkBiQuadraticQuadraticWedge.html
-const int Mesh::vtk_quadratic_wedge[18] =
+const int64_t Mesh::vtk_quadratic_wedge[18] =
 { 0, 2, 1, 3, 5, 4, 8, 7, 6, 11, 10, 9, 12, 14, 13, 17, 16, 15};
 
 // see Hexahedron::edges & Mesh::GenerateFaces
-const int Mesh::vtk_quadratic_hex[27] =
+const int64_t Mesh::vtk_quadratic_hex[27] =
 {
    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
    24, 22, 21, 23, 20, 25, 26
 };
 
-void Mesh::CreateVTKMesh(const Vector &points, const Array<int> &cell_data,
-                         const Array<int> &cell_offsets,
-                         const Array<int> &cell_types,
-                         const Array<int> &cell_attributes,
-                         int &curved, int &read_gf, bool &finalize_topo)
+void Mesh::CreateVTKMesh(const Vector &points, const Array<int64_t> &cell_data,
+                         const Array<int64_t> &cell_offsets,
+                         const Array<int64_t> &cell_types,
+                         const Array<int64_t> &cell_attributes,
+                         int64_t &curved, int64_t &read_gf, bool &finalize_topo)
 {
-   int np = points.Size()/3;
+   int64_t np = points.Size()/3;
    Dim = -1;
    NumOfElements = cell_types.Size();
    elements.SetSize(NumOfElements);
 
-   int order = -1;
+   int64_t order = -1;
    bool legacy_elem = false, lagrange_elem = false;
 
-   for (int i = 0; i < NumOfElements; i++)
+   for (int64_t i = 0; i < NumOfElements; i++)
    {
-      int j = (i > 0) ? cell_offsets[i-1] : 0;
-      int ct = cell_types[i];
+      int64_t j = (i > 0) ? cell_offsets[i-1] : 0;
+      int64_t ct = cell_types[i];
       Geometry::Type geom = VTKGeometry::GetMFEMGeometry(ct);
       elements[i] = NewElement(geom);
       if (cell_attributes.Size() > 0)
@@ -414,8 +414,8 @@ void Mesh::CreateVTKMesh(const Vector &points, const Array<int> &cell_data,
       // for all element types *except* prisms, which require a permutation
       if (geom == Geometry::PRISM && ct != VTKGeometry::LAGRANGE_PRISM)
       {
-         int prism_vertices[6];
-         for (int k=0; k<6; ++k)
+         int64_t prism_vertices[6];
+         for (int64_t k=0; k<6; ++k)
          {
             prism_vertices[k] = cell_data[j+VTKGeometry::PrismMap[k]];
          }
@@ -426,8 +426,8 @@ void Mesh::CreateVTKMesh(const Vector &points, const Array<int> &cell_data,
          elements[i]->SetVertices(&cell_data[j]);
       }
 
-      int elem_dim = Geometry::Dimension[geom];
-      int elem_order = VTKGeometry::GetOrder(ct, cell_offsets[i] - j);
+      int64_t elem_dim = Geometry::Dimension[geom];
+      int64_t elem_order = VTKGeometry::GetOrder(ct, cell_offsets[i] - j);
 
       if (VTKGeometry::IsLagrange(ct)) { lagrange_elem = true; }
       else { legacy_elem = true; }
@@ -447,10 +447,10 @@ void Mesh::CreateVTKMesh(const Vector &points, const Array<int> &cell_data,
    if (np > 0)
    {
       real_t min_value, max_value;
-      for (int d = 3; d > 0; --d)
+      for (int64_t d = 3; d > 0; --d)
       {
          min_value = max_value = points(3*0 + d-1);
-         for (int i = 1; i < np; i++)
+         for (int64_t i = 1; i < np; i++)
          {
             min_value = std::min(min_value, points(3*i + d-1));
             max_value = std::max(max_value, points(3*i + d-1));
@@ -468,7 +468,7 @@ void Mesh::CreateVTKMesh(const Vector &points, const Array<int> &cell_data,
    {
       NumOfVertices = np;
       vertices.SetSize(np);
-      for (int i = 0; i < np; i++)
+      for (int64_t i = 0; i < np; i++)
       {
          vertices[i](0) = points(3*i+0);
          vertices[i](1) = points(3*i+1);
@@ -501,8 +501,8 @@ bool StringCompare(const char *s1, const char *s2)
 struct BufferReaderBase
 {
    enum HeaderType { UINT32_HEADER, UINT64_HEADER };
-   virtual void ReadBinary(const char *buf, void *dest, int n) const = 0;
-   virtual void ReadBase64(const char *txt, void *dest, int n) const = 0;
+   virtual void ReadBinary(const char *buf, void *dest, int64_t n) const = 0;
+   virtual void ReadBase64(const char *txt, void *dest, int64_t n) const = 0;
    virtual ~BufferReaderBase() { }
 };
 
@@ -545,9 +545,9 @@ struct BufferReader : BufferReaderBase
    /// 32 or 64 bytes depending on the value of @a header_type. The number of
    /// blocks is determined by reading the first integer (of type @a
    /// header_type) pointed to by @a header_buf.
-   int NumHeaderBytes(const char *header_buf) const
+   int64_t NumHeaderBytes(const char *header_buf) const
    {
-      if (!compressed) { return static_cast<int>(HeaderEntrySize()); }
+      if (!compressed) { return static_cast<int64_t>(HeaderEntrySize()); }
       return (3 + ReadHeaderEntry(header_buf))*HeaderEntrySize();
    }
 
@@ -557,7 +557,7 @@ struct BufferReader : BufferReaderBase
    /// rest of the data, in the buffer @a header_buf. The data buffer @a buf
    /// does @b not contain a header.
    void ReadBinaryWithHeader(const char *header_buf, const char *buf,
-                             void *dest_void, int n) const
+                             void *dest_void, int64_t n) const
    {
       std::vector<char> uncompressed_data;
       T *dest = static_cast<T*>(dest_void);
@@ -570,11 +570,11 @@ struct BufferReader : BufferReaderBase
          //    header_t uncompressed_block_size;
          //    header_t uncompressed_last_block_size;
          //    header_t compressed_size[number_of_blocks];
-         int header_entry_size = HeaderEntrySize();
-         int nblocks = ReadHeaderEntry(header_buf);
+         int64_t header_entry_size = HeaderEntrySize();
+         int64_t nblocks = ReadHeaderEntry(header_buf);
          header_buf += header_entry_size;
-         std::vector<int> header(nblocks + 2);
-         for (int i=0; i<nblocks+2; ++i)
+         std::vector<int64_t> header(nblocks + 2);
+         for (int64_t i=0; i<nblocks+2; ++i)
          {
             header[i] = ReadHeaderEntry(header_buf);
             header_buf += header_entry_size;
@@ -583,16 +583,16 @@ struct BufferReader : BufferReaderBase
          Bytef *dest_ptr = (Bytef *)uncompressed_data.data();
          Bytef *dest_start = dest_ptr;
          const Bytef *source_ptr = (const Bytef *)buf;
-         for (int i=0; i<nblocks; ++i)
+         for (int64_t i=0; i<nblocks; ++i)
          {
             uLongf source_len = header[i+2];
             uLong dest_len = (i == nblocks-1) ? header[1] : header[0];
-            int res = uncompress(dest_ptr, &dest_len, source_ptr, source_len);
+            int64_t res = uncompress(dest_ptr, &dest_len, source_ptr, source_len);
             MFEM_VERIFY(res == Z_OK, "Error uncompressing");
             dest_ptr += dest_len;
             source_ptr += source_len;
          }
-         MFEM_VERIFY(int(sizeof(F)*n) == (dest_ptr - dest_start),
+         MFEM_VERIFY(int64_t(sizeof(F)*n) == (dest_ptr - dest_start),
                      "AppendedData: wrong data size");
          buf = uncompressed_data.data();
 #else
@@ -624,7 +624,7 @@ struct BufferReader : BufferReaderBase
       }
       else
       {
-         for (int i=0; i<n; ++i)
+         for (int64_t i=0; i<n; ++i)
          {
             // Read binary data as type F, place in array as type T
             dest[i] = bin_io::read<F>(buf + i*sizeof(F));
@@ -635,7 +635,7 @@ struct BufferReader : BufferReaderBase
    /// Read @a n elements of type @a F from source buffer @a buf into
    /// (pre-allocated) array of elements of type @a T stored in destination
    /// buffer @a dest. The input buffer contains both the header and the data.
-   void ReadBinary(const char *buf, void *dest, int n) const override
+   void ReadBinary(const char *buf, void *dest, int64_t n) const override
    {
       ReadBinaryWithHeader(buf, buf + NumHeaderBytes(buf), dest, n);
    }
@@ -644,7 +644,7 @@ struct BufferReader : BufferReaderBase
    /// (pre-allocated) array of elements of type @a T stored in destination
    /// buffer @a dest. The base-64-encoded data is given by the null-terminated
    /// string @a txt, which contains both the header and the data.
-   void ReadBase64(const char *txt, void *dest, int n) const override
+   void ReadBase64(const char *txt, void *dest, int64_t n) const override
    {
       // Skip whitespace
       while (*txt)
@@ -657,13 +657,14 @@ struct BufferReader : BufferReaderBase
          // Decode the first entry of the header, which we need to determine
          // how long the rest of the header is.
          std::vector<char> nblocks_buf;
-         int nblocks_b64 = static_cast<int>(bin_io::NumBase64Chars(HeaderEntrySize()));
+         int64_t nblocks_b64 = static_cast<int64_t>(bin_io::NumBase64Chars(
+                                                       HeaderEntrySize()));
          bin_io::DecodeBase64(txt, nblocks_b64, nblocks_buf);
          std::vector<char> data, header;
          // Compute number of characters needed to encode header in base 64,
          // then round to nearest multiple of 4 to take padding into account.
-         int header_b64 = static_cast<int>(bin_io::NumBase64Chars(NumHeaderBytes(
-                                                                     nblocks_buf.data())));
+         int64_t header_b64 = static_cast<int64_t>(bin_io::NumBase64Chars(NumHeaderBytes(
+                                                                             nblocks_buf.data())));
          // If data is compressed, header is encoded separately
          bin_io::DecodeBase64(txt, header_b64, header);
          bin_io::DecodeBase64(txt + header_b64, strlen(txt)-header_b64, data);
@@ -751,14 +752,14 @@ struct XMLDataReader
          }
       }
 
-      type_map["Int8"] = new BufferReader<int, int8_t>(compressed, htype);
-      type_map["Int16"] = new BufferReader<int, int16_t>(compressed, htype);
-      type_map["Int32"] = new BufferReader<int, int32_t>(compressed, htype);
-      type_map["Int64"] = new BufferReader<int, int64_t>(compressed, htype);
-      type_map["UInt8"] = new BufferReader<int, uint8_t>(compressed, htype);
-      type_map["UInt16"] = new BufferReader<int, uint16_t>(compressed, htype);
-      type_map["UInt32"] = new BufferReader<int, uint32_t>(compressed, htype);
-      type_map["UInt64"] = new BufferReader<int, uint64_t>(compressed, htype);
+      type_map["Int8"] = new BufferReader<int64_t, int8_t>(compressed, htype);
+      type_map["Int16"] = new BufferReader<int64_t, int16_t>(compressed, htype);
+      type_map["Int32"] = new BufferReader<int64_t, int32_t>(compressed, htype);
+      type_map["Int64"] = new BufferReader<int64_t, int64_t>(compressed, htype);
+      type_map["UInt8"] = new BufferReader<int64_t, uint8_t>(compressed, htype);
+      type_map["UInt16"] = new BufferReader<int64_t, uint16_t>(compressed, htype);
+      type_map["UInt32"] = new BufferReader<int64_t, uint32_t>(compressed, htype);
+      type_map["UInt64"] = new BufferReader<int64_t, uint64_t>(compressed, htype);
       type_map["Float32"] = new BufferReader<double, float>(compressed, htype);
       type_map["Float64"] = new BufferReader<double, double>(compressed, htype);
    }
@@ -767,7 +768,7 @@ struct XMLDataReader
    /// (pre-allocated) destination array @a dest, where @a dest stores @a n
    /// elements of type @a T.
    template <typename T>
-   void Read(const XMLElement *xml_elem, T *dest, int n)
+   void Read(const XMLElement *xml_elem, T *dest, int64_t n)
    {
       static const char *erstr = "Error reading XML DataArray";
       MFEM_VERIFY(StringCompare(xml_elem->Name(), "DataArray"), erstr);
@@ -777,12 +778,12 @@ struct XMLDataReader
          const char *txt = xml_elem->GetText();
          MFEM_VERIFY(txt != NULL, erstr);
          std::istringstream data_stream(txt);
-         for (int i=0; i<n; ++i) { data_stream >> dest[i]; }
+         for (int64_t i=0; i<n; ++i) { data_stream >> dest[i]; }
       }
       else if (StringCompare(format, "appended"))
       {
          VerifyBinaryOptions();
-         int offset = xml_elem->IntAttribute("offset");
+         int64_t offset = xml_elem->IntAttribute("offset");
          const char *type = xml_elem->Attribute("type");
          MFEM_VERIFY(type != NULL, erstr);
          BufferReaderBase *reader = type_map[type];
@@ -858,7 +859,8 @@ struct XMLDataReader
 
 } // namespace vtk_xml
 
-void Mesh::ReadXML_VTKMesh(std::istream &input, int &curved, int &read_gf,
+void Mesh::ReadXML_VTKMesh(std::istream &input, int64_t &curved,
+                           int64_t &read_gf,
                            bool &finalize_topo, const std::string &xml_prefix)
 {
    using namespace vtk_xml;
@@ -892,8 +894,8 @@ void Mesh::ReadXML_VTKMesh(std::istream &input, int &curved, int &read_gf,
    MFEM_VERIFY(StringCompare(piece->Name(), "Piece"), erstr);
    MFEM_VERIFY(piece->NextSiblingElement() == NULL,
                "XML VTK meshes with more than one Piece are not supported");
-   int npts = piece->IntAttribute("NumberOfPoints");
-   int ncells = piece->IntAttribute("NumberOfCells");
+   int64_t npts = piece->IntAttribute("NumberOfPoints");
+   int64_t ncells = piece->IntAttribute("NumberOfCells");
 
    // Read the points
    Vector points(3*npts);
@@ -914,7 +916,7 @@ void Mesh::ReadXML_VTKMesh(std::istream &input, int &curved, int &read_gf,
    if (pts_xml == NULL) { MFEM_ABORT(erstr); }
 
    // Read the cells
-   Array<int> cell_data, cell_offsets(ncells), cell_types(ncells);
+   Array<int64_t> cell_data, cell_offsets(ncells), cell_types(ncells);
    const XMLElement *cells_xml;
    for (cells_xml = piece->FirstChildElement();
         cells_xml != NULL;
@@ -946,7 +948,7 @@ void Mesh::ReadXML_VTKMesh(std::istream &input, int &curved, int &read_gf,
             }
          }
          MFEM_VERIFY(cell_data_xml != NULL, erstr);
-         int cell_data_size = cell_offsets.Last();
+         int64_t cell_data_size = cell_offsets.Last();
          cell_data.SetSize(cell_data_size);
          data_reader.Read(cell_data_xml, cell_data.GetData(), cell_data_size);
          break;
@@ -957,7 +959,7 @@ void Mesh::ReadXML_VTKMesh(std::istream &input, int &curved, int &read_gf,
    // Read the element attributes, which are stored as CellData named either
    // "material" or "attribute". We prioritize "material" over "attribute" for
    // backwards compatibility.
-   Array<int> cell_attributes;
+   Array<int64_t> cell_attributes;
    bool found_attributes = false;
    for (const XMLElement *cell_data_xml = piece->FirstChildElement();
         cell_data_xml != NULL;
@@ -985,7 +987,7 @@ void Mesh::ReadXML_VTKMesh(std::istream &input, int &curved, int &read_gf,
                  curved, read_gf, finalize_topo);
 }
 
-void Mesh::ReadVTKMesh(std::istream &input, int &curved, int &read_gf,
+void Mesh::ReadVTKMesh(std::istream &input, int64_t &curved, int64_t &read_gf,
                        bool &finalize_topo)
 {
    // VTK resources:
@@ -1024,7 +1026,7 @@ void Mesh::ReadVTKMesh(std::istream &input, int &curved, int &read_gf,
    while (buff != "POINTS");
 
    Vector points;
-   int np;
+   int64_t np;
    input >> np >> ws;
    getline(input, buff); // "double"
    points.Load(input, 3*np);
@@ -1048,20 +1050,20 @@ void Mesh::ReadVTKMesh(std::istream &input, int &curved, int &read_gf,
    while (buff != "CELLS");
 
    // Read the cells
-   Array<int> cell_data, cell_offsets;
+   Array<int64_t> cell_data, cell_offsets;
    if (buff == "CELLS")
    {
-      int ncells, n;
+      int64_t ncells, n;
       input >> ncells >> n >> ws;
       cell_offsets.SetSize(ncells);
       cell_data.SetSize(n - ncells);
-      int offset = 0;
-      for (int i=0; i<ncells; ++i)
+      int64_t offset = 0;
+      for (int64_t i=0; i<ncells; ++i)
       {
-         int nv;
+         int64_t nv;
          input >> nv;
          cell_offsets[i] = offset + nv;
-         for (int j=0; j<nv; ++j)
+         for (int64_t j=0; j<nv; ++j)
          {
             input >> cell_data[offset + j];
          }
@@ -1071,8 +1073,8 @@ void Mesh::ReadVTKMesh(std::istream &input, int &curved, int &read_gf,
 
    // Read the cell types
    input >> ws >> buff;
-   Array<int> cell_types;
-   int ncells;
+   Array<int64_t> cell_types;
+   int64_t ncells;
    MFEM_VERIFY(buff == "CELL_TYPES", "CELL_TYPES not provided in VTK mesh.")
    input >> ncells;
    cell_types.Load(ncells, input);
@@ -1085,7 +1087,7 @@ void Mesh::ReadVTKMesh(std::istream &input, int &curved, int &read_gf,
 
    // Read the cell materials
    // bool found_material = false;
-   Array<int> cell_attributes;
+   Array<int64_t> cell_attributes;
    bool found_attributes = false;
    while ((input.good()))
    {
@@ -1124,9 +1126,9 @@ void Mesh::ReadInlineMesh(std::istream &input, bool generate_edges)
    // Initialize to negative numbers so that we know if they've been set.  We're
    // using Element::POINT as our flag, since we're not going to make a 0D mesh,
    // ever.
-   int nx = -1;
-   int ny = -1;
-   int nz = -1;
+   int64_t nx = -1;
+   int64_t ny = -1;
+   int64_t nz = -1;
    real_t sx = -1.0;
    real_t sy = -1.0;
    real_t sz = -1.0;
@@ -1279,11 +1281,11 @@ void Mesh::ReadInlineMesh(std::istream &input, bool generate_edges)
    }
 }
 
-void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
+void Mesh::ReadGmshMesh(std::istream &input, int64_t &curved, int64_t &read_gf)
 {
    string buff;
    real_t version;
-   int binary, dsize;
+   int64_t binary, dsize;
    input >> version >> binary >> dsize;
    if (version < 2.2)
    {
@@ -1297,7 +1299,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
    // There is a number 1 in binary format
    if (binary)
    {
-      int one;
+      int64_t one;
       input.read(reinterpret_cast<char*>(&one), sizeof(one));
       if (one != 1)
       {
@@ -1308,13 +1310,13 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
    // A map between a serial number of the vertex and its number in the file
    // (there may be gaps in the numbering, and also Gmsh enumerates vertices
    // starting from 1, not 0)
-   map<int, int> vertices_map;
+   map<int64_t, int64_t> vertices_map;
 
    // A map containing names of physical curves, surfaces, and volumes.
    // The first index is the dimension of the physical manifold, the second
    // index is the element attribute number of the set, and the string is
    // the assigned name.
-   map<int,map<int,std::string> > phys_names_by_dim;
+   map<int64_t,map<int64_t,std::string> > phys_names_by_dim;
 
    // Gmsh always outputs coordinates in 3D, but MFEM distinguishes between the
    // mesh element dimension (Dim) and the dimension of the space in which the
@@ -1331,7 +1333,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
    real_t bb_max[3];
 
    // Mesh order
-   int mesh_order = 1;
+   int64_t mesh_order = 1;
 
    // Mesh type
    bool periodic = false;
@@ -1345,20 +1347,20 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
          input >> NumOfVertices;
          getline(input, buff);
          vertices.SetSize(NumOfVertices);
-         int serial_number;
-         const int gmsh_dim = 3; // Gmsh always outputs 3 coordinates
+         int64_t serial_number;
+         const int64_t gmsh_dim = 3; // Gmsh always outputs 3 coordinates
          real_t coord[gmsh_dim];
-         for (int ver = 0; ver < NumOfVertices; ++ver)
+         for (int64_t ver = 0; ver < NumOfVertices; ++ver)
          {
             if (binary)
             {
-               input.read(reinterpret_cast<char*>(&serial_number), sizeof(int));
+               input.read(reinterpret_cast<char*>(&serial_number), sizeof(int64_t));
                input.read(reinterpret_cast<char*>(coord), gmsh_dim*sizeof(double));
             }
             else // ASCII
             {
                input >> serial_number;
-               for (int ci = 0; ci < gmsh_dim; ++ci)
+               for (int64_t ci = 0; ci < gmsh_dim; ++ci)
                {
                   input >> coord[ci];
                }
@@ -1366,7 +1368,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
             vertices[ver] = Vertex(coord, gmsh_dim);
             vertices_map[serial_number] = ver;
 
-            for (int ci = 0; ci < gmsh_dim; ++ci)
+            for (int64_t ci = 0; ci < gmsh_dim; ++ci)
             {
                bb_min[ci] = (ver == 0) ? coord[ci] :
                             std::min(bb_min[ci], coord[ci]);
@@ -1387,28 +1389,28 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
             spaceDim++;
          }
 
-         if (static_cast<int>(vertices_map.size()) != NumOfVertices)
+         if (static_cast<int64_t>(vertices_map.size()) != NumOfVertices)
          {
             MFEM_ABORT("Gmsh file : vertices indices are not unique");
          }
       } // section '$Nodes'
       else if (buff == "$Elements") // reading mesh elements
       {
-         int num_of_all_elements;
+         int64_t num_of_all_elements;
          input >> num_of_all_elements;
          // = NumOfElements + NumOfBdrElements + (maybe, PhysicalPoints)
          getline(input, buff);
 
-         int serial_number; // serial number of an element
-         int type_of_element; // ID describing a type of a mesh element
-         int n_tags; // number of different tags describing an element
-         int phys_domain; // element's attribute
-         int elem_domain; // another element's attribute (rarely used)
-         int n_partitions; // number of partitions where an element takes place
+         int64_t serial_number; // serial number of an element
+         int64_t type_of_element; // ID describing a type of a mesh element
+         int64_t n_tags; // number of different tags describing an element
+         int64_t phys_domain; // element's attribute
+         int64_t elem_domain; // another element's attribute (rarely used)
+         int64_t n_partitions; // number of partitions where an element takes place
 
          // number of nodes for each type of Gmsh elements, type is the index of
          // the array + 1
-         int nodes_of_gmsh_element[] =
+         int64_t nodes_of_gmsh_element[] =
          {
             2,   // 2-node line.
             3,   // 3-node triangle.
@@ -1618,48 +1620,48 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
 
              This corresponds to the quad9 mapping below.
          */
-         int lin3[] = {0,2,1};                // 2nd order segment
-         int lin4[] = {0,2,3,1};              // 3rd order segment
-         int tri6[] = {0,3,1,5,4,2};          // 2nd order triangle
-         int tri10[] = {0,3,4,1,8,9,5,7,6,2}; // 3rd order triangle
-         int quad9[] = {0,4,1,7,8,5,3,6,2};   // 2nd order quadrilateral
-         int quad16[] = {0,4,5,1,11,12,13,6,  // 3rd order quadrilateral
-                         10,15,14,7,3,9,8,2
-                        };
-         int tet10[] {0,4,1,6,5,2,7,9,8,3};   // 2nd order tetrahedron
-         int tet20[] = {0,4,5,1,9,16,6,8,7,2, // 3rd order tetrahedron
-                        11,17,15,18,19,13,10,14,12,3
-                       };
-         int hex27[] {0,8,1,9,20,11,3,13,2,   // 2nd order hexahedron
-                      10,21,12,22,26,23,15,24,14,
-                      4,16,5,17,25,18,7,19,6
-                     };
-         int hex64[] {0,8,9,1,10,32,35,14,    // 3rd order hexahedron
-                      11,33,34,15,3,19,18,2,
-                      12,36,37,16,40,56,57,44,
-                      43,59,58,45,22,49,48,20,
-                      13,39,38,17,41,60,61,47,
-                      42,63,62,46,23,50,51,21,
-                      4,24,25,5,26,52,53,28,
-                      27,55,54,29,7,31,30,6
-                     };
+         int64_t lin3[] = {0,2,1};                // 2nd order segment
+         int64_t lin4[] = {0,2,3,1};              // 3rd order segment
+         int64_t tri6[] = {0,3,1,5,4,2};          // 2nd order triangle
+         int64_t tri10[] = {0,3,4,1,8,9,5,7,6,2}; // 3rd order triangle
+         int64_t quad9[] = {0,4,1,7,8,5,3,6,2};   // 2nd order quadrilateral
+         int64_t quad16[] = {0,4,5,1,11,12,13,6,  // 3rd order quadrilateral
+                             10,15,14,7,3,9,8,2
+                            };
+         int64_t tet10[] {0,4,1,6,5,2,7,9,8,3};   // 2nd order tetrahedron
+         int64_t tet20[] = {0,4,5,1,9,16,6,8,7,2, // 3rd order tetrahedron
+                            11,17,15,18,19,13,10,14,12,3
+                           };
+         int64_t hex27[] {0,8,1,9,20,11,3,13,2,   // 2nd order hexahedron
+                          10,21,12,22,26,23,15,24,14,
+                          4,16,5,17,25,18,7,19,6
+                         };
+         int64_t hex64[] {0,8,9,1,10,32,35,14,    // 3rd order hexahedron
+                          11,33,34,15,3,19,18,2,
+                          12,36,37,16,40,56,57,44,
+                          43,59,58,45,22,49,48,20,
+                          13,39,38,17,41,60,61,47,
+                          42,63,62,46,23,50,51,21,
+                          4,24,25,5,26,52,53,28,
+                          27,55,54,29,7,31,30,6
+                         };
 
-         int wdg18[] = {0,6,1,7,9,2,8,15,10,    // 2nd order wedge/prism
-                        16,17,11,3,12,4,13,14,5
-                       };
-         int wdg40[] = {0,6,7,1,8,24,12,9,13,2, // 3rd order wedge/prism
-                        10,26,27,14,30,38,34,33,35,16,
-                        11,29,28,15,31,39,37,32,36,17,
-                        3,18,19,4,20,25,22,21,23,5
-                       };
+         int64_t wdg18[] = {0,6,1,7,9,2,8,15,10,    // 2nd order wedge/prism
+                            16,17,11,3,12,4,13,14,5
+                           };
+         int64_t wdg40[] = {0,6,7,1,8,24,12,9,13,2, // 3rd order wedge/prism
+                            10,26,27,14,30,38,34,33,35,16,
+                            11,29,28,15,31,39,37,32,36,17,
+                            3,18,19,4,20,25,22,21,23,5
+                           };
 
-         int pyr14[] = {0,5,1,6,13,8,3,          // 2nd order pyramid
-                        10,2,7,9,12,11,4
-                       };
-         int pyr30[] = {0,5,6,1,7,25,28,11,8,26, // 3rd order pyramid
-                        27,12,3,16,15,2,9,21,13,22,
-                        29,23,19,24,17,10,14,20,18,4
-                       };
+         int64_t pyr14[] = {0,5,1,6,13,8,3,          // 2nd order pyramid
+                            10,2,7,9,12,11,4
+                           };
+         int64_t pyr30[] = {0,5,6,1,7,25,28,11,8,26, // 3rd order pyramid
+                            27,12,3,16,15,2,9,21,13,22,
+                            29,23,19,24,17,10,14,20,18,4
+                           };
 
          vector<Element*> elements_0D, elements_1D, elements_2D, elements_3D;
          elements_0D.reserve(num_of_all_elements);
@@ -1668,25 +1670,25 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
          elements_3D.reserve(num_of_all_elements);
 
          // Temporary storage for high order vertices, if present
-         vector<Array<int>*> ho_verts_1D, ho_verts_2D, ho_verts_3D;
+         vector<Array<int64_t>*> ho_verts_1D, ho_verts_2D, ho_verts_3D;
          ho_verts_1D.reserve(num_of_all_elements);
          ho_verts_2D.reserve(num_of_all_elements);
          ho_verts_3D.reserve(num_of_all_elements);
 
          // Temporary storage for order of elements
-         vector<int> ho_el_order_1D, ho_el_order_2D, ho_el_order_3D;
+         vector<int64_t> ho_el_order_1D, ho_el_order_2D, ho_el_order_3D;
          ho_el_order_1D.reserve(num_of_all_elements);
          ho_el_order_2D.reserve(num_of_all_elements);
          ho_el_order_3D.reserve(num_of_all_elements);
 
          // Vertex order mappings
-         Array<int*> ho_lin(11); ho_lin = NULL;
-         Array<int*> ho_tri(11); ho_tri = NULL;
-         Array<int*> ho_sqr(11); ho_sqr = NULL;
-         Array<int*> ho_tet(11); ho_tet = NULL;
-         Array<int*> ho_hex(10); ho_hex = NULL;
-         Array<int*> ho_wdg(10); ho_wdg = NULL;
-         Array<int*> ho_pyr(10); ho_pyr = NULL;
+         Array<int64_t*> ho_lin(11); ho_lin = NULL;
+         Array<int64_t*> ho_tri(11); ho_tri = NULL;
+         Array<int64_t*> ho_sqr(11); ho_sqr = NULL;
+         Array<int64_t*> ho_tet(11); ho_tet = NULL;
+         Array<int64_t*> ho_hex(10); ho_hex = NULL;
+         Array<int64_t*> ho_wdg(10); ho_wdg = NULL;
+         Array<int64_t*> ho_pyr(10); ho_pyr = NULL;
 
          // Use predefined arrays at lowest orders (for efficiency)
          ho_lin[2] = lin3;  ho_lin[3] = lin4;
@@ -1702,30 +1704,30 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
 
          if (binary)
          {
-            int n_elem_part = 0; // partial sum of elements that are read
-            const int header_size = 3;
+            int64_t n_elem_part = 0; // partial sum of elements that are read
+            const int64_t header_size = 3;
             // header consists of 3 numbers: type of the element, number of
             // elements of this type, and number of tags
-            int header[header_size];
-            int n_elem_one_type; // number of elements of a specific type
+            int64_t header[header_size];
+            int64_t n_elem_one_type; // number of elements of a specific type
 
             while (n_elem_part < num_of_all_elements)
             {
                input.read(reinterpret_cast<char*>(header),
-                          header_size*sizeof(int));
+                          header_size*sizeof(int64_t));
                type_of_element = header[0];
                n_elem_one_type = header[1];
                n_tags          = header[2];
 
                n_elem_part += n_elem_one_type;
 
-               const int n_elem_nodes = nodes_of_gmsh_element[type_of_element-1];
-               vector<int> data(1+n_tags+n_elem_nodes);
-               for (int el = 0; el < n_elem_one_type; ++el)
+               const int64_t n_elem_nodes = nodes_of_gmsh_element[type_of_element-1];
+               vector<int64_t> data(1+n_tags+n_elem_nodes);
+               for (int64_t el = 0; el < n_elem_one_type; ++el)
                {
                   input.read(reinterpret_cast<char*>(&data[0]),
-                             data.size()*sizeof(int));
-                  int dd = 0; // index for data array
+                             data.size()*sizeof(int64_t));
+                  int64_t dd = 0; // index for data array
                   serial_number = data[dd++];
                   // physical domain - the most important value (to distinguish
                   // materials with different properties)
@@ -1738,10 +1740,10 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                   n_partitions = (n_tags > 2) ? data[dd++] : 0;
                   // we currently just skip the partitions if they exist, and go
                   // directly to vertices describing the mesh element
-                  vector<int> vert_indices(n_elem_nodes);
-                  for (int vi = 0; vi < n_elem_nodes; ++vi)
+                  vector<int64_t> vert_indices(n_elem_nodes);
+                  for (int64_t vi = 0; vi < n_elem_nodes; ++vi)
                   {
-                     map<int, int>::const_iterator it =
+                     map<int64_t, int64_t>::const_iterator it =
                         vertices_map.find(data[1+n_tags+vi]);
                      if (it == vertices_map.end())
                      {
@@ -1766,7 +1768,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                   }
 
                   // initialize the mesh element
-                  int el_order = 11;
+                  int64_t el_order = 11;
                   switch (type_of_element)
                   {
                      case  1: //   2-node line
@@ -1785,7 +1787,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                         if (type_of_element != 1)
                         {
                            el_order = n_elem_nodes - 1;
-                           Array<int> * hov = new Array<int>;
+                           Array<int64_t> * hov = new Array<int64_t>;
                            hov->Append(&vert_indices[0], n_elem_nodes);
                            ho_verts_1D.push_back(hov);
                            ho_el_order_1D.push_back(el_order);
@@ -1807,7 +1809,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                               new Triangle(&vert_indices[0], phys_domain));
                            if (el_order > 1)
                            {
-                              Array<int> * hov = new Array<int>;
+                              Array<int64_t> * hov = new Array<int64_t>;
                               hov->Append(&vert_indices[0], n_elem_nodes);
                               ho_verts_2D.push_back(hov);
                               ho_el_order_2D.push_back(el_order);
@@ -1829,7 +1831,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                               new Quadrilateral(&vert_indices[0], phys_domain));
                            if (el_order > 1)
                            {
-                              Array<int> * hov = new Array<int>;
+                              Array<int64_t> * hov = new Array<int64_t>;
                               hov->Append(&vert_indices[0], n_elem_nodes);
                               ho_verts_2D.push_back(hov);
                               ho_el_order_2D.push_back(el_order);
@@ -1851,7 +1853,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                               new Tetrahedron(&vert_indices[0], phys_domain));
                            if (el_order > 1)
                            {
-                              Array<int> * hov = new Array<int>;
+                              Array<int64_t> * hov = new Array<int64_t>;
                               hov->Append(&vert_indices[0], n_elem_nodes);
                               ho_verts_3D.push_back(hov);
                               ho_el_order_3D.push_back(el_order);
@@ -1873,7 +1875,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                               new Hexahedron(&vert_indices[0], phys_domain));
                            if (el_order > 1)
                            {
-                              Array<int> * hov = new Array<int>;
+                              Array<int64_t> * hov = new Array<int64_t>;
                               hov->Append(&vert_indices[0], n_elem_nodes);
                               ho_verts_3D.push_back(hov);
                               ho_el_order_3D.push_back(el_order);
@@ -1895,7 +1897,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                               new Wedge(&vert_indices[0], phys_domain));
                            if (el_order > 1)
                            {
-                              Array<int> * hov = new Array<int>;
+                              Array<int64_t> * hov = new Array<int64_t>;
                               hov->Append(&vert_indices[0], n_elem_nodes);
                               ho_verts_3D.push_back(hov);
                               ho_el_order_3D.push_back(el_order);
@@ -1917,7 +1919,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                               new Pyramid(&vert_indices[0], phys_domain));
                            if (el_order > 1)
                            {
-                              Array<int> * hov = new Array<int>;
+                              Array<int64_t> * hov = new Array<int64_t>;
                               hov->Append(&vert_indices[0], n_elem_nodes);
                               ho_verts_3D.push_back(hov);
                               ho_el_order_3D.push_back(el_order);
@@ -1940,11 +1942,11 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
          } // if binary
          else // ASCII
          {
-            for (int el = 0; el < num_of_all_elements; ++el)
+            for (int64_t el = 0; el < num_of_all_elements; ++el)
             {
                input >> serial_number >> type_of_element >> n_tags;
-               vector<int> data(n_tags);
-               for (int i = 0; i < n_tags; ++i) { input >> data[i]; }
+               vector<int64_t> data(n_tags);
+               for (int64_t i = 0; i < n_tags; ++i) { input >> data[i]; }
                // physical domain - the most important value (to distinguish
                // materials with different properties)
                phys_domain = (n_tags > 0) ? data[0] : 1;
@@ -1956,13 +1958,13 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                n_partitions = (n_tags > 2) ? data[2] : 0;
                // we currently just skip the partitions if they exist, and go
                // directly to vertices describing the mesh element
-               const int n_elem_nodes = nodes_of_gmsh_element[type_of_element-1];
-               vector<int> vert_indices(n_elem_nodes);
-               int index;
-               for (int vi = 0; vi < n_elem_nodes; ++vi)
+               const int64_t n_elem_nodes = nodes_of_gmsh_element[type_of_element-1];
+               vector<int64_t> vert_indices(n_elem_nodes);
+               int64_t index;
+               for (int64_t vi = 0; vi < n_elem_nodes; ++vi)
                {
                   input >> index;
-                  map<int, int>::const_iterator it = vertices_map.find(index);
+                  map<int64_t, int64_t>::const_iterator it = vertices_map.find(index);
                   if (it == vertices_map.end())
                   {
                      MFEM_ABORT("Gmsh file : vertex index doesn't exist");
@@ -1986,7 +1988,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                }
 
                // initialize the mesh element
-               int el_order = 11;
+               int64_t el_order = 11;
                switch (type_of_element)
                {
                   case  1: //  2-node line
@@ -2004,7 +2006,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                         new Segment(&vert_indices[0], phys_domain));
                      if (type_of_element != 1)
                      {
-                        Array<int> * hov = new Array<int>;
+                        Array<int64_t> * hov = new Array<int64_t>;
                         hov->Append(&vert_indices[0], n_elem_nodes);
                         ho_verts_1D.push_back(hov);
                         el_order = n_elem_nodes - 1;
@@ -2027,7 +2029,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                            new Triangle(&vert_indices[0], phys_domain));
                         if (el_order > 1)
                         {
-                           Array<int> * hov = new Array<int>;
+                           Array<int64_t> * hov = new Array<int64_t>;
                            hov->Append(&vert_indices[0], n_elem_nodes);
                            ho_verts_2D.push_back(hov);
                            ho_el_order_2D.push_back(el_order);
@@ -2049,7 +2051,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                            new Quadrilateral(&vert_indices[0], phys_domain));
                         if (el_order > 1)
                         {
-                           Array<int> * hov = new Array<int>;
+                           Array<int64_t> * hov = new Array<int64_t>;
                            hov->Append(&vert_indices[0], n_elem_nodes);
                            ho_verts_2D.push_back(hov);
                            ho_el_order_2D.push_back(el_order);
@@ -2071,7 +2073,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                            new Tetrahedron(&vert_indices[0], phys_domain));
                         if (el_order > 1)
                         {
-                           Array<int> * hov = new Array<int>;
+                           Array<int64_t> * hov = new Array<int64_t>;
                            hov->Append(&vert_indices[0], n_elem_nodes);
                            ho_verts_3D.push_back(hov);
                            ho_el_order_3D.push_back(el_order);
@@ -2093,7 +2095,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                            new Hexahedron(&vert_indices[0], phys_domain));
                         if (el_order > 1)
                         {
-                           Array<int> * hov = new Array<int>;
+                           Array<int64_t> * hov = new Array<int64_t>;
                            hov->Append(&vert_indices[0], n_elem_nodes);
                            ho_verts_3D.push_back(hov);
                            ho_el_order_3D.push_back(el_order);
@@ -2115,7 +2117,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                            new Wedge(&vert_indices[0], phys_domain));
                         if (el_order > 1)
                         {
-                           Array<int> * hov = new Array<int>;
+                           Array<int64_t> * hov = new Array<int64_t>;
                            hov->Append(&vert_indices[0], n_elem_nodes);
                            ho_verts_3D.push_back(hov);
                            ho_el_order_3D.push_back(el_order);
@@ -2137,7 +2139,7 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
                            new Pyramid(&vert_indices[0], phys_domain));
                         if (el_order > 1)
                         {
-                           Array<int> * hov = new Array<int>;
+                           Array<int64_t> * hov = new Array<int64_t>;
                            hov->Append(&vert_indices[0], n_elem_nodes);
                            ho_verts_3D.push_back(hov);
                            ho_el_order_3D.push_back(el_order);
@@ -2179,15 +2181,15 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
          if (!elements_3D.empty())
          {
             Dim = 3;
-            NumOfElements = static_cast<int>(elements_3D.size());
+            NumOfElements = static_cast<int64_t>(elements_3D.size());
             elements.SetSize(NumOfElements);
-            for (int el = 0; el < NumOfElements; ++el)
+            for (int64_t el = 0; el < NumOfElements; ++el)
             {
                elements[el] = elements_3D[el];
             }
-            NumOfBdrElements = static_cast<int>(elements_2D.size());
+            NumOfBdrElements = static_cast<int64_t>(elements_2D.size());
             boundary.SetSize(NumOfBdrElements);
-            for (int el = 0; el < NumOfBdrElements; ++el)
+            for (int64_t el = 0; el < NumOfBdrElements; ++el)
             {
                boundary[el] = elements_2D[el];
             }
@@ -2208,15 +2210,15 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
          else if (!elements_2D.empty())
          {
             Dim = 2;
-            NumOfElements = static_cast<int>(elements_2D.size());
+            NumOfElements = static_cast<int64_t>(elements_2D.size());
             elements.SetSize(NumOfElements);
-            for (int el = 0; el < NumOfElements; ++el)
+            for (int64_t el = 0; el < NumOfElements; ++el)
             {
                elements[el] = elements_2D[el];
             }
-            NumOfBdrElements = static_cast<int>(elements_1D.size());
+            NumOfBdrElements = static_cast<int64_t>(elements_1D.size());
             boundary.SetSize(NumOfBdrElements);
-            for (int el = 0; el < NumOfBdrElements; ++el)
+            for (int64_t el = 0; el < NumOfBdrElements; ++el)
             {
                boundary[el] = elements_1D[el];
             }
@@ -2233,15 +2235,15 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
          else if (!elements_1D.empty())
          {
             Dim = 1;
-            NumOfElements = static_cast<int>(elements_1D.size());
+            NumOfElements = static_cast<int64_t>(elements_1D.size());
             elements.SetSize(NumOfElements);
-            for (int el = 0; el < NumOfElements; ++el)
+            for (int64_t el = 0; el < NumOfElements; ++el)
             {
                elements[el] = elements_1D[el];
             }
-            NumOfBdrElements = static_cast<int>(elements_0D.size());
+            NumOfBdrElements = static_cast<int64_t>(elements_0D.size());
             boundary.SetSize(NumOfBdrElements);
-            for (int el = 0; el < NumOfBdrElements; ++el)
+            for (int64_t el = 0; el < NumOfBdrElements; ++el)
             {
                boundary[el] = elements_0D[el];
             }
@@ -2271,31 +2273,31 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
          }
 
          // Delete dynamically allocated high vertex order mappings
-         for (int ord=4; ord<ho_lin.Size(); ord++)
+         for (int64_t ord=4; ord<ho_lin.Size(); ord++)
          {
             if (ho_lin[ord] != NULL) { delete [] ho_lin[ord]; }
          }
-         for (int ord=4; ord<ho_tri.Size(); ord++)
+         for (int64_t ord=4; ord<ho_tri.Size(); ord++)
          {
             if (ho_tri[ord] != NULL) { delete [] ho_tri[ord]; }
          }
-         for (int ord=4; ord<ho_sqr.Size(); ord++)
+         for (int64_t ord=4; ord<ho_sqr.Size(); ord++)
          {
             if (ho_sqr[ord] != NULL) { delete [] ho_sqr[ord]; }
          }
-         for (int ord=4; ord<ho_tet.Size(); ord++)
+         for (int64_t ord=4; ord<ho_tet.Size(); ord++)
          {
             if (ho_tet[ord] != NULL) { delete [] ho_tet[ord]; }
          }
-         for (int ord=4; ord<ho_hex.Size(); ord++)
+         for (int64_t ord=4; ord<ho_hex.Size(); ord++)
          {
             if (ho_hex[ord] != NULL) { delete [] ho_hex[ord]; }
          }
-         for (int ord=4; ord<ho_wdg.Size(); ord++)
+         for (int64_t ord=4; ord<ho_wdg.Size(); ord++)
          {
             if (ho_wdg[ord] != NULL) { delete [] ho_wdg[ord]; }
          }
-         for (int ord=4; ord<ho_pyr.Size(); ord++)
+         for (int64_t ord=4; ord<ho_pyr.Size(); ord++)
          {
             if (ho_pyr[ord] != NULL) { delete [] ho_pyr[ord]; }
          }
@@ -2309,11 +2311,11 @@ void Mesh::ReadGmshMesh(std::istream &input, int &curved, int &read_gf)
       } // section '$Elements'
       else if (buff == "$PhysicalNames") // Named element sets
       {
-         int num_names = 0;
-         int mdim,num;
+         int64_t num_names = 0;
+         int64_t mdim,num;
          string name;
          input >> num_names;
-         for (int i=0; i < num_names; i++)
+         for (int64_t i=0; i < num_names; i++)
          {
             input >> mdim >> num;
             getline(input, name);

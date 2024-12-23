@@ -25,15 +25,15 @@ namespace mfem
 class AttributeSets
 {
 private:
-   const Array<int> & attributes;
+   const Array<int64_t> & attributes;
 
-   const int def_width = 10;
+   const int64_t def_width = 10;
 
 public:
    /// Named sets of attributes
-   ArraysByName<int> attr_sets;
+   ArraysByName<int64_t> attr_sets;
 
-   AttributeSets(const Array<int> &attr);
+   AttributeSets(const Array<int64_t> &attr);
 
    /// @brief Create a copy of the internal data to the provided @a copy.
    void Copy(AttributeSets &copy) const;
@@ -48,7 +48,7 @@ public:
    bool AttributeSetExists(const std::string &name) const;
 
    /// @brief Create an empty named attribute set
-   Array<int> & CreateAttributeSet(const std::string &set_name);
+   Array<int64_t> & CreateAttributeSet(const std::string &set_name);
 
    /// @brief Delete a named attribute set
    void DeleteAttributeSet(const std::string &set_name);
@@ -64,7 +64,7 @@ public:
        @note The attribute numbers are not checked for validity or
        existence within the mesh.
     */
-   void SetAttributeSet(const std::string &set_name, const Array<int> &attr);
+   void SetAttributeSet(const std::string &set_name, const Array<int64_t> &attr);
 
    /// @brief Add a single entry to an existing attribute set
    /**
@@ -77,7 +77,7 @@ public:
        @note Duplicate entries will be ignored and the resulting sets will be
        sorted.
     */
-   void AddToAttributeSet(const std::string &set_name, int attr);
+   void AddToAttributeSet(const std::string &set_name, int64_t attr);
 
    /// @brief Add an array of entries to an existing attribute set
    /**
@@ -90,7 +90,7 @@ public:
        @note Duplicate entries will be ignored and the resulting sets will be
        sorted.
     */
-   void AddToAttributeSet(const std::string &set_name, const Array<int> &attr);
+   void AddToAttributeSet(const std::string &set_name, const Array<int64_t> &attr);
 
    /// @brief Remove a single entry from an existing attribute set
    /**
@@ -103,13 +103,13 @@ public:
        @note If @a attr is not a member of the named set the set will not
        be modified and no error will occur.
     */
-   void RemoveFromAttributeSet(const std::string &set_name, int attr);
+   void RemoveFromAttributeSet(const std::string &set_name, int64_t attr);
 
    /// @brief Print the contents of the container to an output stream
    ///
    /// @note The array entries will contain 10 entries per line. A specific
    /// number of entries per line can be used by changing the @a width argument.
-   void Print(std::ostream &out = mfem::out, int width = -1) const;
+   void Print(std::ostream &out = mfem::out, int64_t width = -1) const;
 
    /// @brief Access a named attribute set
    /**
@@ -124,7 +124,7 @@ public:
        RemoveFromAttributeSet. AddToAttributeSet should not invalidate this
        reference.
     */
-   Array<int> & GetAttributeSet(const std::string & set_name);
+   Array<int64_t> & GetAttributeSet(const std::string & set_name);
 
    /// @brief Return a marker array corresponding to a named attribute set
    /**
@@ -134,7 +134,7 @@ public:
        and execution will halt. `AttributeSetExists()` may be used to verify
        existence of a named set.
     */
-   Array<int> GetAttributeSetMarker(const std::string & set_name);
+   Array<int64_t> GetAttributeSetMarker(const std::string & set_name);
 
    /// @brief Prepares a marker array corresponding to an array of element
    /// attributes
@@ -147,7 +147,8 @@ public:
        only zeroes and ones. Ones indicate which attribute numbers are present
        in the @a attrs array.
     */
-   static Array<int> AttrToMarker(int max_attr, const Array<int> &attrs);
+   static Array<int64_t> AttrToMarker(int64_t max_attr,
+                                      const Array<int64_t> &attrs);
 };
 
 } // namespace mfem

@@ -29,7 +29,7 @@ class Element
 protected:
 
    /// Element's attribute (specifying material property, etc).
-   int attribute;
+   int64_t attribute;
 
    /// Element's type from the Finite Element's perspective
    Geometry::Type base_geom;
@@ -51,49 +51,49 @@ public:
    Geometry::Type GetGeometryType() const { return base_geom; }
 
    /// Return element's attribute.
-   inline int GetAttribute() const { return attribute; }
+   inline int64_t GetAttribute() const { return attribute; }
 
    /// Set element's attribute.
-   inline void SetAttribute(const int attr) { attribute = attr; }
+   inline void SetAttribute(const int64_t attr) { attribute = attr; }
 
    /// Get the indices defining the vertices.
-   virtual void GetVertices(Array<int> &v) const = 0;
+   virtual void GetVertices(Array<int64_t> &v) const = 0;
 
    /// Set the indices defining the vertices.
-   virtual void SetVertices(const Array<int> &v) = 0;
+   virtual void SetVertices(const Array<int64_t> &v) = 0;
 
    /// Set the indices defining the vertices.
-   virtual void SetVertices(const int *ind) = 0;
+   virtual void SetVertices(const int64_t *ind) = 0;
 
    /// @note The returned array should NOT be deleted by the caller.
-   virtual int *GetVertices() = 0;
+   virtual int64_t *GetVertices() = 0;
 
-   const int *GetVertices() const
+   const int64_t *GetVertices() const
    { return const_cast<Element *>(this)->GetVertices(); }
 
-   virtual int GetNVertices() const = 0;
+   virtual int64_t GetNVertices() const = 0;
 
-   virtual int GetNEdges() const = 0;
+   virtual int64_t GetNEdges() const = 0;
 
-   virtual const int *GetEdgeVertices(int) const = 0;
+   virtual const int64_t *GetEdgeVertices(int64_t) const = 0;
 
-   virtual int GetNFaces() const = 0;
+   virtual int64_t GetNFaces() const = 0;
 
-   virtual int GetNFaceVertices(int fi) const = 0;
+   virtual int64_t GetNFaceVertices(int64_t fi) const = 0;
 
-   virtual const int *GetFaceVertices(int fi) const = 0;
+   virtual const int64_t *GetFaceVertices(int64_t fi) const = 0;
 
    /// Mark the longest edge by assuming/changing the order of the vertices.
-   virtual void MarkEdge(const DSTable &v_to_v, const int *length) {}
+   virtual void MarkEdge(const DSTable &v_to_v, const int64_t *length) {}
 
    /// Return 1 if the element needs refinement in order to get conforming mesh.
-   virtual int NeedRefinement(HashTable<Hashed2> &v_to_v) const { return 0; }
+   virtual int64_t NeedRefinement(HashTable<Hashed2> &v_to_v) const { return 0; }
 
    /// Set current coarse-fine transformation number.
-   virtual void ResetTransform(int tr) {}
+   virtual void ResetTransform(int64_t tr) {}
 
    /// Add 'tr' to the current chain of coarse-fine transformations.
-   virtual void PushTransform(int tr) {}
+   virtual void PushTransform(int64_t tr) {}
 
    /// Return current coarse-fine transformation.
    virtual unsigned GetTransform() const { return 0; }

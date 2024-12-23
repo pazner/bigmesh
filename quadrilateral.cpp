@@ -15,18 +15,19 @@
 namespace mfem
 {
 
-Quadrilateral::Quadrilateral( const int *ind, int attr )
+Quadrilateral::Quadrilateral( const int64_t *ind, int64_t attr )
    : Element(Geometry::SQUARE)
 {
    attribute = attr;
-   for (int i=0; i<4; i++)
+   for (int64_t i=0; i<4; i++)
    {
       indices[i] = ind[i];
    }
 }
 
-Quadrilateral::Quadrilateral( int ind1, int ind2, int ind3, int ind4,
-                              int attr ) : Element(Geometry::SQUARE)
+Quadrilateral::Quadrilateral( int64_t ind1, int64_t ind2, int64_t ind3,
+                              int64_t ind4,
+                              int64_t attr ) : Element(Geometry::SQUARE)
 {
    attribute  = attr;
    indices[0] = ind1;
@@ -35,19 +36,19 @@ Quadrilateral::Quadrilateral( int ind1, int ind2, int ind3, int ind4,
    indices[3] = ind4;
 }
 
-void Quadrilateral::SetVertices(const int *ind)
+void Quadrilateral::SetVertices(const int64_t *ind)
 {
    std::copy(ind, ind + 4, indices);
 }
 
-void Quadrilateral::GetVertices(Array<int> &v) const
+void Quadrilateral::GetVertices(Array<int64_t> &v) const
 {
    v.SetSize(4);
    std::copy(indices, indices + 4, v.begin());
 }
 
 
-void Quadrilateral::SetVertices(const Array<int> &v)
+void Quadrilateral::SetVertices(const Array<int64_t> &v)
 {
    MFEM_ASSERT(v.Size() == 4, "!");
    std::copy(v.begin(), v.end(), indices);

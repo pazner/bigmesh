@@ -38,16 +38,16 @@ public:
       NUM_GEOMETRIES
    };
 
-   static const int NumGeom = NUM_GEOMETRIES;
-   static const int MaxDim = 3;
-   static const int NumBdrArray[NumGeom];
+   static const int64_t NumGeom = NUM_GEOMETRIES;
+   static const int64_t MaxDim = 3;
+   static const int64_t NumBdrArray[NumGeom];
    static const char *Name[NumGeom];
    static const real_t Volume[NumGeom];
-   static const int Dimension[NumGeom];
-   static const int DimStart[MaxDim+2]; // including MaxDim+1
-   static const int NumVerts[NumGeom];
-   static const int NumEdges[NumGeom];
-   static const int NumFaces[NumGeom];
+   static const int64_t Dimension[NumGeom];
+   static const int64_t DimStart[MaxDim+2]; // including MaxDim+1
+   static const int64_t NumVerts[NumGeom];
+   static const int64_t NumEdges[NumGeom];
+   static const int64_t NumFaces[NumGeom];
 
    // Structure that holds constants describing the Geometries.
    template <Type Geom> struct Constants;
@@ -64,35 +64,36 @@ public:
 
    /** @brief Return an IntegrationRule consisting of all vertices of the given
        Geometry::Type, @a GeomType. */
-   const IntegrationRule *GetVertices(int GeomType) const;
+   const IntegrationRule *GetVertices(int64_t GeomType) const;
 
    /// Return the center of the given Geometry::Type, @a GeomType.
-   const IntegrationPoint &GetCenter(int GeomType) const
+   const IntegrationPoint &GetCenter(int64_t GeomType) const
    { return GeomCenter[GeomType]; }
 
    /// Get a random point in the reference element specified by @a GeomType.
    /** This method uses the function rand() for random number generation. */
-   static void GetRandomPoint(int GeomType, IntegrationPoint &ip);
+   static void GetRandomPoint(int64_t GeomType, IntegrationPoint &ip);
 
    /// Check if the given point is inside the given reference element.
-   static bool CheckPoint(int GeomType, const IntegrationPoint &ip);
+   static bool CheckPoint(int64_t GeomType, const IntegrationPoint &ip);
    /** @brief Check if the given point is inside the given reference element.
        Overload for fuzzy tolerance. */
-   static bool CheckPoint(int GeomType, const IntegrationPoint &ip, real_t eps);
+   static bool CheckPoint(int64_t GeomType, const IntegrationPoint &ip,
+                          real_t eps);
 
    /// Project a point @a end, onto the given Geometry::Type, @a GeomType.
    /** Check if the @a end point is inside the reference element, if not
        overwrite it with the point on the boundary that lies on the line segment
        between @a beg and @a end (@a beg must be inside the element). Return
        true if @a end is inside the element, and false otherwise. */
-   static bool ProjectPoint(int GeomType, const IntegrationPoint &beg,
+   static bool ProjectPoint(int64_t GeomType, const IntegrationPoint &beg,
                             IntegrationPoint &end);
 
    /// Project a point @a ip, onto the given Geometry::Type, @a GeomType.
    /** If @a ip is outside the element, replace it with the point on the
        boundary that is closest to the original @a ip and return false;
        otherwise, return true without changing @a ip. */
-   static bool ProjectPoint(int GeomType, IntegrationPoint &ip);
+   static bool ProjectPoint(int64_t GeomType, IntegrationPoint &ip);
 
    /// Returns true if the given @a geom is of tensor-product type (i.e. if geom
    /// is a segment, quadrilateral, or hexahedron), returns false otherwise.
@@ -101,7 +102,7 @@ public:
 
    /// Returns the Geometry::Type corresponding to a tensor-product of the
    /// given dimension.
-   static Type TensorProductGeometry(int dim)
+   static Type TensorProductGeometry(int64_t dim)
    {
       switch (dim)
       {
@@ -114,161 +115,161 @@ public:
    }
 
    /// Return the inverse of the given orientation for the specified geometry type.
-   static int GetInverseOrientation(Type geom_type, int orientation);
+   static int64_t GetInverseOrientation(Type geom_type, int64_t orientation);
 
    /// Return the number of boundary "faces" of a given Geometry::Type.
-   int NumBdr(int GeomType) const { return NumBdrArray[GeomType]; }
+   int64_t NumBdr(int64_t GeomType) const { return NumBdrArray[GeomType]; }
 };
 
 template <> struct
    Geometry::Constants<Geometry::POINT>
 {
-   static const int Dimension = 0;
-   static const int NumVert = 1;
+   static const int64_t Dimension = 0;
+   static const int64_t NumVert = 1;
 
-   static const int NumOrient = 1;
-   static const int Orient[NumOrient][NumVert];
-   static const int InvOrient[NumOrient];
+   static const int64_t NumOrient = 1;
+   static const int64_t Orient[NumOrient][NumVert];
+   static const int64_t InvOrient[NumOrient];
 };
 
 template <> struct
    Geometry::Constants<Geometry::SEGMENT>
 {
-   static const int Dimension = 1;
-   static const int NumVert = 2;
-   static const int NumEdges = 1;
-   static const int Edges[NumEdges][2];
+   static const int64_t Dimension = 1;
+   static const int64_t NumVert = 2;
+   static const int64_t NumEdges = 1;
+   static const int64_t Edges[NumEdges][2];
 
-   static const int NumOrient = 2;
-   static const int Orient[NumOrient][NumVert];
-   static const int InvOrient[NumOrient];
+   static const int64_t NumOrient = 2;
+   static const int64_t Orient[NumOrient][NumVert];
+   static const int64_t InvOrient[NumOrient];
 };
 
 template <> struct
    Geometry::Constants<Geometry::TRIANGLE>
 {
-   static const int Dimension = 2;
-   static const int NumVert = 3;
-   static const int NumEdges = 3;
-   static const int Edges[NumEdges][2];
+   static const int64_t Dimension = 2;
+   static const int64_t NumVert = 3;
+   static const int64_t NumEdges = 3;
+   static const int64_t Edges[NumEdges][2];
    // Upper-triangular part of the local vertex-to-vertex graph.
    struct VertToVert
    {
-      static const int I[NumVert];
-      static const int J[NumEdges][2]; // {end,edge_idx}
+      static const int64_t I[NumVert];
+      static const int64_t J[NumEdges][2]; // {end,edge_idx}
    };
-   static const int NumFaces = 1;
-   static const int FaceVert[NumFaces][NumVert];
+   static const int64_t NumFaces = 1;
+   static const int64_t FaceVert[NumFaces][NumVert];
 
    // For a given base tuple v={v0,v1,v2}, the orientation of a permutation
    // u={u0,u1,u2} of v, is an index 'j' such that u[i]=v[Orient[j][i]].
    // The static method Mesh::GetTriOrientation, computes the index 'j' of the
    // permutation that maps the second argument 'test' to the first argument
    // 'base': test[Orient[j][i]]=base[i].
-   static const int NumOrient = 6;
-   static const int Orient[NumOrient][NumVert];
+   static const int64_t NumOrient = 6;
+   static const int64_t Orient[NumOrient][NumVert];
    // The inverse of orientation 'j' is InvOrient[j].
-   static const int InvOrient[NumOrient];
+   static const int64_t InvOrient[NumOrient];
 };
 
 template <> struct
    Geometry::Constants<Geometry::SQUARE>
 {
-   static const int Dimension = 2;
-   static const int NumVert = 4;
-   static const int NumEdges = 4;
-   static const int Edges[NumEdges][2];
+   static const int64_t Dimension = 2;
+   static const int64_t NumVert = 4;
+   static const int64_t NumEdges = 4;
+   static const int64_t Edges[NumEdges][2];
    // Upper-triangular part of the local vertex-to-vertex graph.
    struct VertToVert
    {
-      static const int I[NumVert];
-      static const int J[NumEdges][2]; // {end,edge_idx}
+      static const int64_t I[NumVert];
+      static const int64_t J[NumEdges][2]; // {end,edge_idx}
    };
-   static const int NumFaces = 1;
-   static const int FaceVert[NumFaces][NumVert];
+   static const int64_t NumFaces = 1;
+   static const int64_t FaceVert[NumFaces][NumVert];
 
-   static const int NumOrient = 8;
-   static const int Orient[NumOrient][NumVert];
-   static const int InvOrient[NumOrient];
+   static const int64_t NumOrient = 8;
+   static const int64_t Orient[NumOrient][NumVert];
+   static const int64_t InvOrient[NumOrient];
 };
 
 template <> struct
    Geometry::Constants<Geometry::TETRAHEDRON>
 {
-   static const int Dimension = 3;
-   static const int NumVert = 4;
-   static const int NumEdges = 6;
-   static const int Edges[NumEdges][2];
-   static const int NumFaces = 4;
-   static const int FaceTypes[NumFaces];
-   static const int MaxFaceVert = 3;
-   static const int FaceVert[NumFaces][MaxFaceVert];
+   static const int64_t Dimension = 3;
+   static const int64_t NumVert = 4;
+   static const int64_t NumEdges = 6;
+   static const int64_t Edges[NumEdges][2];
+   static const int64_t NumFaces = 4;
+   static const int64_t FaceTypes[NumFaces];
+   static const int64_t MaxFaceVert = 3;
+   static const int64_t FaceVert[NumFaces][MaxFaceVert];
    // Upper-triangular part of the local vertex-to-vertex graph.
    struct VertToVert
    {
-      static const int I[NumVert];
-      static const int J[NumEdges][2]; // {end,edge_idx}
+      static const int64_t I[NumVert];
+      static const int64_t J[NumEdges][2]; // {end,edge_idx}
    };
 
-   static const int NumOrient = 24;
-   static const int Orient[NumOrient][NumVert];
-   static const int InvOrient[NumOrient];
+   static const int64_t NumOrient = 24;
+   static const int64_t Orient[NumOrient][NumVert];
+   static const int64_t InvOrient[NumOrient];
 };
 
 template <> struct
    Geometry::Constants<Geometry::CUBE>
 {
-   static const int Dimension = 3;
-   static const int NumVert = 8;
-   static const int NumEdges = 12;
-   static const int Edges[NumEdges][2];
-   static const int NumFaces = 6;
-   static const int FaceTypes[NumFaces];
-   static const int MaxFaceVert = 4;
-   static const int FaceVert[NumFaces][MaxFaceVert];
+   static const int64_t Dimension = 3;
+   static const int64_t NumVert = 8;
+   static const int64_t NumEdges = 12;
+   static const int64_t Edges[NumEdges][2];
+   static const int64_t NumFaces = 6;
+   static const int64_t FaceTypes[NumFaces];
+   static const int64_t MaxFaceVert = 4;
+   static const int64_t FaceVert[NumFaces][MaxFaceVert];
    // Upper-triangular part of the local vertex-to-vertex graph.
    struct VertToVert
    {
-      static const int I[NumVert];
-      static const int J[NumEdges][2]; // {end,edge_idx}
+      static const int64_t I[NumVert];
+      static const int64_t J[NumEdges][2]; // {end,edge_idx}
    };
 };
 
 template <> struct
    Geometry::Constants<Geometry::PRISM>
 {
-   static const int Dimension = 3;
-   static const int NumVert = 6;
-   static const int NumEdges = 9;
-   static const int Edges[NumEdges][2];
-   static const int NumFaces = 5;
-   static const int FaceTypes[NumFaces];
-   static const int MaxFaceVert = 4;
-   static const int FaceVert[NumFaces][MaxFaceVert];
+   static const int64_t Dimension = 3;
+   static const int64_t NumVert = 6;
+   static const int64_t NumEdges = 9;
+   static const int64_t Edges[NumEdges][2];
+   static const int64_t NumFaces = 5;
+   static const int64_t FaceTypes[NumFaces];
+   static const int64_t MaxFaceVert = 4;
+   static const int64_t FaceVert[NumFaces][MaxFaceVert];
    // Upper-triangular part of the local vertex-to-vertex graph.
    struct VertToVert
    {
-      static const int I[NumVert];
-      static const int J[NumEdges][2]; // {end,edge_idx}
+      static const int64_t I[NumVert];
+      static const int64_t J[NumEdges][2]; // {end,edge_idx}
    };
 };
 
 template <> struct
    Geometry::Constants<Geometry::PYRAMID>
 {
-   static const int Dimension = 3;
-   static const int NumVert = 5;
-   static const int NumEdges = 8;
-   static const int Edges[NumEdges][2];
-   static const int NumFaces = 5;
-   static const int FaceTypes[NumFaces];
-   static const int MaxFaceVert = 4;
-   static const int FaceVert[NumFaces][MaxFaceVert];
+   static const int64_t Dimension = 3;
+   static const int64_t NumVert = 5;
+   static const int64_t NumEdges = 8;
+   static const int64_t Edges[NumEdges][2];
+   static const int64_t NumFaces = 5;
+   static const int64_t FaceTypes[NumFaces];
+   static const int64_t MaxFaceVert = 4;
+   static const int64_t FaceVert[NumFaces][MaxFaceVert];
    // Upper-triangular part of the local vertex-to-vertex graph.
    struct VertToVert
    {
-      static const int I[NumVert];
-      static const int J[NumEdges][2]; // {end,edge_idx}
+      static const int64_t I[NumVert];
+      static const int64_t J[NumEdges][2]; // {end,edge_idx}
    };
 };
 
@@ -280,13 +281,13 @@ extern Geometry Geometries;
 class RefinedGeometry
 {
 public:
-   int Times, ETimes;
+   int64_t Times, ETimes;
    IntegrationRule RefPts;
-   Array<int> RefGeoms, RefEdges;
-   int NumBdrEdges; // at the beginning of RefEdges
-   int Type;
+   Array<int64_t> RefGeoms, RefEdges;
+   int64_t NumBdrEdges; // at the beginning of RefEdges
+   int64_t Type;
 
-   RefinedGeometry(int NPts, int NRefG, int NRefE, int NBdrE = 0) :
+   RefinedGeometry(int64_t NPts, int64_t NRefG, int64_t NRefE, int64_t NBdrE = 0) :
       RefPts(NPts), RefGeoms(NRefG), RefEdges(NRefE), NumBdrEdges(NBdrE) {}
 };
 

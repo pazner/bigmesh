@@ -14,17 +14,18 @@
 namespace mfem
 {
 
-Triangle::Triangle(const int *ind, int attr) : Element(Geometry::TRIANGLE)
+Triangle::Triangle(const int64_t *ind,
+                   int64_t attr) : Element(Geometry::TRIANGLE)
 {
    attribute = attr;
-   for (int i = 0; i < 3; i++)
+   for (int64_t i = 0; i < 3; i++)
    {
       indices[i] = ind[i];
    }
    transform = 0;
 }
 
-Triangle::Triangle(int ind1, int ind2, int ind3, int attr)
+Triangle::Triangle(int64_t ind1, int64_t ind2, int64_t ind3, int64_t attr)
    : Element(Geometry::TRIANGLE)
 {
    attribute  = attr;
@@ -34,7 +35,7 @@ Triangle::Triangle(int ind1, int ind2, int ind3, int attr)
    transform = 0;
 }
 
-int Triangle::NeedRefinement(HashTable<Hashed2> &v_to_v) const
+int64_t Triangle::NeedRefinement(HashTable<Hashed2> &v_to_v) const
 {
    if (v_to_v.FindId(indices[0], indices[1]) != -1) { return 1; }
    if (v_to_v.FindId(indices[1], indices[2]) != -1) { return 1; }
@@ -42,9 +43,9 @@ int Triangle::NeedRefinement(HashTable<Hashed2> &v_to_v) const
    return 0;
 }
 
-void Triangle::SetVertices(const int *ind)
+void Triangle::SetVertices(const int64_t *ind)
 {
-   for (int i = 0; i < 3; i++)
+   for (int64_t i = 0; i < 3; i++)
    {
       indices[i] = ind[i];
    }
@@ -53,7 +54,7 @@ void Triangle::SetVertices(const int *ind)
 void Triangle::MarkEdge(DenseMatrix &pmat)
 {
    real_t d[3];
-   int shift, v;
+   int64_t shift, v;
 
    d[0] = ( (pmat(0,1)-pmat(0,0))*(pmat(0,1)-pmat(0,0)) +
             (pmat(1,1)-pmat(1,0))*(pmat(1,1)-pmat(1,0)) );
@@ -98,9 +99,10 @@ void Triangle::MarkEdge(DenseMatrix &pmat)
 }
 
 // Static method
-void Triangle::MarkEdge(int *indices, const DSTable &v_to_v, const int *length)
+void Triangle::MarkEdge(int64_t *indices, const DSTable &v_to_v,
+                        const int64_t *length)
 {
-   int l, L, j, ind[3], i;
+   int64_t l, L, j, ind[3], i;
 
    L = length[ v_to_v(indices[0], indices[1]) ]; j = 0;
    if ( (l = length[ v_to_v(indices[1], indices[2]) ]) > L ) { L = l; j = 1; }
@@ -132,7 +134,7 @@ void Triangle::GetPointMatrix(unsigned transform, DenseMatrix &pm)
    b[0] = 1.0; b[1] = 0.0;
    c[0] = 0.0; c[1] = 1.0;
 
-   int chain[12], n = 0;
+   int64_t chain[12], n = 0;
    while (transform)
    {
       chain[n++] = (transform & 7) - 1;
@@ -185,13 +187,13 @@ void Triangle::GetPointMatrix(unsigned transform, DenseMatrix &pm)
    }
 }
 
-void Triangle::GetVertices(Array<int> &v) const
+void Triangle::GetVertices(Array<int64_t> &v) const
 {
    v.SetSize(3);
    std::copy(indices, indices + 3, v.begin());
 }
 
-void Triangle::SetVertices(const Array<int> &v)
+void Triangle::SetVertices(const Array<int64_t> &v)
 {
    MFEM_ASSERT(v.Size() == 3, "!");
    std::copy(v.begin(), v.end(), indices);

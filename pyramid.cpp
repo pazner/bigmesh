@@ -16,17 +16,18 @@
 namespace mfem
 {
 
-Pyramid::Pyramid(const int *ind, int attr)
+Pyramid::Pyramid(const int64_t *ind, int64_t attr)
    : Element(Geometry::PYRAMID)
 {
    attribute = attr;
-   for (int i = 0; i < 5; i++)
+   for (int64_t i = 0; i < 5; i++)
    {
       indices[i] = ind[i];
    }
 }
 
-Pyramid::Pyramid(int ind1, int ind2, int ind3, int ind4, int ind5, int attr)
+Pyramid::Pyramid(int64_t ind1, int64_t ind2, int64_t ind3, int64_t ind4,
+                 int64_t ind5, int64_t attr)
    : Element(Geometry::PYRAMID)
 {
    attribute  = attr;
@@ -37,21 +38,21 @@ Pyramid::Pyramid(int ind1, int ind2, int ind3, int ind4, int ind5, int attr)
    indices[4] = ind5;
 }
 
-void Pyramid::SetVertices(const int *ind)
+void Pyramid::SetVertices(const int64_t *ind)
 {
-   for (int i = 0; i < 5; i++)
+   for (int64_t i = 0; i < 5; i++)
    {
       indices[i] = ind[i];
    }
 }
 
-void Pyramid::GetVertices(Array<int> &v) const
+void Pyramid::GetVertices(Array<int64_t> &v) const
 {
    v.SetSize(5);
    std::copy(indices, indices + 5, v.begin());
 }
 
-void Pyramid::SetVertices(const Array<int> &v)
+void Pyramid::SetVertices(const Array<int64_t> &v)
 {
    MFEM_ASSERT(v.Size() == 5, "!");
    std::copy(v.begin(), v.end(), indices);

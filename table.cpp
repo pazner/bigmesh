@@ -29,7 +29,7 @@ Table::Table(const Table &table)
    size = table.size;
    if (size >= 0)
    {
-      const int nnz = table.I[size];
+      const int64_t nnz = table.I[size];
       I.New(size+1, table.I.GetMemoryType());
       J.New(nnz, table.J.GetMemoryType());
       I.CopyFrom(table.I, size+1);
@@ -38,30 +38,30 @@ Table::Table(const Table &table)
 }
 
 Table::Table(const Table &table1,
-             const Table &table2, int offset)
+             const Table &table2, int64_t offset)
 {
    MFEM_ASSERT(table1.size == table2.size,
                "Tables have different sizes can not merge.");
    size = table1.size;
 
-   const int nnz = table1.I[size] + table2.I[size];
+   const int64_t nnz = table1.I[size] + table2.I[size];
    I.New(size+1, table1.I.GetMemoryType());
    J.New(nnz, table1.J.GetMemoryType());
 
    I[0] = 0;
-   Array<int> row;
-   for (int i = 0; i < size; i++)
+   Array<int64_t> row;
+   for (int64_t i = 0; i < size; i++)
    {
       I[i+1] = I[i];
 
       table1.GetRow(i, row);
-      for (int r = 0; r < row.Size(); r++,  I[i+1] ++)
+      for (int64_t r = 0; r < row.Size(); r++,  I[i+1] ++)
       {
          J[ I[i+1] ] = row[r];
       }
 
       table2.GetRow(i, row);
-      for (int r = 0; r < row.Size(); r++,  I[i+1] ++)
+      for (int64_t r = 0; r < row.Size(); r++,  I[i+1] ++)
       {
          J[ I[i+1] ] = (row[r] < 0) ? row[r] - offset : row[r] + offset;
       }
@@ -70,8 +70,8 @@ Table::Table(const Table &table1,
 }
 
 Table::Table(const Table &table1,
-             const Table &table2, int offset2,
-             const Table &table3, int offset3)
+             const Table &table2, int64_t offset2,
+             const Table &table3, int64_t offset3)
 {
    MFEM_ASSERT(table1.size == table2.size,
                "Tables have different sizes can not merge.");
@@ -79,30 +79,30 @@ Table::Table(const Table &table1,
                "Tables have different sizes can not merge.");
    size = table1.size;
 
-   const int nnz = table1.I[size] + table2.I[size] + table3.I[size];
+   const int64_t nnz = table1.I[size] + table2.I[size] + table3.I[size];
    I.New(size+1, table1.I.GetMemoryType());
    J.New(nnz, table1.J.GetMemoryType());
 
    I[0] = 0;
-   Array<int> row;
-   for (int i = 0; i < size; i++)
+   Array<int64_t> row;
+   for (int64_t i = 0; i < size; i++)
    {
       I[i+1] = I[i];
 
       table1.GetRow(i, row);
-      for (int r = 0; r < row.Size(); r++,  I[i+1] ++)
+      for (int64_t r = 0; r < row.Size(); r++,  I[i+1] ++)
       {
          J[ I[i+1] ] = row[r];
       }
 
       table2.GetRow(i, row);
-      for (int r = 0; r < row.Size(); r++,  I[i+1] ++)
+      for (int64_t r = 0; r < row.Size(); r++,  I[i+1] ++)
       {
          J[ I[i+1] ] = (row[r] < 0) ? row[r] - offset2 : row[r] + offset2;
       }
 
       table3.GetRow(i, row);
-      for (int r = 0; r < row.Size(); r++,  I[i+1] ++)
+      for (int64_t r = 0; r < row.Size(); r++,  I[i+1] ++)
       {
          J[ I[i+1] ] = (row[r] < 0) ? row[r] - offset3 : row[r] + offset3;
       }
@@ -119,9 +119,9 @@ Table& Table::operator=(const Table &rhs)
    return *this;
 }
 
-Table::Table (int dim, int connections_per_row)
+Table::Table (int64_t dim, int64_t connections_per_row)
 {
-   int i, j, sum = dim * connections_per_row;
+   int64_t i, j, sum = dim * connections_per_row;
 
    size = dim;
    I.New(size+1);
@@ -135,14 +135,14 @@ Table::Table (int dim, int connections_per_row)
    }
 }
 
-Table::Table (int nrows, int *partitioning)
+Table::Table (int64_t nrows, int64_t *partitioning)
 {
    size = nrows;
 
    I.New(size+1);
    J.New(size);
 
-   for (int i = 0; i < size; i++)
+   for (int64_t i = 0; i < size; i++)
    {
       I[i] = i;
       J[i] = partitioning[i];
@@ -150,11 +150,11 @@ Table::Table (int nrows, int *partitioning)
    I[size] = size;
 }
 
-void Table::MakeI (int nrows)
+void Table::MakeI (int64_t nrows)
 {
    SetDims (nrows, 0);
 
-   for (int i = 0; i <= nrows; i++)
+   for (int64_t i = 0; i <= nrows; i++)
    {
       I[i] = 0;
    }
@@ -162,7 +162,7 @@ void Table::MakeI (int nrows)
 
 void Table::MakeJ()
 {
-   int i, j, k;
+   int64_t i, j, k;
 
    for (k = i = 0; i < size; i++)
    {
@@ -173,11 +173,11 @@ void Table::MakeJ()
    J.New(I[size]=k);
 }
 
-void Table::AddConnections (int r, const int *c, int nc)
+void Table::AddConnections (int64_t r, const int64_t *c, int64_t nc)
 {
-   int *jp = J+I[r];
+   int64_t *jp = J+I[r];
 
-   for (int i = 0; i < nc; i++)
+   for (int64_t i = 0; i < nc; i++)
    {
       jp[i] = c[i];
    }
@@ -186,32 +186,32 @@ void Table::AddConnections (int r, const int *c, int nc)
 
 void Table::ShiftUpI()
 {
-   for (int i = size; i > 0; i--)
+   for (int64_t i = size; i > 0; i--)
    {
       I[i] = I[i-1];
    }
    I[0] = 0;
 }
 
-void Table::SetSize(int dim, int connections_per_row)
+void Table::SetSize(int64_t dim, int64_t connections_per_row)
 {
    SetDims (dim, dim * connections_per_row);
 
    if (size > 0)
    {
       I[0] = 0;
-      for (int i = 0, j = 0; i < size; i++)
+      for (int64_t i = 0, j = 0; i < size; i++)
       {
-         int end = I[i] + connections_per_row;
+         int64_t end = I[i] + connections_per_row;
          I[i+1] = end;
          for ( ; j < end; j++) { J[j] = -1; }
       }
    }
 }
 
-void Table::SetDims(int rows, int nnz)
+void Table::SetDims(int64_t rows, int64_t nnz)
 {
-   int j;
+   int64_t j;
 
    j = (I) ? (I[size]) : (0);
    if (size != rows)
@@ -234,14 +234,14 @@ void Table::SetDims(int rows, int nnz)
    }
 }
 
-int Table::operator() (int i, int j) const
+int64_t Table::operator() (int64_t i, int64_t j) const
 {
    if ( i>=size || i<0 )
    {
       return -1;
    }
 
-   int k, end = I[i+1];
+   int64_t k, end = I[i+1];
    for (k = I[i]; k < end; k++)
    {
       if (J[k] == j)
@@ -256,7 +256,7 @@ int Table::operator() (int i, int j) const
    return -1;
 }
 
-void Table::GetRow(int i, Array<int> &row) const
+void Table::GetRow(int64_t i, Array<int64_t> &row) const
 {
    MFEM_ASSERT(i >= 0 && i < size, "Row index " << i << " is out of range [0,"
                << size << ')');
@@ -270,13 +270,13 @@ void Table::GetRow(int i, Array<int> &row) const
 
 void Table::SortRows()
 {
-   for (int r = 0; r < size; r++)
+   for (int64_t r = 0; r < size; r++)
    {
       std::sort(J + I[r], J + I[r+1]);
    }
 }
 
-void Table::SetIJ(int *newI, int *newJ, int newsize)
+void Table::SetIJ(int64_t *newI, int64_t *newJ, int64_t newsize)
 {
    I.Delete();
    J.Delete();
@@ -288,12 +288,12 @@ void Table::SetIJ(int *newI, int *newJ, int newsize)
    J.Wrap(newJ, I[size], true);
 }
 
-int Table::Push(int i, int j)
+int64_t Table::Push(int64_t i, int64_t j)
 {
    MFEM_ASSERT(i >=0 &&
                i<size, "Index out of bounds.  i = " << i << " size " << size);
 
-   for (int k = I[i], end = I[i+1]; k < end; k++)
+   for (int64_t k = I[i], end = I[i+1]; k < end; k++)
    {
       if (J[k] == j)
       {
@@ -314,7 +314,7 @@ int Table::Push(int i, int j)
 
 void Table::Finalize()
 {
-   int i, j, end, sum = 0, n = 0, newI = 0;
+   int64_t i, j, end, sum = 0, n = 0, newI = 0;
 
    for (i=0; i<I[size]; i++)
    {
@@ -326,7 +326,7 @@ void Table::Finalize()
 
    if (sum != I[size])
    {
-      int *NewJ = Memory<int>(sum);
+      int64_t *NewJ = Memory<int64_t>(sum);
 
       for (i=0; i<size; i++)
       {
@@ -349,17 +349,17 @@ void Table::Finalize()
    }
 }
 
-void Table::MakeFromList(int nrows, const Array<Connection> &list)
+void Table::MakeFromList(int64_t nrows, const Array<Connection> &list)
 {
    Clear();
 
    size = nrows;
-   int nnz = list.Size();
+   int64_t nnz = list.Size();
 
    I.New(size+1);
    J.New(nnz);
 
-   for (int i = 0, k = 0; i <= size; i++)
+   for (int64_t i = 0, k = 0; i <= size; i++)
    {
       I[i] = k;
       while (k < nnz && list[k].from == i)
@@ -370,19 +370,19 @@ void Table::MakeFromList(int nrows, const Array<Connection> &list)
    }
 }
 
-int Table::Width() const
+int64_t Table::Width() const
 {
-   int width = -1, nnz = (size >= 0) ? I[size] : 0;
-   for (int k = 0; k < nnz; k++)
+   int64_t width = -1, nnz = (size >= 0) ? I[size] : 0;
+   for (int64_t k = 0; k < nnz; k++)
    {
       if (J[k] > width) { width = J[k]; }
    }
    return width + 1;
 }
 
-void Table::Print(std::ostream & os, int width) const
+void Table::Print(std::ostream & os, int64_t width) const
 {
-   int i, j;
+   int64_t i, j;
 
    for (i = 0; i < size; i++)
    {
@@ -404,7 +404,7 @@ void Table::Print(std::ostream & os, int width) const
 
 void Table::PrintMatlab(std::ostream & os) const
 {
-   int i, j;
+   int64_t i, j;
 
    for (i = 0; i < size; i++)
    {
@@ -421,11 +421,11 @@ void Table::Save(std::ostream &os) const
 {
    os << size << '\n';
 
-   for (int i = 0; i <= size; i++)
+   for (int64_t i = 0; i <= size; i++)
    {
       os << I[i] << '\n';
    }
-   for (int i = 0, nnz = I[size]; i < nnz; i++)
+   for (int64_t i = 0, nnz = I[size]; i < nnz; i++)
    {
       os << J[i] << '\n';
    }
@@ -438,13 +438,13 @@ void Table::Load(std::istream &in)
 
    in >> size;
    I.New(size+1);
-   for (int i = 0; i <= size; i++)
+   for (int64_t i = 0; i <= size; i++)
    {
       in >> I[i];
    }
-   int nnz = I[size];
+   int64_t nnz = I[size];
    J.New(nnz);
-   for (int j = 0; j < nnz; j++)
+   for (int64_t j = 0; j < nnz; j++)
    {
       in >> J[j];
    }
@@ -474,7 +474,7 @@ void Table::Swap(Table & other)
 std::size_t Table::MemoryUsage() const
 {
    if (size < 0 || I == NULL) { return 0; }
-   return (size+1 + I[size]) * sizeof(int);
+   return (size+1 + I[size]) * sizeof(int64_t);
 }
 
 Table::~Table ()
@@ -483,40 +483,40 @@ Table::~Table ()
    J.Delete();
 }
 
-void Transpose (const Table &A, Table &At, int ncols_A_)
+void Transpose (const Table &A, Table &At, int64_t ncols_A_)
 {
-   const int *i_A     = A.GetI();
-   const int *j_A     = A.GetJ();
-   const int  nrows_A = A.Size();
-   const int  ncols_A = (ncols_A_ < 0) ? A.Width() : ncols_A_;
-   const int  nnz_A   = i_A[nrows_A];
+   const int64_t *i_A     = A.GetI();
+   const int64_t *j_A     = A.GetJ();
+   const int64_t  nrows_A = A.Size();
+   const int64_t  ncols_A = (ncols_A_ < 0) ? A.Width() : ncols_A_;
+   const int64_t  nnz_A   = i_A[nrows_A];
 
    At.SetDims (ncols_A, nnz_A);
 
-   int *i_At = At.GetI();
-   int *j_At = At.GetJ();
+   int64_t *i_At = At.GetI();
+   int64_t *j_At = At.GetJ();
 
-   for (int i = 0; i <= ncols_A; i++)
+   for (int64_t i = 0; i <= ncols_A; i++)
    {
       i_At[i] = 0;
    }
-   for (int i = 0; i < nnz_A; i++)
+   for (int64_t i = 0; i < nnz_A; i++)
    {
       i_At[j_A[i]+1]++;
    }
-   for (int i = 1; i < ncols_A; i++)
+   for (int64_t i = 1; i < ncols_A; i++)
    {
       i_At[i+1] += i_At[i];
    }
 
-   for (int i = 0; i < nrows_A; i++)
+   for (int64_t i = 0; i < nrows_A; i++)
    {
-      for (int j = i_A[i]; j < i_A[i+1]; j++)
+      for (int64_t j = i_A[i]; j < i_A[i+1]; j++)
       {
          j_At[i_At[j_A[j]]++] = i;
       }
    }
-   for (int i = ncols_A; i > 0; i--)
+   for (int64_t i = ncols_A; i > 0; i--)
    {
       i_At[i] = i_At[i-1];
    }
@@ -530,15 +530,15 @@ Table * Transpose(const Table &A)
    return At;
 }
 
-void Transpose(const Array<int> &A, Table &At, int ncols_A_)
+void Transpose(const Array<int64_t> &A, Table &At, int64_t ncols_A_)
 {
    At.MakeI((ncols_A_ < 0) ? (A.Max() + 1) : ncols_A_);
-   for (int i = 0; i < A.Size(); i++)
+   for (int64_t i = 0; i < A.Size(); i++)
    {
       At.AddAColumnInRow(A[i]);
    }
    At.MakeJ();
-   for (int i = 0; i < A.Size(); i++)
+   for (int64_t i = 0; i < A.Size(); i++)
    {
       At.AddConnection(A[i], i);
    }
@@ -547,27 +547,27 @@ void Transpose(const Array<int> &A, Table &At, int ncols_A_)
 
 void Mult (const Table &A, const Table &B, Table &C)
 {
-   int  i, j, k, l, m;
-   const int *i_A     = A.GetI();
-   const int *j_A     = A.GetJ();
-   const int *i_B     = B.GetI();
-   const int *j_B     = B.GetJ();
-   const int  nrows_A = A.Size();
-   const int  nrows_B = B.Size();
-   const int  ncols_A = A.Width();
-   const int  ncols_B = B.Width();
+   int64_t  i, j, k, l, m;
+   const int64_t *i_A     = A.GetI();
+   const int64_t *j_A     = A.GetJ();
+   const int64_t *i_B     = B.GetI();
+   const int64_t *j_B     = B.GetJ();
+   const int64_t  nrows_A = A.Size();
+   const int64_t  nrows_B = B.Size();
+   const int64_t  ncols_A = A.Width();
+   const int64_t  ncols_B = B.Width();
 
    MFEM_VERIFY( ncols_A <= nrows_B, "Table size mismatch: ncols_A = " << ncols_A
                 << ", nrows_B = " << nrows_B);
 
-   Array<int> B_marker (ncols_B);
+   Array<int64_t> B_marker (ncols_B);
 
    for (i = 0; i < ncols_B; i++)
    {
       B_marker[i] = -1;
    }
 
-   int counter = 0;
+   int64_t counter = 0;
    for (i = 0; i < nrows_A; i++)
    {
       for (j = i_A[i]; j < i_A[i+1]; j++)
@@ -592,8 +592,8 @@ void Mult (const Table &A, const Table &B, Table &C)
       B_marker[i] = -1;
    }
 
-   int *i_C = C.GetI();
-   int *j_C = C.GetJ();
+   int64_t *i_C = C.GetI();
+   int64_t *j_C = C.GetJ();
    counter = 0;
    for (i = 0; i < nrows_A; i++)
    {
@@ -623,11 +623,11 @@ Table * Mult (const Table &A, const Table &B)
    return C;
 }
 
-STable::STable (int dim, int connections_per_row) :
+STable::STable (int64_t dim, int64_t connections_per_row) :
    Table(dim, connections_per_row)
 {}
 
-int STable::operator() (int i, int j) const
+int64_t STable::operator() (int64_t i, int64_t j) const
 {
    if (i < j)
    {
@@ -639,7 +639,7 @@ int STable::operator() (int i, int j) const
    }
 }
 
-int STable::Push( int i, int j )
+int64_t STable::Push( int64_t i, int64_t j )
 {
    if (i < j)
    {
@@ -652,10 +652,10 @@ int STable::Push( int i, int j )
 }
 
 
-DSTable::DSTable(int nrows)
+DSTable::DSTable(int64_t nrows)
 {
    Rows = new Node*[nrows];
-   for (int i = 0; i < nrows; i++)
+   for (int64_t i = 0; i < nrows; i++)
    {
       Rows[i] = NULL;
    }
@@ -663,7 +663,7 @@ DSTable::DSTable(int nrows)
    NumEntries = 0;
 }
 
-int DSTable::Push_(int r, int c)
+int64_t DSTable::Push_(int64_t r, int64_t c)
 {
    MFEM_ASSERT(r >= 0 && r < NumRows,
                "Row out of bounds: r = " << r << ", NumRows = " << NumRows);
@@ -687,7 +687,7 @@ int DSTable::Push_(int r, int c)
    return (NumEntries++);
 }
 
-int DSTable::Index(int r, int c) const
+int64_t DSTable::Index(int64_t r, int64_t c) const
 {
    MFEM_ASSERT( r>=0, "Row index must be non-negative, not "<<r);
    if (r >= NumRows)
@@ -709,7 +709,7 @@ DSTable::~DSTable()
 #ifdef MFEM_USE_MEMALLOC
    // NodesMem.Clear();  // this is done implicitly
 #else
-   for (int i = 0; i < NumRows; i++)
+   for (int64_t i = 0; i < NumRows; i++)
    {
       Node *na, *nb = Rows[i];
       while (nb != NULL)

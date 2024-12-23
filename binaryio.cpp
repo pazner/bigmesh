@@ -81,7 +81,7 @@ void DecodeBase64(const char *src, size_t len, std::vector<char> &buf)
    buf.resize(3*len/4);
    unsigned char *out = (unsigned char *)buf.data();
    count = 0;
-   int pad = 0;
+   int64_t pad = 0;
    unsigned char c[4];
    for (size_t i=0; i<len; ++i)
    {

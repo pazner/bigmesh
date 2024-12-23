@@ -68,7 +68,7 @@ void Operator::ArrayMult(const Array<const Vector *> &X,
 {
    MFEM_ASSERT(X.Size() == Y.Size(),
                "Number of columns mismatch in Operator::Mult!");
-   for (int i = 0; i < X.Size(); i++)
+   for (int64_t i = 0; i < X.Size(); i++)
    {
       MFEM_ASSERT(X[i] && Y[i], "Missing Vector in Operator::Mult!");
       Mult(*X[i], *Y[i]);
@@ -80,7 +80,7 @@ void Operator::ArrayMultTranspose(const Array<const Vector *> &X,
 {
    MFEM_ASSERT(X.Size() == Y.Size(),
                "Number of columns mismatch in Operator::MultTranspose!");
-   for (int i = 0; i < X.Size(); i++)
+   for (int64_t i = 0; i < X.Size(); i++)
    {
       MFEM_ASSERT(X[i] && Y[i], "Missing Vector in Operator::MultTranspose!");
       MultTranspose(*X[i], *Y[i]);
@@ -92,7 +92,7 @@ void Operator::ArrayAddMult(const Array<const Vector *> &X, Array<Vector *> &Y,
 {
    MFEM_ASSERT(X.Size() == Y.Size(),
                "Number of columns mismatch in Operator::AddMult!");
-   for (int i = 0; i < X.Size(); i++)
+   for (int64_t i = 0; i < X.Size(); i++)
    {
       MFEM_ASSERT(X[i] && Y[i], "Missing Vector in Operator::AddMult!");
       AddMult(*X[i], *Y[i], a);
@@ -104,17 +104,17 @@ void Operator::ArrayAddMultTranspose(const Array<const Vector *> &X,
 {
    MFEM_ASSERT(X.Size() == Y.Size(),
                "Number of columns mismatch in Operator::AddMultTranspose!");
-   for (int i = 0; i < X.Size(); i++)
+   for (int64_t i = 0; i < X.Size(); i++)
    {
       MFEM_ASSERT(X[i] && Y[i], "Missing Vector in Operator::AddMultTranspose!");
       AddMultTranspose(*X[i], *Y[i], a);
    }
 }
 
-void Operator::FormLinearSystem(const Array<int> &ess_tdof_list,
+void Operator::FormLinearSystem(const Array<int64_t> &ess_tdof_list,
                                 Vector &x, Vector &b,
                                 Operator* &Aout, Vector &X, Vector &B,
-                                int copy_interior)
+                                int64_t copy_interior)
 {
    const Operator *P = this->GetProlongation();
    const Operator *R = this->GetRestriction();
@@ -129,8 +129,8 @@ void Operator::FormLinearSystem(const Array<int> &ess_tdof_list,
 }
 
 void Operator::FormRectangularLinearSystem(
-   const Array<int> &trial_tdof_list,
-   const Array<int> &test_tdof_list, Vector &x, Vector &b,
+   const Array<int64_t> &trial_tdof_list,
+   const Array<int64_t> &test_tdof_list, Vector &x, Vector &b,
    Operator* &Aout, Vector &X, Vector &B)
 {
    const Operator *Pi = this->GetProlongation();
@@ -195,7 +195,7 @@ Operator * Operator::SetupRAP(const Operator *Pi, const Operator *Po)
 }
 
 void Operator::FormConstrainedSystemOperator(
-   const Array<int> &ess_tdof_list, ConstrainedOperator* &Aout)
+   const Array<int64_t> &ess_tdof_list, ConstrainedOperator* &Aout)
 {
    const Operator *P = this->GetProlongation();
    Operator *rap = SetupRAP(P, P);
@@ -208,7 +208,7 @@ void Operator::FormConstrainedSystemOperator(
 }
 
 void Operator::FormRectangularConstrainedSystemOperator(
-   const Array<int> &trial_tdof_list, const Array<int> &test_tdof_list,
+   const Array<int64_t> &trial_tdof_list, const Array<int64_t> &test_tdof_list,
    RectangularConstrainedOperator* &Aout)
 {
    const Operator *Pi = this->GetProlongation();
@@ -224,7 +224,7 @@ void Operator::FormRectangularConstrainedSystemOperator(
    Aout = A;
 }
 
-void Operator::FormSystemOperator(const Array<int> &ess_tdof_list,
+void Operator::FormSystemOperator(const Array<int64_t> &ess_tdof_list,
                                   Operator* &Aout)
 {
    ConstrainedOperator *A;
@@ -232,8 +232,9 @@ void Operator::FormSystemOperator(const Array<int> &ess_tdof_list,
    Aout = A;
 }
 
-void Operator::FormRectangularSystemOperator(const Array<int> &trial_tdof_list,
-                                             const Array<int> &test_tdof_list,
+void Operator::FormRectangularSystemOperator(const Array<int64_t>
+                                             &trial_tdof_list,
+                                             const Array<int64_t> &test_tdof_list,
                                              Operator* &Aout)
 {
    RectangularConstrainedOperator *A;
@@ -248,7 +249,7 @@ void Operator::FormDiscreteOperator(Operator* &Aout)
    Aout = new TripleProductOperator(Rout, this, Pin,false, false, false);
 }
 
-void Operator::PrintMatlab(std::ostream & os, int n, int m) const
+void Operator::PrintMatlab(std::ostream & os, int64_t n, int64_t m) const
 {
    using namespace std;
    if (n == 0) { n = width; }
@@ -258,11 +259,11 @@ void Operator::PrintMatlab(std::ostream & os, int n, int m) const
    x = 0.0;
 
    os << setiosflags(ios::scientific | ios::showpos);
-   for (int i = 0; i < n; i++)
+   for (int64_t i = 0; i < n; i++)
    {
       x(i) = 1.0;
       Mult(x, y);
-      for (int j = 0; j < m; j++)
+      for (int64_t j = 0; j < m; j++)
       {
          if (y(j) != 0)
          {
@@ -316,33 +317,34 @@ Operator &TimeDependentOperator::GetExplicitGradient(const Vector &) const
    return const_cast<Operator &>(dynamic_cast<const Operator &>(*this));
 }
 
-int TimeDependentOperator::SUNImplicitSetup(const Vector &,
-                                            const Vector &,
-                                            int, int *, real_t)
+int64_t TimeDependentOperator::SUNImplicitSetup(const Vector &,
+                                                const Vector &,
+                                                int64_t, int64_t *, real_t)
 {
    mfem_error("TimeDependentOperator::SUNImplicitSetup() is not overridden!");
    return (-1);
 }
 
-int TimeDependentOperator::SUNImplicitSolve(const Vector &, Vector &, real_t)
+int64_t TimeDependentOperator::SUNImplicitSolve(const Vector &, Vector &,
+                                                real_t)
 {
    mfem_error("TimeDependentOperator::SUNImplicitSolve() is not overridden!");
    return (-1);
 }
 
-int TimeDependentOperator::SUNMassSetup()
+int64_t TimeDependentOperator::SUNMassSetup()
 {
    mfem_error("TimeDependentOperator::SUNMassSetup() is not overridden!");
    return (-1);
 }
 
-int TimeDependentOperator::SUNMassSolve(const Vector &, Vector &, real_t)
+int64_t TimeDependentOperator::SUNMassSolve(const Vector &, Vector &, real_t)
 {
    mfem_error("TimeDependentOperator::SUNMassSolve() is not overridden!");
    return (-1);
 }
 
-int TimeDependentOperator::SUNMassMult(const Vector &, Vector &)
+int64_t TimeDependentOperator::SUNMassMult(const Vector &, Vector &)
 {
    mfem_error("TimeDependentOperator::SUNMassMult() is not overridden!");
    return (-1);
@@ -508,7 +510,8 @@ TripleProductOperator::~TripleProductOperator()
 }
 
 
-ConstrainedOperator::ConstrainedOperator(Operator *A, const Array<int> &list,
+ConstrainedOperator::ConstrainedOperator(Operator *A,
+                                         const Array<int64_t> &list,
                                          bool own_A_,
                                          DiagonalPolicy diag_policy_)
    : Operator(A->Height(), A->Width()), A(A), own_A(own_A_),
@@ -531,22 +534,22 @@ void ConstrainedOperator::AssembleDiagonal(Vector &diag) const
 
    if (diag_policy == DIAG_KEEP) { return; }
 
-   const int csz = constraint_list.Size();
+   const int64_t csz = constraint_list.Size();
    auto d_diag = diag.ReadWrite();
    auto idx = constraint_list.Read();
    switch (diag_policy)
    {
       case DIAG_ONE:
-         mfem::forall(csz, [=] MFEM_HOST_DEVICE (int i)
+         mfem::forall(csz, [=] MFEM_HOST_DEVICE (int64_t i)
          {
-            const int id = idx[i];
+            const int64_t id = idx[i];
             d_diag[id] = 1.0;
          });
          break;
       case DIAG_ZERO:
-         mfem::forall(csz, [=] MFEM_HOST_DEVICE (int i)
+         mfem::forall(csz, [=] MFEM_HOST_DEVICE (int64_t i)
          {
-            const int id = idx[i];
+            const int64_t id = idx[i];
             d_diag[id] = 0.0;
          });
          break;
@@ -559,14 +562,14 @@ void ConstrainedOperator::AssembleDiagonal(Vector &diag) const
 void ConstrainedOperator::EliminateRHS(const Vector &x, Vector &b) const
 {
    w = 0.0;
-   const int csz = constraint_list.Size();
+   const int64_t csz = constraint_list.Size();
    auto idx = constraint_list.Read();
    auto d_x = x.Read();
    // Use read+write access - we are modifying sub-vector of w
    auto d_w = w.ReadWrite();
-   mfem::forall(csz, [=] MFEM_HOST_DEVICE (int i)
+   mfem::forall(csz, [=] MFEM_HOST_DEVICE (int64_t i)
    {
-      const int id = idx[i];
+      const int64_t id = idx[i];
       d_w[id] = d_x[id];
    });
 
@@ -576,9 +579,9 @@ void ConstrainedOperator::EliminateRHS(const Vector &x, Vector &b) const
 
    // Use read+write access - we are modifying sub-vector of b
    auto d_b = b.ReadWrite();
-   mfem::forall(csz, [=] MFEM_HOST_DEVICE (int i)
+   mfem::forall(csz, [=] MFEM_HOST_DEVICE (int64_t i)
    {
-      const int id = idx[i];
+      const int64_t id = idx[i];
       d_b[id] = d_x[id];
    });
 }
@@ -586,7 +589,7 @@ void ConstrainedOperator::EliminateRHS(const Vector &x, Vector &b) const
 void ConstrainedOperator::ConstrainedMult(const Vector &x, Vector &y,
                                           const bool transpose) const
 {
-   const int csz = constraint_list.Size();
+   const int64_t csz = constraint_list.Size();
    if (csz == 0)
    {
       if (transpose)
@@ -605,7 +608,7 @@ void ConstrainedOperator::ConstrainedMult(const Vector &x, Vector &y,
    auto idx = constraint_list.Read();
    // Use read+write access - we are modifying sub-vector of z
    auto d_z = z.ReadWrite();
-   mfem::forall(csz, [=] MFEM_HOST_DEVICE (int i) { d_z[idx[i]] = 0.0; });
+   mfem::forall(csz, [=] MFEM_HOST_DEVICE (int64_t i) { d_z[idx[i]] = 0.0; });
 
    if (transpose)
    {
@@ -622,16 +625,16 @@ void ConstrainedOperator::ConstrainedMult(const Vector &x, Vector &y,
    switch (diag_policy)
    {
       case DIAG_ONE:
-         mfem::forall(csz, [=] MFEM_HOST_DEVICE (int i)
+         mfem::forall(csz, [=] MFEM_HOST_DEVICE (int64_t i)
          {
-            const int id = idx[i];
+            const int64_t id = idx[i];
             d_y[id] = d_x[id];
          });
          break;
       case DIAG_ZERO:
-         mfem::forall(csz, [=] MFEM_HOST_DEVICE (int i)
+         mfem::forall(csz, [=] MFEM_HOST_DEVICE (int64_t i)
          {
-            const int id = idx[i];
+            const int64_t id = idx[i];
             d_y[id] = 0.0;
          });
          break;
@@ -666,8 +669,8 @@ void ConstrainedOperator::AddMult(const Vector &x, Vector &y,
 
 RectangularConstrainedOperator::RectangularConstrainedOperator(
    Operator *A,
-   const Array<int> &trial_list,
-   const Array<int> &test_list,
+   const Array<int64_t> &trial_list,
+   const Array<int64_t> &test_list,
    bool own_A_)
    : Operator(A->Height(), A->Width()), A(A), own_A(own_A_)
 {
@@ -687,23 +690,23 @@ void RectangularConstrainedOperator::EliminateRHS(const Vector &x,
                                                   Vector &b) const
 {
    w = 0.0;
-   const int trial_csz = trial_constraints.Size();
+   const int64_t trial_csz = trial_constraints.Size();
    auto trial_idx = trial_constraints.Read();
    auto d_x = x.Read();
    // Use read+write access - we are modifying sub-vector of w
    auto d_w = w.ReadWrite();
-   mfem::forall(trial_csz, [=] MFEM_HOST_DEVICE (int i)
+   mfem::forall(trial_csz, [=] MFEM_HOST_DEVICE (int64_t i)
    {
-      const int id = trial_idx[i];
+      const int64_t id = trial_idx[i];
       d_w[id] = d_x[id];
    });
 
    A->AddMult(w, b, -1.0);
 
-   const int test_csz = test_constraints.Size();
+   const int64_t test_csz = test_constraints.Size();
    auto test_idx = test_constraints.Read();
    auto d_b = b.ReadWrite();
-   mfem::forall(test_csz, [=] MFEM_HOST_DEVICE (int i)
+   mfem::forall(test_csz, [=] MFEM_HOST_DEVICE (int64_t i)
    {
       d_b[test_idx[i]] = 0.0;
    });
@@ -711,8 +714,8 @@ void RectangularConstrainedOperator::EliminateRHS(const Vector &x,
 
 void RectangularConstrainedOperator::Mult(const Vector &x, Vector &y) const
 {
-   const int trial_csz = trial_constraints.Size();
-   const int test_csz = test_constraints.Size();
+   const int64_t trial_csz = trial_constraints.Size();
+   const int64_t test_csz = test_constraints.Size();
    if (trial_csz == 0)
    {
       A->Mult(x, y);
@@ -724,7 +727,7 @@ void RectangularConstrainedOperator::Mult(const Vector &x, Vector &y) const
       auto idx = trial_constraints.Read();
       // Use read+write access - we are modifying sub-vector of w
       auto d_w = w.ReadWrite();
-      mfem::forall(trial_csz, [=] MFEM_HOST_DEVICE (int i)
+      mfem::forall(trial_csz, [=] MFEM_HOST_DEVICE (int64_t i)
       {
          d_w[idx[i]] = 0.0;
       });
@@ -736,7 +739,7 @@ void RectangularConstrainedOperator::Mult(const Vector &x, Vector &y) const
    {
       auto idx = test_constraints.Read();
       auto d_y = y.ReadWrite();
-      mfem::forall(test_csz, [=] MFEM_HOST_DEVICE (int i)
+      mfem::forall(test_csz, [=] MFEM_HOST_DEVICE (int64_t i)
       {
          d_y[idx[i]] = 0.0;
       });
@@ -746,8 +749,8 @@ void RectangularConstrainedOperator::Mult(const Vector &x, Vector &y) const
 void RectangularConstrainedOperator::MultTranspose(const Vector &x,
                                                    Vector &y) const
 {
-   const int trial_csz = trial_constraints.Size();
-   const int test_csz = test_constraints.Size();
+   const int64_t trial_csz = trial_constraints.Size();
+   const int64_t test_csz = test_constraints.Size();
    if (test_csz == 0)
    {
       A->MultTranspose(x, y);
@@ -759,7 +762,7 @@ void RectangularConstrainedOperator::MultTranspose(const Vector &x,
       auto idx = test_constraints.Read();
       // Use read+write access - we are modifying sub-vector of z
       auto d_z = z.ReadWrite();
-      mfem::forall(test_csz, [=] MFEM_HOST_DEVICE (int i)
+      mfem::forall(test_csz, [=] MFEM_HOST_DEVICE (int64_t i)
       {
          d_z[idx[i]] = 0.0;
       });
@@ -771,7 +774,7 @@ void RectangularConstrainedOperator::MultTranspose(const Vector &x,
    {
       auto idx = trial_constraints.Read();
       auto d_y = y.ReadWrite();
-      mfem::forall(trial_csz, [=] MFEM_HOST_DEVICE (int i)
+      mfem::forall(trial_csz, [=] MFEM_HOST_DEVICE (int64_t i)
       {
          d_y[idx[i]] = 0.0;
       });
@@ -779,7 +782,7 @@ void RectangularConstrainedOperator::MultTranspose(const Vector &x,
 }
 
 real_t PowerMethod::EstimateLargestEigenvalue(Operator& opr, Vector& v0,
-                                              int numSteps, real_t tolerance, int seed)
+                                              int64_t numSteps, real_t tolerance, int64_t seed)
 {
    v1.SetSize(v0.Size());
    if (seed != 0)
@@ -789,7 +792,7 @@ real_t PowerMethod::EstimateLargestEigenvalue(Operator& opr, Vector& v0,
 
    real_t eigenvalue = 1.0;
 
-   for (int iter = 0; iter < numSteps; ++iter)
+   for (int64_t iter = 0; iter < numSteps; ++iter)
    {
       real_t normV0;
 

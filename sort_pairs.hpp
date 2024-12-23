@@ -46,7 +46,7 @@ bool operator==(const Pair<A,B> &p, const Pair<A,B> &q)
 
 /// Sort an array of Pairs with respect to the first element
 template <class A, class B>
-void SortPairs (Pair<A, B> *pairs, int size)
+void SortPairs (Pair<A, B> *pairs, int64_t size)
 {
    std::sort(pairs, pairs + size);
 }
@@ -77,7 +77,7 @@ bool operator<(const Triple<A,B,C> &p, const Triple<A,B,C> &q)
 
 /// @brief Lexicographic sort for arrays of class Triple.
 template <class A, class B, class C>
-void SortTriple (Triple<A, B, C> *triples, int size)
+void SortTriple (Triple<A, B, C> *triples, int64_t size)
 {
    std::sort(triples, triples + size);
 }

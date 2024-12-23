@@ -25,8 +25,8 @@ namespace mfem
  */
 struct Hashed2
 {
-   int p1, p2;
-   int next;
+   int64_t p1, p2;
+   int64_t next;
 };
 
 /** A concept for items that should be used in HashTable and be accessible by
@@ -34,8 +34,8 @@ struct Hashed2
  */
 struct Hashed4
 {
-   int p1, p2, p3; // NOTE: p4 is neither hashed nor stored
-   int next;
+   int64_t p1, p2, p3; // NOTE: p4 is neither hashed nor stored
+   int64_t next;
 };
 
 
@@ -90,7 +90,7 @@ public:
                              BlockArray<T>.
        @param[in] init_hash_size The initial size of the hash table. Must be
                                  a power of 2. */
-   HashTable(int block_size = 16*1024, int init_hash_size = 32*1024);
+   HashTable(int64_t block_size = 16*1024, int64_t init_hash_size = 32*1024);
    /// @brief Deep copy
    HashTable(const HashTable& other);
    /// @brief Copy assignment not supported
@@ -105,7 +105,7 @@ public:
        @return The index "id" of the key in the BlockArray<T>.
 
        @warning This method should only be called if T inherits from Hashed2. */
-   T* Get(int p1, int p2);
+   T* Get(int64_t p1, int64_t p2);
 
    /** @brief Item accessor with key (or parents) the quadruplet 'p1', 'p2',
        'p3', 'p4'. The key 'p4' is optional. Default construct an item of type T
@@ -118,7 +118,7 @@ public:
        @return The index "id" of the key in the BlockArray<T>.
 
       @warning This method should only be called if T inherits from Hashed4. */
-   T* Get(int p1, int p2, int p3, int p4 = -1 /* p4 optional */);
+   T* Get(int64_t p1, int64_t p2, int64_t p3, int64_t p4 = -1 /* p4 optional */);
 
    /// Get id of item whose parents are p1, p2... Create it if it doesn't exist.
    /** @brief Get the "id" of an item, this "id" corresponding to the index of the
@@ -130,7 +130,7 @@ public:
        @return The index "id" of the key in the BlockArray<T>.
 
        @warning This method should only be called if T inherits from Hashed2. */
-   int GetId(int p1, int p2);
+   int64_t GetId(int64_t p1, int64_t p2);
 
    /** @brief Get the "id" of an item, this "id" corresponding to the index of the
        item in the underlying BlockArray<T> object. Default construct an item
@@ -143,7 +143,7 @@ public:
        @return The index "id" of the key in the BlockArray<T>.
 
        @warning This method should only be called if T inherits from Hashed4. */
-   int GetId(int p1, int p2, int p3, int p4 = -1);
+   int64_t GetId(int64_t p1, int64_t p2, int64_t p3, int64_t p4 = -1);
 
    /// Find item whose parents are p1, p2... Return NULL if it doesn't exist.
    /** @brief Item accessor with key (or parents) the pair 'p1', 'p2'. Return
@@ -154,7 +154,7 @@ public:
        @return The item associated to the key (p1,p2).
 
        @warning This method should only be called if T inherits from Hashed2. */
-   T* Find(int p1, int p2);
+   T* Find(int64_t p1, int64_t p2);
 
    /** @brief Item accessor with key (or parents) the quadruplet 'p1', 'p2',
        'p3', 'p4'. The key 'p4' is optional. Return nullptr if no value
@@ -167,7 +167,7 @@ public:
        @return The item associated to the key (p1,p2,p3,p4).
 
        @warning This method should only be called if T inherits from Hashed4. */
-   T* Find(int p1, int p2, int p3, int p4 = -1);
+   T* Find(int64_t p1, int64_t p2, int64_t p3, int64_t p4 = -1);
 
    /** @brief Item const accessor with key (or parents) the pair 'p1', 'p2'.
        Return nullptr if no value correspond to the requested key.
@@ -177,7 +177,7 @@ public:
        @return The item associated to the key (p1,p2).
 
       @warning This method should only be called if T inherits from Hashed2. */
-   const T* Find(int p1, int p2) const;
+   const T* Find(int64_t p1, int64_t p2) const;
 
    /** @brief Item const accessor with key (or parents) the quadruplet 'p1',
        'p2', 'p3', 'p4'. The key 'p4' is optional. Return nullptr if no value
@@ -190,7 +190,7 @@ public:
        @return The item associated to the key (p1,p2,p3,p4).
 
        @warning This method should only be called if T inherits from Hashed4. */
-   const T* Find(int p1, int p2, int p3, int p4 = -1) const;
+   const T* Find(int64_t p1, int64_t p2, int64_t p3, int64_t p4 = -1) const;
 
    /// Find id of item whose parents are p1, p2... Return -1 if it doesn't exist.
    /** @brief Find the "id" of an item, this "id" corresponding to the index of
@@ -202,7 +202,7 @@ public:
        @return The index "id" of the key in the BlockArray<T>.
 
        @warning This method should only be called if T inherits from Hashed2. */
-   int FindId(int p1, int p2) const;
+   int64_t FindId(int64_t p1, int64_t p2) const;
 
    /** @brief Find the "id" of an item, this "id" corresponding to the index of
        the item in the underlying BlockArray<T> object. Default construct an
@@ -215,30 +215,30 @@ public:
        @return The index "id" of the key in the BlockArray<T>.
 
        @warning This method should only be called if T inherits from Hashed4. */
-   int FindId(int p1, int p2, int p3, int p4 = -1) const;
+   int64_t FindId(int64_t p1, int64_t p2, int64_t p3, int64_t p4 = -1) const;
 
    /// @brief Return the number of elements currently stored in the HashTable.
-   int Size() const { return Base::Size() - unused.Size(); }
+   int64_t Size() const { return Base::Size() - unused.Size(); }
 
    /// @brief Return the total number of ids (used and unused) in the HashTable.
-   int NumIds() const { return Base::Size(); }
+   int64_t NumIds() const { return Base::Size(); }
 
    /// @brief Return the number of free/unused ids in the HashTable.
-   int NumFreeIds() const { return unused.Size(); }
+   int64_t NumFreeIds() const { return unused.Size(); }
 
    /** @brief Return true if item 'id' exists in (is used by) the container.
 
        @param[in] id Index of the item in the underlying BlockArray<T>.
 
        @warning It is assumed that 0 <= id < NumIds(). */
-   bool IdExists(int id) const { return (Base::At(id).next != -2); }
+   bool IdExists(int64_t id) const { return (Base::At(id).next != -2); }
 
    /** @brief Remove an item from the hash table.
 
        @param[in] id Index of the item in the underlying BlockArray<T>.
 
        @warning Its id will be reused by newly added items. */
-   void Delete(int id);
+   void Delete(int64_t id);
 
    /// @brief Remove all items.
    void DeleteAll();
@@ -252,7 +252,7 @@ public:
 
        @warning This is a special purpose method used when loading data from a
        file. Does nothing if the slot 'id' has already been allocated. */
-   void Alloc(int id, int p1, int p2);
+   void Alloc(int64_t id, int64_t p1, int64_t p2);
 
    /** @brief Reinitialize the internal list of unallocated items.
 
@@ -268,7 +268,7 @@ public:
        @param[in] new_p2 Second part of the new key.
 
        @warning This method should only be called if T inherits from Hashed2. */
-   void Reparent(int id, int new_p1, int new_p2);
+   void Reparent(int64_t id, int64_t new_p1, int64_t new_p2);
 
    /** @brief Change the key associated with an item.
 
@@ -281,7 +281,8 @@ public:
        @param[in] new_p4 Fourth part of the new key (optional).
 
        @warning This method should only be called if T inherits from Hashed4. */
-   void Reparent(int id, int new_p1, int new_p2, int new_p3, int new_p4 = -1);
+   void Reparent(int64_t id, int64_t new_p1, int64_t new_p2, int64_t new_p3,
+                 int64_t new_p4 = -1);
 
    /// @brief Return total size of allocated memory (tables plus items), in bytes.
    std::size_t MemoryUsage() const;
@@ -344,16 +345,16 @@ protected:
    /** The hash table: each bin is a linked list of items. For each non-empty
        bin, this arrays stores the 'id' of the first item in the list, or -1
        if the bin is empty. */
-   int* table;
+   int64_t* table;
 
    /** mask = table_size-1. Used for fast modulo operation in Hash(), to wrap
        the raw hashed index around the current table size (which must be a power
        of two). */
-   int mask;
+   int64_t mask;
 
    /** List of deleted items in the BlockArray<T>. New items are created with
        these ids first, before they are appended to the block array. */
-   Array<int> unused;
+   Array<int64_t> unused;
 
    /** @brief hash function for Hashed2 items.
 
@@ -363,7 +364,7 @@ protected:
 
        NOTE: the constants are arbitrary
        @warning This method should only be called if T inherits from Hashed2. */
-   inline int Hash(size_t p1, size_t p2) const
+   inline int64_t Hash(size_t p1, size_t p2) const
    { return (984120265ul*p1 + 125965121ul*p2) & mask; }
 
    /** @brief hash function for Hashed4 items.
@@ -376,16 +377,16 @@ protected:
        NOTE: The constants are arbitrary.
        NOTE: p4 is not hashed nor stored as p1, p2, p3 identify a face uniquely.
        @warning This method should only be called if T inherits from Hashed4. */
-   inline int Hash(size_t p1, size_t p2, size_t p3) const
+   inline int64_t Hash(size_t p1, size_t p2, size_t p3) const
    { return (984120265ul*p1 + 125965121ul*p2 + 495698413ul*p3) & mask; }
 
    // Delete() and Reparent() use one of these:
    /// @brief Hash function for items of type T that inherit from Hashed2.
-   inline int Hash(const Hashed2& item) const
+   inline int64_t Hash(const Hashed2& item) const
    { return Hash(item.p1, item.p2); }
 
    /// @brief Hash function for items of type T that inherit from Hashed4.
-   inline int Hash(const Hashed4& item) const
+   inline int64_t Hash(const Hashed4& item) const
    { return Hash(item.p1, item.p2, item.p3); }
 
    /** @brief Search the index of the item associated to the key (p1,p2)
@@ -397,7 +398,7 @@ protected:
        @return The index "id" of the key in the BlockArray<T>.
 
        @warning This method should only be called if T inherits from Hashed2. */
-   int SearchList(int id, int p1, int p2) const;
+   int64_t SearchList(int64_t id, int64_t p1, int64_t p2) const;
 
    /** @brief Search the index of the item associated to the key (p1,p2,p3,(p4))
        starting from the item with index @a id.
@@ -409,7 +410,7 @@ protected:
        @return The index "id" of the key in the BlockArray<T>.
 
        @warning This method should only be called if T inherits from Hashed4. */
-   int SearchList(int id, int p1, int p2, int p3) const;
+   int64_t SearchList(int64_t id, int64_t p1, int64_t p2, int64_t p3) const;
 
    /** @brief Insert the item 'id' into bin 'idx'.
 
@@ -420,7 +421,7 @@ protected:
        @warning The method only works with bin 'idx' and does not check the
                 overall fill factor of the hash table. If appropriate,
                 use CheckRehash() for that. */
-   inline void Insert(int idx, int id, T &item);
+   inline void Insert(int64_t idx, int64_t id, T &item);
 
    /** @brief Unlink an item @a id from the linked list of bin @a idx.
 
@@ -428,7 +429,7 @@ protected:
        @param[in] id The index of the item in the BlockArray<T>.
 
        @warning The method aborts if the item is not found. */
-   void Unlink(int idx, int id);
+   void Unlink(int64_t idx, int64_t id);
 
    /** @brief Check table fill factor and resize if necessary.
 
@@ -448,7 +449,7 @@ protected:
 
        @param[in] idx The index of the bin.
        @return The size of the bin. */
-   int BinSize(int idx) const;
+   int64_t BinSize(int64_t idx) const;
 };
 
 
@@ -485,21 +486,21 @@ public:
 
    /// Add a sequence of integers for hashing, given as a c-array.
    /** Before hashing the sequence is encoded so that the result is independent
-       of endianness and type: int, long, unsigned, etc. */
+       of endianness and type: int64_t, long, unsigned, etc. */
    template <typename int_type>
    HashFunction &AppendInts(const int_type *ints, size_t num_ints)
    { return EncodeAndHashInts(ints, ints + num_ints); }
 
    /// Add a sequence of integers for hashing, given as a fixed-size c-array.
    /** Before hashing the sequence is encoded so that the result is independent
-       of endianness and type: int, long, unsigned, etc. */
+       of endianness and type: int64_t, long, unsigned, etc. */
    template <typename int_type, size_t num_ints>
    HashFunction &AppendInts(const int_type (&ints)[num_ints])
    { return EncodeAndHashInts(ints, ints + num_ints); }
 
    /// Add a sequence of integers for hashing, given as a container.
    /** Before hashing the sequence is encoded so that the result is independent
-       of endianness and type: int, long, unsigned, etc. */
+       of endianness and type: int64_t, long, unsigned, etc. */
    template <typename int_type_container>
    HashFunction &AppendInts(const int_type_container &ints)
    { return EncodeAndHashInts(ints.begin(), ints.end()); }
@@ -533,14 +534,14 @@ public:
 // implementation
 
 template<typename T>
-HashTable<T>::HashTable(int block_size, int init_hash_size)
+HashTable<T>::HashTable(int64_t block_size, int64_t init_hash_size)
    : Base(block_size)
 {
    mask = init_hash_size-1;
    MFEM_VERIFY(!(init_hash_size & mask), "init_size must be a power of two.");
 
-   table = new int[init_hash_size];
-   for (int i = 0; i < init_hash_size; i++)
+   table = new int64_t[init_hash_size];
+   for (int64_t i = 0; i < init_hash_size; i++)
    {
       table[i] = -1;
    }
@@ -550,9 +551,9 @@ template<typename T>
 HashTable<T>::HashTable(const HashTable& other)
    : Base(other), mask(other.mask)
 {
-   int size = mask+1;
-   table = new int[size];
-   memcpy(table, other.table, size*sizeof(int));
+   int64_t size = mask+1;
+   table = new int64_t[size];
+   memcpy(table, other.table, size*sizeof(int64_t));
    other.unused.Copy(unused);
 }
 
@@ -565,14 +566,14 @@ HashTable<T>::~HashTable()
 namespace internal
 {
 
-inline void sort3(int &a, int &b, int &c)
+inline void sort3(int64_t &a, int64_t &b, int64_t &c)
 {
    if (a > b) { std::swap(a, b); }
    if (a > c) { std::swap(a, c); }
    if (b > c) { std::swap(b, c); }
 }
 
-inline void sort4(int &a, int &b, int &c, int &d)
+inline void sort4(int64_t &a, int64_t &b, int64_t &c, int64_t &d)
 {
    if (a > b) { std::swap(a, b); }
    if (a > c) { std::swap(a, c); }
@@ -580,7 +581,7 @@ inline void sort4(int &a, int &b, int &c, int &d)
    sort3(b, c, d);
 }
 
-inline void sort4_ext(int &a, int &b, int &c, int &d)
+inline void sort4_ext(int64_t &a, int64_t &b, int64_t &c, int64_t &d)
 {
    if (d < 0) // support optional last index
    {
@@ -595,28 +596,28 @@ inline void sort4_ext(int &a, int &b, int &c, int &d)
 } // internal
 
 template<typename T>
-inline T* HashTable<T>::Get(int p1, int p2)
+inline T* HashTable<T>::Get(int64_t p1, int64_t p2)
 {
    return &(Base::At(GetId(p1, p2)));
 }
 
 template<typename T>
-inline T* HashTable<T>::Get(int p1, int p2, int p3, int p4)
+inline T* HashTable<T>::Get(int64_t p1, int64_t p2, int64_t p3, int64_t p4)
 {
    return &(Base::At(GetId(p1, p2, p3, p4)));
 }
 
 template<typename T>
-int HashTable<T>::GetId(int p1, int p2)
+int64_t HashTable<T>::GetId(int64_t p1, int64_t p2)
 {
    // search for the item in the hashtable
    if (p1 > p2) { std::swap(p1, p2); }
-   int idx = Hash(p1, p2);
-   int id = SearchList(table[idx], p1, p2);
+   int64_t idx = Hash(p1, p2);
+   int64_t id = SearchList(table[idx], p1, p2);
    if (id >= 0) { return id; }
 
    // not found - use an unused item or create a new one
-   int new_id;
+   int64_t new_id;
    if (unused.Size())
    {
       new_id = unused.Last();
@@ -638,16 +639,16 @@ int HashTable<T>::GetId(int p1, int p2)
 }
 
 template<typename T>
-int HashTable<T>::GetId(int p1, int p2, int p3, int p4)
+int64_t HashTable<T>::GetId(int64_t p1, int64_t p2, int64_t p3, int64_t p4)
 {
    // search for the item in the hashtable
    internal::sort4_ext(p1, p2, p3, p4);
-   int idx = Hash(p1, p2, p3);
-   int id = SearchList(table[idx], p1, p2, p3);
+   int64_t idx = Hash(p1, p2, p3);
+   int64_t id = SearchList(table[idx], p1, p2, p3);
    if (id >= 0) { return id; }
 
    // not found - use an unused item or create a new one
-   int new_id;
+   int64_t new_id;
    if (unused.Size())
    {
       new_id = unused.Last();
@@ -670,49 +671,51 @@ int HashTable<T>::GetId(int p1, int p2, int p3, int p4)
 }
 
 template<typename T>
-inline T* HashTable<T>::Find(int p1, int p2)
+inline T* HashTable<T>::Find(int64_t p1, int64_t p2)
 {
-   int id = FindId(p1, p2);
+   int64_t id = FindId(p1, p2);
    return (id >= 0) ? &(Base::At(id)) : NULL;
 }
 
 template<typename T>
-inline T* HashTable<T>::Find(int p1, int p2, int p3, int p4)
+inline T* HashTable<T>::Find(int64_t p1, int64_t p2, int64_t p3, int64_t p4)
 {
-   int id = FindId(p1, p2, p3, p4);
+   int64_t id = FindId(p1, p2, p3, p4);
    return (id >= 0) ? &(Base::At(id)) : NULL;
 }
 
 template<typename T>
-inline const T* HashTable<T>::Find(int p1, int p2) const
+inline const T* HashTable<T>::Find(int64_t p1, int64_t p2) const
 {
-   int id = FindId(p1, p2);
+   int64_t id = FindId(p1, p2);
    return (id >= 0) ? &(Base::At(id)) : NULL;
 }
 
 template<typename T>
-inline const T* HashTable<T>::Find(int p1, int p2, int p3, int p4) const
+inline const T* HashTable<T>::Find(int64_t p1, int64_t p2, int64_t p3,
+                                   int64_t p4) const
 {
-   int id = FindId(p1, p2, p3, p4);
+   int64_t id = FindId(p1, p2, p3, p4);
    return (id >= 0) ? &(Base::At(id)) : NULL;
 }
 
 template<typename T>
-int HashTable<T>::FindId(int p1, int p2) const
+int64_t HashTable<T>::FindId(int64_t p1, int64_t p2) const
 {
    if (p1 > p2) { std::swap(p1, p2); }
    return SearchList(table[Hash(p1, p2)], p1, p2);
 }
 
 template<typename T>
-int HashTable<T>::FindId(int p1, int p2, int p3, int p4) const
+int64_t HashTable<T>::FindId(int64_t p1, int64_t p2, int64_t p3,
+                             int64_t p4) const
 {
    internal::sort4_ext(p1, p2, p3, p4);
    return SearchList(table[Hash(p1, p2, p3)], p1, p2, p3);
 }
 
 template<typename T>
-int HashTable<T>::SearchList(int id, int p1, int p2) const
+int64_t HashTable<T>::SearchList(int64_t id, int64_t p1, int64_t p2) const
 {
    while (id >= 0)
    {
@@ -724,7 +727,8 @@ int HashTable<T>::SearchList(int id, int p1, int p2) const
 }
 
 template<typename T>
-int HashTable<T>::SearchList(int id, int p1, int p2, int p3) const
+int64_t HashTable<T>::SearchList(int64_t id, int64_t p1, int64_t p2,
+                                 int64_t p3) const
 {
    while (id >= 0)
    {
@@ -738,7 +742,7 @@ int HashTable<T>::SearchList(int id, int p1, int p2, int p3) const
 template<typename T>
 inline void HashTable<T>::CheckRehash()
 {
-   const int fill_factor = 2;
+   const int64_t fill_factor = 2;
 
    // is the table overfull?
    if (Base::Size() > (mask+1) * fill_factor)
@@ -753,9 +757,9 @@ void HashTable<T>::DoRehash()
    delete [] table;
 
    // double the table size
-   int new_table_size = 2*(mask+1);
-   table = new int[new_table_size];
-   for (int i = 0; i < new_table_size; i++) { table[i] = -1; }
+   int64_t new_table_size = 2*(mask+1);
+   table = new int64_t[new_table_size];
+   for (int64_t i = 0; i < new_table_size; i++) { table[i] = -1; }
    mask = new_table_size-1;
 
 #if defined(MFEM_DEBUG) && !defined(MFEM_USE_MPI)
@@ -771,7 +775,7 @@ void HashTable<T>::DoRehash()
 }
 
 template<typename T>
-inline void HashTable<T>::Insert(int idx, int id, T &item)
+inline void HashTable<T>::Insert(int64_t idx, int64_t id, T &item)
 {
    // add item at the beginning of the linked list
    item.next = table[idx];
@@ -779,10 +783,10 @@ inline void HashTable<T>::Insert(int idx, int id, T &item)
 }
 
 template<typename T>
-void HashTable<T>::Unlink(int idx, int id)
+void HashTable<T>::Unlink(int64_t idx, int64_t id)
 {
    // remove item from the linked list
-   int* p_id = table + idx;
+   int64_t* p_id = table + idx;
    while (*p_id >= 0)
    {
       T& item = Base::At(*p_id);
@@ -797,7 +801,7 @@ void HashTable<T>::Unlink(int idx, int id)
 }
 
 template<typename T>
-void HashTable<T>::Delete(int id)
+void HashTable<T>::Delete(int64_t id)
 {
    T& item = Base::At(id);
    Unlink(Hash(item), id);
@@ -809,12 +813,12 @@ template<typename T>
 void HashTable<T>::DeleteAll()
 {
    Base::DeleteAll();
-   for (int i = 0; i <= mask; i++) { table[i] = -1; }
+   for (int64_t i = 0; i <= mask; i++) { table[i] = -1; }
    unused.DeleteAll();
 }
 
 template<typename T>
-void HashTable<T>::Alloc(int id, int p1, int p2)
+void HashTable<T>::Alloc(int64_t id, int64_t p1, int64_t p2)
 {
    // enlarge the BlockArray to hold 'id'
    while (id >= Base::Size())
@@ -838,14 +842,14 @@ template<typename T>
 void HashTable<T>::UpdateUnused()
 {
    unused.DeleteAll();
-   for (int i = 0; i < Base::Size(); i++)
+   for (int64_t i = 0; i < Base::Size(); i++)
    {
       if (Base::At(i).next == -2) { unused.Append(i); }
    }
 }
 
 template<typename T>
-void HashTable<T>::Reparent(int id, int new_p1, int new_p2)
+void HashTable<T>::Reparent(int64_t id, int64_t new_p1, int64_t new_p2)
 {
    T& item = Base::At(id);
    Unlink(Hash(item), id);
@@ -855,13 +859,13 @@ void HashTable<T>::Reparent(int id, int new_p1, int new_p2)
    item.p2 = new_p2;
 
    // reinsert under new parent IDs
-   int new_idx = Hash(new_p1, new_p2);
+   int64_t new_idx = Hash(new_p1, new_p2);
    Insert(new_idx, id, item);
 }
 
 template<typename T>
-void HashTable<T>::Reparent(int id,
-                            int new_p1, int new_p2, int new_p3, int new_p4)
+void HashTable<T>::Reparent(int64_t id,
+                            int64_t new_p1, int64_t new_p2, int64_t new_p3, int64_t new_p4)
 {
    T& item = Base::At(id);
    Unlink(Hash(item), id);
@@ -872,28 +876,28 @@ void HashTable<T>::Reparent(int id,
    item.p3 = new_p3;
 
    // reinsert under new parent IDs
-   int new_idx = Hash(new_p1, new_p2, new_p3);
+   int64_t new_idx = Hash(new_p1, new_p2, new_p3);
    Insert(new_idx, id, item);
 }
 
 template<typename T>
 std::size_t HashTable<T>::MemoryUsage() const
 {
-   return (mask+1) * sizeof(int) + Base::MemoryUsage() + unused.MemoryUsage();
+   return (mask+1) * sizeof(int64_t) + Base::MemoryUsage() + unused.MemoryUsage();
 }
 
 template<typename T>
 void HashTable<T>::PrintMemoryDetail() const
 {
-   mfem::out << Base::MemoryUsage() << " + " << (mask+1) * sizeof(int)
+   mfem::out << Base::MemoryUsage() << " + " << (mask+1) * sizeof(int64_t)
              << " + " << unused.MemoryUsage();
 }
 
 template<typename T>
-int HashTable<T>::BinSize(int idx) const
+int64_t HashTable<T>::BinSize(int64_t idx) const
 {
-   int count = 0;
-   int id = table[idx];
+   int64_t count = 0;
+   int64_t id = table[idx];
    while (id >= 0)
    {
       const T& item = Base::At(id);
@@ -906,25 +910,25 @@ int HashTable<T>::BinSize(int idx) const
 template<typename T>
 void HashTable<T>::PrintStats() const
 {
-   int table_size = mask+1;
+   int64_t table_size = mask+1;
    mfem::out << "Hash table size: " << table_size << "\n";
    mfem::out << "Item count: " << Size() << "\n";
    mfem::out << "BlockArray size: " << Base::Size() << "\n";
 
-   const int H = 16;
-   int hist[H];
+   const int64_t H = 16;
+   int64_t hist[H];
 
-   for (int i = 0; i < H; i++) { hist[i] = 0; }
+   for (int64_t i = 0; i < H; i++) { hist[i] = 0; }
 
-   for (int i = 0; i < table_size; i++)
+   for (int64_t i = 0; i < table_size; i++)
    {
-      int bs = BinSize(i);
+      int64_t bs = BinSize(i);
       if (bs >= H) { bs = H-1; }
       hist[bs]++;
    }
 
    mfem::out << "Bin size histogram:\n";
-   for (int i = 0; i < H; i++)
+   for (int64_t i = 0; i < H; i++)
    {
       mfem::out << "  size " << i << ": "
                 << hist[i] << " bins" << std::endl;
@@ -953,12 +957,12 @@ HashFunction &HashFunction::EncodeAndHashInts(int_type_const_iter begin,
    // Skip encoding if hashing is not available:
    if (hash_data == nullptr) { return *this; }
 
-   constexpr int max_buffer_bytes = 64*1024;
+   constexpr int64_t max_buffer_bytes = 64*1024;
    unsigned char buffer[max_buffer_bytes];
-   int buffer_counter = 0;
+   int64_t buffer_counter = 0;
    while (begin != end)
    {
-      int byte_counter = 0;
+      int64_t byte_counter = 0;
       auto k = *begin;
       buffer[buffer_counter] = (k >= 0) ? 0 : (k = -k, 128);
       while (k != 0)
@@ -995,13 +999,13 @@ HashFunction &HashFunction::EncodeAndHashDoubles(double_const_iter begin,
    // Skip encoding if hashing is not available:
    if (hash_data == nullptr) { return *this; }
 
-   constexpr int max_buffer_bytes = 64*1024;
+   constexpr int64_t max_buffer_bytes = 64*1024;
    unsigned char buffer[max_buffer_bytes];
-   int buffer_counter = 0;
+   int64_t buffer_counter = 0;
    while (begin != end)
    {
       auto k = reinterpret_cast<const uint64_t &>(*begin);
-      for (int i = 0; i != 7; i++)
+      for (int64_t i = 0; i != 7; i++)
       {
          buffer[buffer_counter++] = (unsigned char)(k & 255); k >>= 8;
       }

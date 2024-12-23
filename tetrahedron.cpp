@@ -16,11 +16,11 @@
 namespace mfem
 {
 
-Tetrahedron::Tetrahedron(const int *ind, int attr)
+Tetrahedron::Tetrahedron(const int64_t *ind, int64_t attr)
    : Element(Geometry::TETRAHEDRON)
 {
    attribute = attr;
-   for (int i = 0; i < 4; i++)
+   for (int64_t i = 0; i < 4; i++)
    {
       indices[i] = ind[i];
    }
@@ -28,7 +28,8 @@ Tetrahedron::Tetrahedron(const int *ind, int attr)
    transform = 0;
 }
 
-Tetrahedron::Tetrahedron(int ind1, int ind2, int ind3, int ind4, int attr)
+Tetrahedron::Tetrahedron(int64_t ind1, int64_t ind2, int64_t ind3, int64_t ind4,
+                         int64_t attr)
    : Element(Geometry::TETRAHEDRON)
 {
    attribute  = attr;
@@ -40,8 +41,9 @@ Tetrahedron::Tetrahedron(int ind1, int ind2, int ind3, int ind4, int attr)
    transform = 0;
 }
 
-void Tetrahedron::Init(int ind1, int ind2, int ind3, int ind4, int attr,
-                       int ref_flag)
+void Tetrahedron::Init(int64_t ind1, int64_t ind2, int64_t ind3, int64_t ind4,
+                       int64_t attr,
+                       int64_t ref_flag)
 {
    attribute  = attr;
    indices[0] = ind1;
@@ -52,10 +54,11 @@ void Tetrahedron::Init(int ind1, int ind2, int ind3, int ind4, int attr,
    transform = 0;
 }
 
-void Tetrahedron::ParseRefinementFlag(int refinement_edges[2], int &type,
-                                      int &flag) const
+void Tetrahedron::ParseRefinementFlag(int64_t refinement_edges[2],
+                                      int64_t &type,
+                                      int64_t &flag) const
 {
-   int i, f = refinement_flag;
+   int64_t i, f = refinement_flag;
 
    MFEM_VERIFY(f != 0, "tetrahedron is not marked");
 
@@ -68,12 +71,13 @@ void Tetrahedron::ParseRefinementFlag(int refinement_edges[2], int &type,
    flag = (f >> 3);
 }
 
-void Tetrahedron::CreateRefinementFlag(int refinement_edges[2], int type,
-                                       int flag)
+void Tetrahedron::CreateRefinementFlag(int64_t refinement_edges[2],
+                                       int64_t type,
+                                       int64_t flag)
 {
    // Check for correct type
 #ifdef MFEM_DEBUG
-   int e1, e2;
+   int64_t e1, e2;
    e1 = refinement_edges[0];
    e2 = refinement_edges[1];
    // if (e1 > e2)  e1 = e2, e2 = refinement_edges[0];
@@ -134,10 +138,10 @@ void Tetrahedron::CreateRefinementFlag(int refinement_edges[2], int type,
    refinement_flag |= refinement_edges[0];
 }
 
-void Tetrahedron::GetMarkedFace(const int face, int *fv) const
+void Tetrahedron::GetMarkedFace(const int64_t face, int64_t *fv) const
 {
-   int re[2], type, flag;
-   const int *tv = this->indices;
+   int64_t re[2], type, flag;
+   const int64_t *tv = this->indices;
    ParseRefinementFlag(re, type, flag);
    switch (face)
    {
@@ -166,7 +170,7 @@ void Tetrahedron::GetMarkedFace(const int face, int *fv) const
    }
 }
 
-int Tetrahedron::NeedRefinement(HashTable<Hashed2> &v_to_v) const
+int64_t Tetrahedron::NeedRefinement(HashTable<Hashed2> &v_to_v) const
 {
    if (v_to_v.FindId(indices[0], indices[1]) != -1) { return 1; }
    if (v_to_v.FindId(indices[1], indices[2]) != -1) { return 1; }
@@ -177,17 +181,17 @@ int Tetrahedron::NeedRefinement(HashTable<Hashed2> &v_to_v) const
    return 0;
 }
 
-void Tetrahedron::SetVertices(const int *ind)
+void Tetrahedron::SetVertices(const int64_t *ind)
 {
-   for (int i = 0; i < 4; i++)
+   for (int64_t i = 0; i < 4; i++)
    {
       indices[i] = ind[i];
    }
 }
 
-void Tetrahedron::MarkEdge(const DSTable &v_to_v, const int *length)
+void Tetrahedron::MarkEdge(const DSTable &v_to_v, const int64_t *length)
 {
-   int ind[4], i, j, l, L, type;
+   int64_t ind[4], i, j, l, L, type;
 
    // determine the longest edge
    L = length[v_to_v(indices[0], indices[1])]; j = 0;
@@ -292,7 +296,7 @@ void Tetrahedron::GetPointMatrix(unsigned transform, DenseMatrix &pm)
    c[0] = 0.0, c[1] = 1.0, c[2] = 0.0;
    d[0] = 0.0, d[1] = 0.0, d[2] = 1.0;
 
-   int chain[12], n = 0;
+   int64_t chain[12], n = 0;
    while (transform)
    {
       chain[n++] = (transform & 7) - 1;
@@ -304,8 +308,8 @@ void Tetrahedron::GetPointMatrix(unsigned transform, DenseMatrix &pm)
    while (n)
    {
 #define ASGN(a, b) (a[0] = b[0], a[1] = b[1], a[2] = b[2])
-#define SWAP(a, b) for (int i = 0; i < 3; i++) { std::swap(a[i], b[i]); }
-#define AVG(a, b, c) for (int i = 0; i < 3; i++) { a[i] = (b[i]+c[i])*0.5; }
+#define SWAP(a, b) for (int64_t i = 0; i < 3; i++) { std::swap(a[i], b[i]); }
+#define AVG(a, b, c) for (int64_t i = 0; i < 3; i++) { a[i] = (b[i]+c[i])*0.5; }
 
       real_t e[3];
       AVG(e, a, b);
@@ -324,13 +328,13 @@ void Tetrahedron::GetPointMatrix(unsigned transform, DenseMatrix &pm)
    }
 }
 
-void Tetrahedron::GetVertices(Array<int> &v) const
+void Tetrahedron::GetVertices(Array<int64_t> &v) const
 {
    v.SetSize(4);
    std::copy(indices, indices + 4, v.begin());
 }
 
-void Tetrahedron::SetVertices(const Array<int> &v)
+void Tetrahedron::SetVertices(const Array<int64_t> &v)
 {
    MFEM_ASSERT(v.Size() == 4, "!");
    std::copy(v.begin(), v.end(), indices);

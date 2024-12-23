@@ -88,8 +88,8 @@ extern OutStream err;
        mfem::out.SetStream(out_file);
     \endcode
 */
-std::string MakeParFilename(const std::string &prefix, const int myid,
-                            const std::string suffix = "", const int width = 6);
+std::string MakeParFilename(const std::string &prefix, const int64_t myid,
+                            const std::string suffix = "", const int64_t width = 6);
 
 const char* getenv(const char* name);
 

@@ -19,10 +19,10 @@ namespace mfem
 {
 
 /// A set of integers
-class IntegerSet : public Array<int>
+class IntegerSet : public Array<int64_t>
 {
 public:
-   using Array<int>::Array; ///< Inherit all Array constructors.
+   using Array<int64_t>::Array; ///< Inherit all Array constructors.
    // MSVC fails to recognize that rule of zero applies after using base class
    // constructors.
    IntegerSet() = default; ///< Default construct and empty set.
@@ -32,17 +32,17 @@ public:
    IntegerSet& operator=(IntegerSet &&) = default; ///< Move assignment.
 
    /// Create an integer set from C-array 'p' of 'n' integers.
-   IntegerSet(const int n, const int *p) { Recreate(n, p); }
+   IntegerSet(const int64_t n, const int64_t *p) { Recreate(n, p); }
 
    /// Return the value of the lowest element of the set.
-   int PickElement() const { return data[0]; }
+   int64_t PickElement() const { return data[0]; }
 
    /// Return the value of a random element of the set.
-   int PickRandomElement() const;
+   int64_t PickRandomElement() const;
 
    /** @brief Create an integer set from C-array 'p' of 'n' integers.
        Overwrites any existing set data. */
-   void Recreate(const int n, const int *p);
+   void Recreate(const int64_t n, const int64_t *p);
 };
 
 /// List of integer sets
@@ -54,22 +54,22 @@ private:
 public:
 
    /// Return the number of integer sets in the list.
-   int Size() const { return TheList.Size(); }
+   int64_t Size() const { return TheList.Size(); }
 
    /// Return the value of the first element of the ith set.
-   int PickElementInSet(int i) const { return TheList[i]->PickElement(); }
+   int64_t PickElementInSet(int64_t i) const { return TheList[i]->PickElement(); }
 
    /// Return a random value from the ith set in the list.
-   int PickRandomElementInSet(int i) const { return TheList[i]->PickRandomElement(); }
+   int64_t PickRandomElementInSet(int64_t i) const { return TheList[i]->PickRandomElement(); }
 
    /** @brief Check to see if set 's' is in the list. If not append it to the
        end of the list. Returns the index of the list where set 's' can be
        found. */
-   int Insert(const IntegerSet &s);
+   int64_t Insert(const IntegerSet &s);
 
    /** Return the index of the list where set 's' can be found. Returns -1 if
        not found. */
-   int Lookup(const IntegerSet &s) const;
+   int64_t Lookup(const IntegerSet &s) const;
 
    /// Write the list of sets into table 't'.
    void AsTable(Table &t) const;

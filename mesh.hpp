@@ -35,21 +35,21 @@ enum class FaceType : bool {Interior, Boundary};
 class Mesh
 {
 protected:
-   int Dim;
-   int spaceDim;
+   int64_t Dim;
+   int64_t spaceDim;
 
-   int NumOfVertices, NumOfElements, NumOfBdrElements;
-   int NumOfEdges, NumOfFaces;
+   int64_t NumOfVertices, NumOfElements, NumOfBdrElements;
+   int64_t NumOfEdges, NumOfFaces;
    /** These variables store the number of Interior and Boundary faces. Calling
        fes->GetMesh()->GetNBE() doesn't return the expected value in 3D because
        periodic meshes in 3D have some of their faces marked as boundary for
        visualization purpose in GLVis. */
-   mutable int nbInteriorFaces, nbBoundaryFaces;
+   mutable int64_t nbInteriorFaces, nbBoundaryFaces;
 
    // see MeshGenerator(); global in parallel
-   int meshgen;
+   int64_t meshgen;
    // sum of (1 << geom) for all geom of all dimensions; local in parallel
-   int mesh_geoms;
+   int64_t mesh_geoms;
 
    Array<Element *> elements;
    // Vertices are only at the corners of elements, where you would expect them
@@ -122,8 +122,8 @@ protected:
    struct FaceInfo
    {
       // Inf = 64 * LocalFaceIndex + FaceOrientation
-      int Elem1No, Elem2No, Elem1Inf, Elem2Inf;
-      int NCFace; /* -1 if this is a regular conforming/boundary face;
+      int64_t Elem1No, Elem2No, Elem1Inf, Elem2Inf;
+      int64_t NCFace; /* -1 if this is a regular conforming/boundary face;
                      index into 'nc_faces_info' if >= 0. */
    };
    // NOTE: in NC meshes, master faces have Elem2No == -1. Slave faces on the
@@ -171,7 +171,7 @@ protected:
    struct NCFaceInfo
    {
       bool Slave; // true if this is a slave face, false if master face
-      int MasterFace; // if Slave, this is the index of the master face
+      int64_t MasterFace; // if Slave, this is the index of the master face
       // If not Slave, 'MasterFace' is the local face index of this master face
       // as a face in the unique adjacent element.
       const DenseMatrix* PointMatrix; // if Slave, position within master face
@@ -179,7 +179,7 @@ protected:
 
       NCFaceInfo() = default;
 
-      NCFaceInfo(bool slave, int master, const DenseMatrix* pm)
+      NCFaceInfo(bool slave, int64_t master, const DenseMatrix* pm)
          : Slave(slave), MasterFace(master), PointMatrix(pm) {}
    };
 
@@ -189,7 +189,7 @@ protected:
    Table *el_to_edge;
    Table *el_to_face;
    Table *el_to_el;
-   Array<int> be_to_face; // faces = vertices (1D), edges (2D), faces (3D)
+   Array<int64_t> be_to_face; // faces = vertices (1D), edges (2D), faces (3D)
 
    Table *bel_to_edge;    // for 3D only
 
@@ -200,10 +200,10 @@ protected:
    mutable Table *face_edge;     // Returned by GetFaceEdgeTable().
    mutable Table *edge_vertex;   // Returned by GetEdgeVertexTable().
 
-   static const int vtk_quadratic_tet[10];
-   static const int vtk_quadratic_pyramid[13];
-   static const int vtk_quadratic_wedge[18];
-   static const int vtk_quadratic_hex[27];
+   static const int64_t vtk_quadratic_tet[10];
+   static const int64_t vtk_quadratic_pyramid[13];
+   static const int64_t vtk_quadratic_wedge[18];
+   static const int64_t vtk_quadratic_hex[27];
 
 public:
    typedef Geometry::Constants<Geometry::SEGMENT>     seg_t;
@@ -217,9 +217,9 @@ public:
    enum Operation { NONE, REFINE, DEREFINE, REBALANCE };
 
    /// A list of all unique element attributes used by the Mesh.
-   Array<int> attributes;
+   Array<int64_t> attributes;
    /// A list of all unique boundary attributes used by the Mesh.
-   Array<int> bdr_attributes;
+   Array<int64_t> bdr_attributes;
 
    /// Named sets of element attributes
    AttributeSets attribute_sets;
@@ -250,92 +250,93 @@ protected:
 
    // Readers for different mesh formats, used in the Load() method.
    // The implementations of these methods are in mesh_readers.cpp.
-   void ReadMFEMMesh(std::istream &input, int version, int &curved);
+   void ReadMFEMMesh(std::istream &input, int64_t version, int64_t &curved);
    void ReadLineMesh(std::istream &input);
-   void ReadNetgen2DMesh(std::istream &input, int &curved);
+   void ReadNetgen2DMesh(std::istream &input, int64_t &curved);
    void ReadNetgen3DMesh(std::istream &input);
    void ReadTrueGridMesh(std::istream &input);
-   void CreateVTKMesh(const Vector &points, const Array<int> &cell_data,
-                      const Array<int> &cell_offsets,
-                      const Array<int> &cell_types,
-                      const Array<int> &cell_attributes,
-                      int &curved, int &read_gf, bool &finalize_topo);
-   void ReadVTKMesh(std::istream &input, int &curved, int &read_gf,
+   void CreateVTKMesh(const Vector &points, const Array<int64_t> &cell_data,
+                      const Array<int64_t> &cell_offsets,
+                      const Array<int64_t> &cell_types,
+                      const Array<int64_t> &cell_attributes,
+                      int64_t &curved, int64_t &read_gf, bool &finalize_topo);
+   void ReadVTKMesh(std::istream &input, int64_t &curved, int64_t &read_gf,
                     bool &finalize_topo);
-   void ReadXML_VTKMesh(std::istream &input, int &curved, int &read_gf,
+   void ReadXML_VTKMesh(std::istream &input, int64_t &curved, int64_t &read_gf,
                         bool &finalize_topo, const std::string &xml_prefix="");
-   void ReadNURBSMesh(std::istream &input, int &curved, int &read_gf,
+   void ReadNURBSMesh(std::istream &input, int64_t &curved, int64_t &read_gf,
                       bool spacing=false);
    void ReadInlineMesh(std::istream &input, bool generate_edges = false);
-   void ReadGmshMesh(std::istream &input, int &curved, int &read_gf);
+   void ReadGmshMesh(std::istream &input, int64_t &curved, int64_t &read_gf);
 
    /// Determine the mesh generator bitmask #meshgen, see MeshGenerator().
    /** Also, initializes #mesh_geoms. */
    void SetMeshGen();
 
    /// Return the length of the segment from node i to node j.
-   real_t GetLength(int i, int j) const;
+   real_t GetLength(int64_t i, int64_t j) const;
 
    void MarkForRefinement();
    void MarkTriMeshForRefinement();
-   void GetEdgeOrdering(const DSTable &v_to_v, Array<int> &order);
+   void GetEdgeOrdering(const DSTable &v_to_v, Array<int64_t> &order);
    virtual void MarkTetMeshForRefinement(const DSTable &v_to_v);
 
    STable3D *GetFacesTable();
-   STable3D *GetElementToFaceTable(int ret_ftbl = 0);
+   STable3D *GetElementToFaceTable(int64_t ret_ftbl = 0);
 
    /** Red refinement. Element with index i is refined. The default
        red refinement for now is Uniform. */
-   void RedRefinement(int i, const DSTable &v_to_v,
-                      int *edge1, int *edge2, int *middle)
+   void RedRefinement(int64_t i, const DSTable &v_to_v,
+                      int64_t *edge1, int64_t *edge2, int64_t *middle)
    { UniformRefinement(i, v_to_v, edge1, edge2, middle); }
 
    /** Green refinement. Element with index i is refined. The default
        refinement for now is Bisection. */
-   void GreenRefinement(int i, const DSTable &v_to_v,
-                        int *edge1, int *edge2, int *middle)
+   void GreenRefinement(int64_t i, const DSTable &v_to_v,
+                        int64_t *edge1, int64_t *edge2, int64_t *middle)
    { Bisection(i, v_to_v, edge1, edge2, middle); }
 
    /// Bisect a triangle: element with index @a i is bisected.
-   void Bisection(int i, const DSTable &, int *, int *, int *);
+   void Bisection(int64_t i, const DSTable &, int64_t *, int64_t *, int64_t *);
 
    /// Bisect a tetrahedron: element with index @a i is bisected.
-   void Bisection(int i, HashTable<Hashed2> &);
+   void Bisection(int64_t i, HashTable<Hashed2> &);
 
    /// Bisect a boundary triangle: boundary element with index @a i is bisected.
-   void BdrBisection(int i, const HashTable<Hashed2> &);
+   void BdrBisection(int64_t i, const HashTable<Hashed2> &);
 
    /** Uniform Refinement. Element with index i is refined uniformly. */
-   void UniformRefinement(int i, const DSTable &, int *, int *, int *);
+   void UniformRefinement(int64_t i, const DSTable &, int64_t *, int64_t *,
+                          int64_t *);
 
    /// Returns the orientation of "test" relative to "base"
-   static int GetTriOrientation(const int *base, const int *test);
+   static int64_t GetTriOrientation(const int64_t *base, const int64_t *test);
 
    /// Returns the orientation of "base" relative to "test"
    /// In other words: GetTriOrientation(test, base) should equal
    /// InvertTriOrientation(GetTriOrientation(base, test))
-   static int InvertTriOrientation(int ori);
+   static int64_t InvertTriOrientation(int64_t ori);
 
    /// Returns the orientation of "c" relative to "a" by composing
    /// previously computed orientations relative to an intermediate
    /// set "b".
-   static int ComposeTriOrientations(int ori_a_b, int ori_b_c);
+   static int64_t ComposeTriOrientations(int64_t ori_a_b, int64_t ori_b_c);
 
    /// Returns the orientation of "test" relative to "base"
-   static int GetQuadOrientation(const int *base, const int *test);
+   static int64_t GetQuadOrientation(const int64_t *base, const int64_t *test);
 
    /// Returns the orientation of "base" relative to "test"
    /// In other words: GetQuadOrientation(test, base) should equal
    /// InvertQuadOrientation(GetQuadOrientation(base, test))
-   static int InvertQuadOrientation(int ori);
+   static int64_t InvertQuadOrientation(int64_t ori);
 
    /// Returns the orientation of "c" relative to "a" by composing
    /// previously computed orientations relative to an intermediate
    /// set "b".
-   static int ComposeQuadOrientations(int ori_a_b, int ori_b_c);
+   static int64_t ComposeQuadOrientations(int64_t ori_a_b, int64_t ori_b_c);
 
    /// Returns the orientation of "test" relative to "base"
-   static int GetTetOrientation(const int *base, const int *test);
+   static int64_t GetTetOrientation(const int64_t *base, const int64_t *test);
 
    static void GetElementArrayEdgeTable(const Array<Element*> &elem_array,
                                         const DSTable &v_to_v,
@@ -346,22 +347,23 @@ protected:
        nodes in the elements. For example, if T is the element to edge table
        T(i, 0) gives the index of edge in element i that connects vertex 0
        to vertex 1, etc. Returns the number of the edges. */
-   int GetElementToEdgeTable(Table &);
+   int64_t GetElementToEdgeTable(Table &);
 
    /// Used in GenerateFaces()
-   void AddPointFaceElement(int lf, int gf, int el);
+   void AddPointFaceElement(int64_t lf, int64_t gf, int64_t el);
 
-   void AddSegmentFaceElement (int lf, int gf, int el, int v0, int v1);
+   void AddSegmentFaceElement (int64_t lf, int64_t gf, int64_t el, int64_t v0,
+                               int64_t v1);
 
-   void AddTriangleFaceElement (int lf, int gf, int el,
-                                int v0, int v1, int v2);
+   void AddTriangleFaceElement (int64_t lf, int64_t gf, int64_t el,
+                                int64_t v0, int64_t v1, int64_t v2);
 
-   void AddQuadFaceElement (int lf, int gf, int el,
-                            int v0, int v1, int v2, int v3);
+   void AddQuadFaceElement (int64_t lf, int64_t gf, int64_t el,
+                            int64_t v0, int64_t v1, int64_t v2, int64_t v3);
    /** For a serial Mesh, return true if the face is interior. For a parallel
        ParMesh return true if the face is interior or shared. In parallel, this
        method only works if the face neighbor data is exchanged. */
-   bool FaceIsTrueInterior(int FaceNo) const
+   bool FaceIsTrueInterior(int64_t FaceNo) const
    {
       return FaceIsInterior(FaceNo) || (faces_info[FaceNo].Elem2Inf >= 0);
    }
@@ -372,12 +374,13 @@ protected:
    void GenerateNCFaceInfo();
 
    /// Begin construction of a mesh
-   void InitMesh(int Dim_, int spaceDim_, int NVert, int NElem, int NBdrElem);
+   void InitMesh(int64_t Dim_, int64_t spaceDim_, int64_t NVert, int64_t NElem,
+                 int64_t NBdrElem);
 
    // Used in the methods FinalizeXXXMesh() and FinalizeTopology()
    void FinalizeCheck();
 
-   void Loader(std::istream &input, int generate_edges = 0,
+   void Loader(std::istream &input, int64_t generate_edges = 0,
                std::string parse_tag = "");
 
    /** If NURBS mesh, write NURBS format. If NCMesh, write mfem v1.1 format.
@@ -396,7 +399,7 @@ protected:
    /// The parameter @a sfc_ordering controls how the elements
    /// (when @a type = HEXAHEDRON) are ordered: true - use space-filling curve
    /// ordering, or false - use lexicographic ordering.
-   void Make3D(int nx, int ny, int nz, Element::Type type,
+   void Make3D(int64_t nx, int64_t ny, int64_t nz, Element::Type type,
                real_t sx, real_t sy, real_t sz, bool sfc_ordering);
 
    /// @brief Creates a mesh for the parallelepiped [0,sx]x[0,sy]x[0,sz],
@@ -406,7 +409,7 @@ protected:
    /// hexahedron into 24 tetrahedrons. Each face of the hexahedron is split
    /// into 4 triangles (face edges are connected to a face-centered point),
    /// and the triangles are connected to a hex-centered point.
-   void Make3D24TetsFromHex(int nx, int ny, int nz,
+   void Make3D24TetsFromHex(int64_t nx, int64_t ny, int64_t nz,
                             real_t sx, real_t sy, real_t sz);
 
    /// @brief Creates mesh for the rectangle [0,sx]x[0,sy], divided into nx*ny*4
@@ -415,7 +418,7 @@ protected:
    /// The mesh is generated by taking nx*ny quadrilaterals and splitting each
    /// quadrilateral into 4 triangles by connecting the vertices to a
    /// quad-centered point.
-   void Make2D4TrisFromQuad(int nx, int ny, real_t sx, real_t sy);
+   void Make2D4TrisFromQuad(int64_t nx, int64_t ny, real_t sx, real_t sy);
 
    /// @brief Creates mesh for the rectangle [0,sx]x[0,sy], divided into nx*ny*5
    /// quadrilaterals.
@@ -423,7 +426,7 @@ protected:
    /// The mesh is generated by taking nx*ny quadrilaterals and splitting
    /// each quadrilateral into 5 quadrilaterals. Each quadrilateral is projected
    /// inwards and connected to the original quadrilateral.
-   void Make2D5QuadsFromQuad(int nx, int ny, real_t sx, real_t sy);
+   void Make2D5QuadsFromQuad(int64_t nx, int64_t ny, real_t sx, real_t sy);
 
    /// @brief Creates mesh for the rectangle [0,sx]x[0,sy], divided into nx*ny
    /// quadrilaterals if @a type = QUADRILATERAL or into 2*nx*ny triangles if
@@ -433,19 +436,19 @@ protected:
    /// generated. The parameter @a sfc_ordering controls how the elements (when
    /// @a type = QUADRILATERAL) are ordered: true - use space-filling curve
    /// ordering, or false - use lexicographic ordering.
-   void Make2D(int nx, int ny, Element::Type type, real_t sx, real_t sy,
+   void Make2D(int64_t nx, int64_t ny, Element::Type type, real_t sx, real_t sy,
                bool generate_edges, bool sfc_ordering);
 
    /// @a brief Creates a 1D mesh for the interval [0,sx] divided into n equal
    /// intervals.
-   void Make1D(int n, real_t sx = 1.0);
+   void Make1D(int64_t n, real_t sx = 1.0);
 
    // used in GetElementData() and GetBdrElementData()
-   void GetElementData(const Array<Element*> &elem_array, int geom,
-                       Array<int> &elem_vtx, Array<int> &attr) const;
+   void GetElementData(const Array<Element*> &elem_array, int64_t geom,
+                       Array<int64_t> &elem_vtx, Array<int64_t> &attr) const;
 
    // Internal helper used in MakeSimplicial (and ParMesh::MakeSimplicial).
-   void MakeSimplicial_(const Mesh &orig_mesh, int *vglobal);
+   void MakeSimplicial_(const Mesh &orig_mesh, int64_t *vglobal);
 
 public:
 
@@ -484,12 +487,12 @@ public:
        This method calls the method FinalizeTopology(). The method Finalize()
        may be called after this constructor and after optionally setting the
        Mesh nodes. */
-   Mesh(real_t *vertices, int num_vertices,
-        int *element_indices, Geometry::Type element_type,
-        int *element_attributes, int num_elements,
-        int *boundary_indices, Geometry::Type boundary_type,
-        int *boundary_attributes, int num_boundary_elements,
-        int dimension, int space_dimension = -1);
+   Mesh(real_t *vertices, int64_t num_vertices,
+        int64_t *element_indices, Geometry::Type element_type,
+        int64_t *element_attributes, int64_t num_elements,
+        int64_t *boundary_indices, Geometry::Type boundary_type,
+        int64_t *boundary_attributes, int64_t num_boundary_elements,
+        int64_t dimension, int64_t space_dimension = -1);
 
    /** @anchor mfem_Mesh_init_ctor
        @brief _Init_ constructor: begin the construction of a Mesh object.
@@ -498,7 +501,8 @@ public:
        the vertices, elements, and boundary elements. The vertices and elements
        themselves can later be added using methods from the
        @ref mfem_Mesh_construction "Mesh construction" group. */
-   Mesh(int Dim_, int NVert, int NElem, int NBdrElem = 0, int spaceDim_ = -1)
+   Mesh(int64_t Dim_, int64_t NVert, int64_t NElem, int64_t NBdrElem = 0,
+        int64_t spaceDim_ = -1)
       : attribute_sets(attributes), bdr_attribute_sets(bdr_attributes)
    {
       if (spaceDim_ == -1) { spaceDim_ = Dim_; }
@@ -509,19 +513,20 @@ public:
        generate_edges = 0 (default) edges are not generated, if 1 edges are
        generated. See also @a Mesh::LoadFromFile. See @a Mesh::Finalize for the
        meaning of @a refine. */
-   explicit Mesh(const std::string &filename, int generate_edges = 0,
-                 int refine = 1, bool fix_orientation = true);
+   explicit Mesh(const std::string &filename, int64_t generate_edges = 0,
+                 int64_t refine = 1, bool fix_orientation = true);
 
    /** Creates mesh by reading data stream in MFEM, Netgen, or VTK format. If
        generate_edges = 0 (default) edges are not generated, if 1 edges are
        generated. */
-   explicit Mesh(std::istream &input, int generate_edges = 0, int refine = 1,
+   explicit Mesh(std::istream &input, int64_t generate_edges = 0,
+                 int64_t refine = 1,
                  bool fix_orientation = true);
 
    /// Create a disjoint mesh from the given mesh array
    ///
    /// @note Data is copied from the meshes in @a mesh_array.
-   Mesh(Mesh *mesh_array[], int num_pieces);
+   Mesh(Mesh *mesh_array[], int64_t num_pieces);
 
    /** This is similar to the mesh constructor with the same arguments, but here
        the current mesh is destroyed and another one created based on the data
@@ -529,8 +534,8 @@ public:
        (default) edges are not generated, if 1 edges are generated. */
    /// \see mfem::ifgzstream() for on-the-fly decompression of compressed ascii
    /// inputs.
-   virtual void Load(std::istream &input, int generate_edges = 0,
-                     int refine = 1, bool fix_orientation = true)
+   virtual void Load(std::istream &input, int64_t generate_edges = 0,
+                     int64_t refine = 1, bool fix_orientation = true)
    {
       Loader(input, generate_edges);
       Finalize(refine, fix_orientation);
@@ -564,11 +569,11 @@ public:
        safely deleted following this function call.
    */
    static Mesh LoadFromFile(const std::string &filename,
-                            int generate_edges = 0, int refine = 1,
+                            int64_t generate_edges = 0, int64_t refine = 1,
                             bool fix_orientation = true);
 
    /// Creates 1D mesh, divided into n equal intervals.
-   static Mesh MakeCartesian1D(int n, real_t sx = 1.0);
+   static Mesh MakeCartesian1D(int64_t n, real_t sx = 1.0);
 
    /// @brief Creates mesh for the rectangle [0,sx]x[0,sy], divided into nx*ny
    /// quadrilaterals if @a type = QUADRILATERAL or into 2*nx*ny triangles if
@@ -579,7 +584,7 @@ public:
    /// @a type = QUADRILATERAL) are ordered: true - use space-filling curve
    /// ordering, or false - use lexicographic ordering.
    static Mesh MakeCartesian2D(
-      int nx, int ny, Element::Type type, bool generate_edges = false,
+      int64_t nx, int64_t ny, Element::Type type, bool generate_edges = false,
       real_t sx = 1.0, real_t sy = 1.0, bool sfc_ordering = true);
 
    /// @brief Creates a mesh for the parallelepiped [0,sx]x[0,sy]x[0,sz],
@@ -590,7 +595,7 @@ public:
    /// (when @a type = HEXAHEDRON) are ordered: true - use space-filling curve
    /// ordering, or false - use lexicographic ordering.
    static Mesh MakeCartesian3D(
-      int nx, int ny, int nz, Element::Type type,
+      int64_t nx, int64_t ny, int64_t nz, Element::Type type,
       real_t sx = 1.0, real_t sy = 1.0, real_t sz = 1.0,
       bool sfc_ordering = true);
 
@@ -601,7 +606,7 @@ public:
    /// hexahedron into 24 tetrahedrons. Each face of the hexahedron is split
    /// into 4 triangles (face edges are connected to a face-centered point),
    /// and the triangles are connected to a hex-centered point.
-   static Mesh MakeCartesian3DWith24TetsPerHex(int nx, int ny, int nz,
+   static Mesh MakeCartesian3DWith24TetsPerHex(int64_t nx, int64_t ny, int64_t nz,
                                                real_t sx = 1.0, real_t sy = 1.0,
                                                real_t sz = 1.0);
 
@@ -611,7 +616,8 @@ public:
    /// The mesh is generated by taking nx*ny quadrilaterals and splitting each
    /// quadrilateral into 4 triangles by connecting the vertices to a
    /// quad-centered point.
-   static Mesh MakeCartesian2DWith4TrisPerQuad(int nx, int ny, real_t sx = 1.0,
+   static Mesh MakeCartesian2DWith4TrisPerQuad(int64_t nx, int64_t ny,
+                                               real_t sx = 1.0,
                                                real_t sy = 1.0);
 
    /// @brief Creates mesh for the rectangle [0,sx]x[0,sy], divided into nx*ny*5
@@ -620,7 +626,8 @@ public:
    /// The mesh is generated by taking nx*ny quadrilaterals and splitting
    /// each quadrilateral into 5 quadrilaterals. Each quadrilateral is projected
    /// inwards and connected to the original quadrilateral.
-   static Mesh MakeCartesian2DWith5QuadsPerQuad(int nx, int ny, real_t sx = 1.0,
+   static Mesh MakeCartesian2DWith5QuadsPerQuad(int64_t nx, int64_t ny,
+                                                real_t sx = 1.0,
                                                 real_t sy = 1.0);
 
 
@@ -635,7 +642,7 @@ public:
        is set to reflect the performed refinements.
 
        @note The constructed Mesh is straight-sided. */
-   static Mesh MakeRefined(Mesh &orig_mesh, int ref_factor, int ref_type);
+   static Mesh MakeRefined(Mesh &orig_mesh, int64_t ref_factor, int64_t ref_type);
 
    /// Create a refined mesh, where each element of the original mesh may be
    /// refined by a different factor.
@@ -653,8 +660,8 @@ public:
 
        @note The constructed Mesh is straight-sided. */
    /// refined @a ref_factors[i] times in each dimension.
-   static Mesh MakeRefined(Mesh &orig_mesh, const Array<int> &ref_factors,
-                           int ref_type);
+   static Mesh MakeRefined(Mesh &orig_mesh, const Array<int64_t> &ref_factors,
+                           int64_t ref_type);
 
    /** Create a mesh by splitting each element of @a orig_mesh into simplices.
        Quadrilaterals are split into two triangles, prisms are split into
@@ -674,7 +681,8 @@ public:
        boundaries must be separated by at least two interior vertices.
        @note The resulting mesh uses a discontinuous nodal function, see
        SetCurvature() for further details. */
-   static Mesh MakePeriodic(const Mesh &orig_mesh, const std::vector<int> &v2v);
+   static Mesh MakePeriodic(const Mesh &orig_mesh,
+                            const std::vector<int64_t> &v2v);
 
    ///@}
 
@@ -686,63 +694,69 @@ public:
    ///@{
 
    /// @note The returned object should be deleted by the caller.
-   Element *NewElement(int geom);
+   Element *NewElement(int64_t geom);
 
-   int AddVertex(real_t x, real_t y = 0.0, real_t z = 0.0);
-   int AddVertex(const real_t *coords);
-   int AddVertex(const Vector &coords);
+   int64_t AddVertex(real_t x, real_t y = 0.0, real_t z = 0.0);
+   int64_t AddVertex(const real_t *coords);
+   int64_t AddVertex(const Vector &coords);
    /// Mark vertex @a i as nonconforming, with parent vertices @a p1 and @a p2.
-   void AddVertexParents(int i, int p1, int p2);
+   void AddVertexParents(int64_t i, int64_t p1, int64_t p2);
    /// Adds a vertex at the mean center of the @a nverts vertex indices given
    /// by @a vi.
-   int AddVertexAtMeanCenter(const int *vi, const int nverts, int dim = 3);
+   int64_t AddVertexAtMeanCenter(const int64_t *vi, const int64_t nverts,
+                                 int64_t dim = 3);
 
    /// Adds a segment to the mesh given by 2 vertices @a v1 and @a v2.
-   int AddSegment(int v1, int v2, int attr = 1);
+   int64_t AddSegment(int64_t v1, int64_t v2, int64_t attr = 1);
    /// Adds a segment to the mesh given by 2 vertices @a vi.
-   int AddSegment(const int *vi, int attr = 1);
+   int64_t AddSegment(const int64_t *vi, int64_t attr = 1);
 
    /// Adds a triangle to the mesh given by 3 vertices @a v1 through @a v3.
-   int AddTriangle(int v1, int v2, int v3, int attr = 1);
+   int64_t AddTriangle(int64_t v1, int64_t v2, int64_t v3, int64_t attr = 1);
    /// Adds a triangle to the mesh given by 3 vertices @a vi.
-   int AddTriangle(const int *vi, int attr = 1);
+   int64_t AddTriangle(const int64_t *vi, int64_t attr = 1);
    /// Adds a triangle to the mesh given by 3 vertices @a vi.
-   int AddTri(const int *vi, int attr = 1) { return AddTriangle(vi, attr); }
+   int64_t AddTri(const int64_t *vi, int64_t attr = 1) { return AddTriangle(vi, attr); }
 
    /// Adds a quadrilateral to the mesh given by 4 vertices @a v1 through @a v4.
-   int AddQuad(int v1, int v2, int v3, int v4, int attr = 1);
+   int64_t AddQuad(int64_t v1, int64_t v2, int64_t v3, int64_t v4,
+                   int64_t attr = 1);
    /// Adds a quadrilateral to the mesh given by 4 vertices @a vi.
-   int AddQuad(const int *vi, int attr = 1);
+   int64_t AddQuad(const int64_t *vi, int64_t attr = 1);
 
    /// Adds a tetrahedron to the mesh given by 4 vertices @a v1 through @a v4.
-   int AddTet(int v1, int v2, int v3, int v4, int attr = 1);
+   int64_t AddTet(int64_t v1, int64_t v2, int64_t v3, int64_t v4,
+                  int64_t attr = 1);
    /// Adds a tetrahedron to the mesh given by 4 vertices @a vi.
-   int AddTet(const int *vi, int attr = 1);
+   int64_t AddTet(const int64_t *vi, int64_t attr = 1);
 
    /// Adds a wedge to the mesh given by 6 vertices @a v1 through @a v6.
-   int AddWedge(int v1, int v2, int v3, int v4, int v5, int v6, int attr = 1);
+   int64_t AddWedge(int64_t v1, int64_t v2, int64_t v3, int64_t v4, int64_t v5,
+                    int64_t v6, int64_t attr = 1);
    /// Adds a wedge to the mesh given by 6 vertices @a vi.
-   int AddWedge(const int *vi, int attr = 1);
+   int64_t AddWedge(const int64_t *vi, int64_t attr = 1);
 
    /// Adds a pyramid to the mesh given by 5 vertices @a v1 through @a v5.
-   int AddPyramid(int v1, int v2, int v3, int v4, int v5, int attr = 1);
+   int64_t AddPyramid(int64_t v1, int64_t v2, int64_t v3, int64_t v4, int64_t v5,
+                      int64_t attr = 1);
    /// Adds a pyramid to the mesh given by 5 vertices @a vi.
-   int AddPyramid(const int *vi, int attr = 1);
+   int64_t AddPyramid(const int64_t *vi, int64_t attr = 1);
 
    /// Adds a hexahedron to the mesh given by 8 vertices @a v1 through @a v8.
-   int AddHex(int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8,
-              int attr = 1);
+   int64_t AddHex(int64_t v1, int64_t v2, int64_t v3, int64_t v4, int64_t v5,
+                  int64_t v6, int64_t v7, int64_t v8,
+                  int64_t attr = 1);
    /// Adds a hexahedron to the mesh given by 8 vertices @a vi.
-   int AddHex(const int *vi, int attr = 1);
+   int64_t AddHex(const int64_t *vi, int64_t attr = 1);
    /// @brief Adds 6 tetrahedrons to the mesh by splitting a hexahedron given by
    /// 8 vertices @a vi.
-   void AddHexAsTets(const int *vi, int attr = 1);
+   void AddHexAsTets(const int64_t *vi, int64_t attr = 1);
    /// @brief Adds 2 wedges to the mesh by splitting a hexahedron given by
    /// 8 vertices @a vi.
-   void AddHexAsWedges(const int *vi, int attr = 1);
+   void AddHexAsWedges(const int64_t *vi, int64_t attr = 1);
    /// @brief Adds 6 pyramids to the mesh by splitting a hexahedron given by
    /// 8 vertices @a vi.
-   void AddHexAsPyramids(const int *vi, int attr = 1);
+   void AddHexAsPyramids(const int64_t *vi, int64_t attr = 1);
 
    /// @brief Adds 24 tetrahedrons to the mesh by splitting a hexahedron.
    ///
@@ -750,31 +764,31 @@ public:
    /// map from the 4 vertices of each face of the hexahedron to the index
    /// of the point created at the center of the face, and @a attr is the
    /// attribute of the new elements. See @a Make3D24TetsFromHex for usage.
-   void AddHexAs24TetsWithPoints(int *vi,
-                                 std::map<std::array<int, 4>, int>
+   void AddHexAs24TetsWithPoints(int64_t *vi,
+                                 std::map<std::array<int64_t, 4>, int64_t>
                                  &hex_face_verts,
-                                 int attr = 1);
+                                 int64_t attr = 1);
 
    /// @brief Adds 4 triangles to the mesh by splitting a quadrilateral given by
    /// 4 vertices @a vi.
    ///
    /// @a attr is the attribute of the new elements. See @a Make2D4TrisFromQuad
    /// for usage.
-   void AddQuadAs4TrisWithPoints(int *vi, int attr = 1);
+   void AddQuadAs4TrisWithPoints(int64_t *vi, int64_t attr = 1);
 
    /// @brief Adds 5 quadrilaterals to the mesh by splitting a quadrilateral
    /// given by 4 vertices @a vi.
    ///
    /// @a attr is the attribute of the new elements. See @a Make2D5QuadsFromQuad
    /// for usage.
-   void AddQuadAs5QuadsWithPoints(int *vi, int attr = 1);
+   void AddQuadAs5QuadsWithPoints(int64_t *vi, int64_t attr = 1);
 
    /// The parameter @a elem should be allocated using the NewElement() method
    /// @note Ownership of @a elem will pass to the Mesh object
-   int AddElement(Element *elem);
+   int64_t AddElement(Element *elem);
    /// The parameter @a elem should be allocated using the NewElement() method
    /// @note Ownership of @a elem will pass to the Mesh object
-   int AddBdrElement(Element *elem);
+   int64_t AddBdrElement(Element *elem);
 
    /**
     * @brief Add an array of boundary elements to the mesh, along with map from
@@ -785,39 +799,40 @@ public:
     * index
     */
    void AddBdrElements(Array<Element *> &bdr_elems,
-                       const Array<int> &be_to_face);
+                       const Array<int64_t> &be_to_face);
 
-   int AddBdrSegment(int v1, int v2, int attr = 1);
-   int AddBdrSegment(const int *vi, int attr = 1);
+   int64_t AddBdrSegment(int64_t v1, int64_t v2, int64_t attr = 1);
+   int64_t AddBdrSegment(const int64_t *vi, int64_t attr = 1);
 
-   int AddBdrTriangle(int v1, int v2, int v3, int attr = 1);
-   int AddBdrTriangle(const int *vi, int attr = 1);
+   int64_t AddBdrTriangle(int64_t v1, int64_t v2, int64_t v3, int64_t attr = 1);
+   int64_t AddBdrTriangle(const int64_t *vi, int64_t attr = 1);
 
-   int AddBdrQuad(int v1, int v2, int v3, int v4, int attr = 1);
-   int AddBdrQuad(const int *vi, int attr = 1);
-   void AddBdrQuadAsTriangles(const int *vi, int attr = 1);
+   int64_t AddBdrQuad(int64_t v1, int64_t v2, int64_t v3, int64_t v4,
+                      int64_t attr = 1);
+   int64_t AddBdrQuad(const int64_t *vi, int64_t attr = 1);
+   void AddBdrQuadAsTriangles(const int64_t *vi, int64_t attr = 1);
 
-   int AddBdrPoint(int v, int attr = 1);
+   int64_t AddBdrPoint(int64_t v, int64_t attr = 1);
 
    virtual void GenerateBoundaryElements();
    /// Finalize the construction of a triangular Mesh.
-   void FinalizeTriMesh(int generate_edges = 0, int refine = 0,
+   void FinalizeTriMesh(int64_t generate_edges = 0, int64_t refine = 0,
                         bool fix_orientation = true);
    /// Finalize the construction of a quadrilateral Mesh.
-   void FinalizeQuadMesh(int generate_edges = 0, int refine = 0,
+   void FinalizeQuadMesh(int64_t generate_edges = 0, int64_t refine = 0,
                          bool fix_orientation = true);
    /// Finalize the construction of a tetrahedral Mesh.
-   void FinalizeTetMesh(int generate_edges = 0, int refine = 0,
+   void FinalizeTetMesh(int64_t generate_edges = 0, int64_t refine = 0,
                         bool fix_orientation = true);
    /// Finalize the construction of a wedge Mesh.
-   void FinalizeWedgeMesh(int generate_edges = 0, int refine = 0,
+   void FinalizeWedgeMesh(int64_t generate_edges = 0, int64_t refine = 0,
                           bool fix_orientation = true);
    /// Finalize the construction of a hexahedral Mesh.
-   void FinalizeHexMesh(int generate_edges = 0, int refine = 0,
+   void FinalizeHexMesh(int64_t generate_edges = 0, int64_t refine = 0,
                         bool fix_orientation = true);
    /// Finalize the construction of any type of Mesh.
    /** This method calls FinalizeTopology() and Finalize(). */
-   void FinalizeMesh(int refine = 0, bool fix_orientation = true);
+   void FinalizeMesh(int64_t refine = 0, bool fix_orientation = true);
 
    ///@}
 
@@ -899,21 +914,22 @@ public:
        @return The final edge product cost of the ordering. The function may be
        called in an external loop with different seeds, and the best ordering can
        then be retained. */
-   real_t GetGeckoElementOrdering(Array<int> &ordering,
-                                  int iterations = 4, int window = 4,
-                                  int period = 2, int seed = 0,
+   real_t GetGeckoElementOrdering(Array<int64_t> &ordering,
+                                  int64_t iterations = 4, int64_t window = 4,
+                                  int64_t period = 2, int64_t seed = 0,
                                   bool verbose = false, real_t time_limit = 0);
 
    /** Return an ordering of the elements that approximately follows the Hilbert
        curve. The method performs a spatial (Hilbert) sort on the centers of all
        elements and returns the resulting sequence, which can then be passed to
        ReorderElements. This is a cheap alternative to GetGeckoElementOrdering.*/
-   void GetHilbertElementOrdering(Array<int> &ordering);
+   void GetHilbertElementOrdering(Array<int64_t> &ordering);
 
    /** Rebuilds the mesh with a different order of elements. For each element i,
        the array ordering[i] contains its desired new index. Note that the method
        reorders vertices, edges and faces along with the elements. */
-   void ReorderElements(const Array<int> &ordering, bool reorder_vertices = true);
+   void ReorderElements(const Array<int64_t> &ordering,
+                        bool reorder_vertices = true);
 
    /// @}
 
@@ -921,16 +937,16 @@ public:
    /// @{
 
    /// @brief Dimension of the reference space used within the elements
-   int Dimension() const { return Dim; }
+   int64_t Dimension() const { return Dim; }
 
    /// @brief Dimension of the physical space containing the mesh
-   int SpaceDimension() const { return spaceDim; }
+   int64_t SpaceDimension() const { return spaceDim; }
 
    /// Equals 1 + num_holes - num_loops
-   inline int EulerNumber() const
+   inline int64_t EulerNumber() const
    { return NumOfVertices - NumOfEdges + NumOfFaces - NumOfElements; }
    /// Equals 1 - num_holes
-   inline int EulerNumber2D() const
+   inline int64_t EulerNumber2D() const
    { return NumOfVertices - NumOfEdges + NumOfElements; }
 
    /** @brief Get the mesh generator/type.
@@ -948,7 +964,7 @@ public:
 
        In parallel, the result takes into account elements on all processors.
    */
-   inline int MeshGenerator() const { return meshgen; }
+   inline int64_t MeshGenerator() const { return meshgen; }
 
    /// Checks if the mesh has boundary elements
    virtual bool HasBoundaryElements() const { return (NumOfBdrElements > 0); }
@@ -961,13 +977,13 @@ public:
    /** @brief Return the number of geometries of the given dimension present in
        the mesh. */
    /** For a parallel mesh only the local geometries are counted. */
-   int GetNumGeometries(int dim) const;
+   int64_t GetNumGeometries(int64_t dim) const;
 
    /// Return all element geometries of the given dimension present in the mesh.
    /** For a parallel mesh only the local geometries are returned.
 
        The returned geometries are sorted. */
-   void GetGeometries(int dim, Array<Geometry::Type> &el_geoms) const;
+   void GetGeometries(int64_t dim, Array<Geometry::Type> &el_geoms) const;
 
    void GetCharacteristics(real_t &h_min, real_t &h_max,
                            real_t &kappa_min, real_t &kappa_max,
@@ -980,26 +996,26 @@ public:
 
    /** @brief Returns number of vertices.  Vertices are only at the corners of
        elements, where you would expect them in the lowest-order mesh. */
-   inline int GetNV() const { return NumOfVertices; }
+   inline int64_t GetNV() const { return NumOfVertices; }
 
    /// Returns number of elements.
-   inline int GetNE() const { return NumOfElements; }
+   inline int64_t GetNE() const { return NumOfElements; }
 
    /// Returns number of boundary elements.
-   inline int GetNBE() const { return NumOfBdrElements; }
+   inline int64_t GetNBE() const { return NumOfBdrElements; }
 
    /// Return the number of edges.
-   inline int GetNEdges() const { return NumOfEdges; }
+   inline int64_t GetNEdges() const { return NumOfEdges; }
 
    /// Return the number of faces in a 3D mesh.
-   inline int GetNFaces() const { return NumOfFaces; }
+   inline int64_t GetNFaces() const { return NumOfFaces; }
 
    /// Return the number of faces (3D), edges (2D) or vertices (1D).
-   int GetNumFaces() const;
+   int64_t GetNumFaces() const;
 
    /** @brief Return the number of faces (3D), edges (2D) or vertices (1D)
        including ghost faces. */
-   int GetNumFacesWithGhost() const;
+   int64_t GetNumFacesWithGhost() const;
 
    /** @brief Returns the number of faces according to the requested type, does
        not count master nonconforming faces.
@@ -1009,7 +1025,7 @@ public:
        include actual interior faces.
        Similarly, if type==Interior, only the true interior faces are counted
        excluding all master nonconforming faces. */
-   virtual int GetNFbyType(FaceType type) const;
+   virtual int64_t GetNFbyType(FaceType type) const;
 
    /// Return the total (global) number of elements.
    long long GetGlobalNE() const { return NumOfElements; }
@@ -1022,7 +1038,7 @@ public:
    /// @brief Return pointer to vertex i's coordinates.
    /// @warning For high-order meshes (when #Nodes != NULL) vertices may not be
    /// updated and should not be used!
-   const real_t *GetVertex(int i) const { return vertices[i](); }
+   const real_t *GetVertex(int64_t i) const { return vertices[i](); }
 
    /// @brief Return pointer to vertex i's coordinates.
    ///
@@ -1032,7 +1048,7 @@ public:
    /// @note The pointer returned by this function can be used to
    /// alter vertex locations but the pointer itself should not be
    /// changed by the caller.
-   real_t *GetVertex(int i) { return vertices[i](); }
+   real_t *GetVertex(int64_t i) { return vertices[i](); }
 
    /// @brief Return pointer to the i'th element object
    ///
@@ -1040,14 +1056,14 @@ public:
    ///
    /// In parallel, @a i is the local element index which is in the
    /// same range mentioned above.
-   const Element *GetElement(int i) const { return elements[i]; }
+   const Element *GetElement(int64_t i) const { return elements[i]; }
 
    /// @brief Return pointer to the i'th element object
    ///
    /// @note Provides read/write access to the i'th element object so
    /// that element attributes or connectivity can be adjusted. However,
    /// the Element object itself should not be deleted by the caller.
-   Element *GetElement(int i) { return elements[i]; }
+   Element *GetElement(int64_t i) { return elements[i]; }
 
    /// @brief Return pointer to the i'th boundary element object
    ///
@@ -1055,19 +1071,19 @@ public:
    ///
    /// In parallel, @a i is the local boundary element index which is
    /// in the same range mentioned above.
-   const Element *GetBdrElement(int i) const { return boundary[i]; }
+   const Element *GetBdrElement(int64_t i) const { return boundary[i]; }
 
    /// @brief Return pointer to the i'th boundary element object
    ///
    /// @note Provides read/write access to the i'th boundary element object so
    /// that boundary attributes or connectivity can be adjusted. However,
    /// the Element object itself should not be deleted by the caller.
-   Element *GetBdrElement(int i) { return boundary[i]; }
+   Element *GetBdrElement(int64_t i) { return boundary[i]; }
 
    /// @brief Return pointer to the i'th face element object
    ///
    /// The index @a i should be in the range [0, Mesh::GetNFaces())
-   const Element *GetFace(int i) const { return faces[i]; }
+   const Element *GetFace(int64_t i) const { return faces[i]; }
 
    /// @}
 
@@ -1077,11 +1093,12 @@ public:
    const Element* const *GetElementsArray() const
    { return elements.GetData(); }
 
-   void GetElementData(int geom, Array<int> &elem_vtx, Array<int> &attr) const
+   void GetElementData(int64_t geom, Array<int64_t> &elem_vtx,
+                       Array<int64_t> &attr) const
    { GetElementData(elements, geom, elem_vtx, attr); }
 
-   void GetBdrElementData(int geom, Array<int> &bdr_elem_vtx,
-                          Array<int> &bdr_attr) const
+   void GetBdrElementData(int64_t geom, Array<int64_t> &bdr_elem_vtx,
+                          Array<int64_t> &bdr_attr) const
    { GetElementData(boundary, geom, bdr_elem_vtx, bdr_attr); }
 
    /// @}
@@ -1090,76 +1107,76 @@ public:
    /// @{
 
    /// Return the attribute of element i.
-   int GetAttribute(int i) const { return elements[i]->GetAttribute(); }
+   int64_t GetAttribute(int64_t i) const { return elements[i]->GetAttribute(); }
 
    /// Set the attribute of element i.
-   void SetAttribute(int i, int attr);
+   void SetAttribute(int64_t i, int64_t attr);
 
    /// Return the attribute of boundary element i.
-   int GetBdrAttribute(int i) const { return boundary[i]->GetAttribute(); }
+   int64_t GetBdrAttribute(int64_t i) const { return boundary[i]->GetAttribute(); }
 
    /// Set the attribute of boundary element i.
-   void SetBdrAttribute(int i, int attr) { boundary[i]->SetAttribute(attr); }
+   void SetBdrAttribute(int64_t i, int64_t attr) { boundary[i]->SetAttribute(attr); }
 
    /// Return the attribute of patch i, for a NURBS mesh.
-   int GetPatchAttribute(int i) const;
+   int64_t GetPatchAttribute(int64_t i) const;
 
    /// Set the attribute of patch i, for a NURBS mesh.
-   void SetPatchAttribute(int i, int attr);
+   void SetPatchAttribute(int64_t i, int64_t attr);
 
    /// Return the attribute of patch boundary element i, for a NURBS mesh.
-   int GetPatchBdrAttribute(int i) const;
+   int64_t GetPatchBdrAttribute(int64_t i) const;
 
    /// Set the attribute of patch boundary element i, for a NURBS mesh.
-   void SetPatchBdrAttribute(int i, int attr);
+   void SetPatchBdrAttribute(int64_t i, int64_t attr);
 
    /// Returns the type of element i.
-   Element::Type GetElementType(int i) const;
+   Element::Type GetElementType(int64_t i) const;
 
    /// Returns the type of boundary element i.
-   Element::Type GetBdrElementType(int i) const;
+   Element::Type GetBdrElementType(int64_t i) const;
 
-   Element::Type  GetFaceElementType(int Face) const;
+   Element::Type  GetFaceElementType(int64_t Face) const;
 
    /// Return the Geometry::Type associated with face @a i.
-   Geometry::Type GetFaceGeometry(int i) const;
+   Geometry::Type GetFaceGeometry(int64_t i) const;
 
-   Geometry::Type GetElementGeometry(int i) const
+   Geometry::Type GetElementGeometry(int64_t i) const
    {
       return elements[i]->GetGeometryType();
    }
 
-   Geometry::Type GetBdrElementGeometry(int i) const
+   Geometry::Type GetBdrElementGeometry(int64_t i) const
    {
       return boundary[i]->GetGeometryType();
    }
 
-   Geometry::Type GetElementBaseGeometry(int i) const
+   Geometry::Type GetElementBaseGeometry(int64_t i) const
    { return GetElementGeometry(i); }
 
-   Geometry::Type GetBdrElementBaseGeometry(int i) const
+   Geometry::Type GetBdrElementBaseGeometry(int64_t i) const
    { return GetBdrElementGeometry(i); }
 
    /// Return true if the given face is interior. @sa FaceIsTrueInterior().
-   bool FaceIsInterior(int FaceNo) const
+   bool FaceIsInterior(int64_t FaceNo) const
    {
       return (faces_info[FaceNo].Elem2No >= 0);
    }
 
    /** @brief Get the size of the i-th element relative to the perfect
        reference element. */
-   real_t GetElementSize(int i, int type = 0);
+   real_t GetElementSize(int64_t i, int64_t type = 0);
 
-   real_t GetElementSize(int i, const Vector &dir);
+   real_t GetElementSize(int64_t i, const Vector &dir);
 
-   real_t GetElementVolume(int i);
+   real_t GetElementVolume(int64_t i);
 
-   void GetElementCenter(int i, Vector &center);
+   void GetElementCenter(int64_t i, Vector &center);
 
    /** Compute the Jacobian of the transformation from the perfect
        reference element at the given integration point (defaults to the
        center of the element if no integration point is specified) */
-   void GetElementJacobian(int i, DenseMatrix &J,
+   void GetElementJacobian(int64_t i, DenseMatrix &J,
                            const IntegrationPoint *ip = NULL);
 
    /// @}
@@ -1176,7 +1193,7 @@ public:
       { mesh.GetGeometries(mesh.Dimension(), *this); }
       /** @brief Construct a GeometryList of all geometries of dimension @a dim
           in @a mesh. */
-      GeometryList(const Mesh &mesh, int dim)
+      GeometryList(const Mesh &mesh, int64_t dim)
          : Array<Geometry::Type>(geom_buf, Geometry::NumGeom)
       { mesh.GetGeometries(dim, *this); }
    };
@@ -1185,25 +1202,27 @@ public:
    /// @{
 
    /// Returns the indices of the vertices of element i.
-   void GetElementVertices(int i, Array<int> &v) const
+   void GetElementVertices(int64_t i, Array<int64_t> &v) const
    { elements[i]->GetVertices(v); }
 
    /// Returns the indices of the vertices of boundary element i.
-   void GetBdrElementVertices(int i, Array<int> &v) const
+   void GetBdrElementVertices(int64_t i, Array<int64_t> &v) const
    { boundary[i]->GetVertices(v); }
 
    /// Return the indices and the orientations of all edges of element i.
-   void GetElementEdges(int i, Array<int> &edges, Array<int> &cor) const;
+   void GetElementEdges(int64_t i, Array<int64_t> &edges,
+                        Array<int64_t> &cor) const;
 
    /// Return the indices and the orientations of all edges of bdr element i.
-   void GetBdrElementEdges(int i, Array<int> &edges, Array<int> &cor) const;
+   void GetBdrElementEdges(int64_t i, Array<int64_t> &edges,
+                           Array<int64_t> &cor) const;
 
    /** Return the indices and the orientations of all edges of face i.
        Works for both 2D (face=edge) and 3D faces. */
-   void GetFaceEdges(int i, Array<int> &edges, Array<int> &o) const;
+   void GetFaceEdges(int64_t i, Array<int64_t> &edges, Array<int64_t> &o) const;
 
    /// Returns the indices of the vertices of face i.
-   void GetFaceVertices(int i, Array<int> &vert) const
+   void GetFaceVertices(int64_t i, Array<int64_t> &vert) const
    {
       if (Dim == 1)
       {
@@ -1216,14 +1235,15 @@ public:
    }
 
    /// Returns the indices of the vertices of edge i.
-   void GetEdgeVertices(int i, Array<int> &vert) const;
+   void GetEdgeVertices(int64_t i, Array<int64_t> &vert) const;
 
    /// Return the indices and the orientations of all faces of element i.
-   void GetElementFaces(int i, Array<int> &faces, Array<int> &ori) const;
+   void GetElementFaces(int64_t i, Array<int64_t> &faces,
+                        Array<int64_t> &ori) const;
 
    /** @brief Returns the sorted, unique indices of elements sharing a face with
        element @a elem, including @a elem. */
-   Array<int> FindFaceNeighbors(const int elem) const;
+   Array<int64_t> FindFaceNeighbors(const int64_t elem) const;
 
    /** Return the index and the orientation of the vertex of bdr element i. (1D)
        Return the index and the orientation of the edge of bdr element i. (2D)
@@ -1231,7 +1251,7 @@ public:
 
        In 2D, the returned edge orientation is 0 or 1, not +/-1 as returned by
        GetElementEdges/GetBdrElementEdges. */
-   void GetBdrElementFace(int i, int *f, int *o) const;
+   void GetBdrElementFace(int64_t i, int64_t *f, int64_t *o) const;
 
    /** @brief For the given boundary element, bdr_el, return its adjacent
        element and its info, i.e. 64*local_bdr_index+bdr_orientation.
@@ -1240,11 +1260,12 @@ public:
        the respective face element.
 
        @sa GetBdrElementAdjacentElement2() */
-   void GetBdrElementAdjacentElement(int bdr_el, int &el, int &info) const;
+   void GetBdrElementAdjacentElement(int64_t bdr_el, int64_t &el,
+                                     int64_t &info) const;
 
    /// @brief Return the local face (codimension-1) index for the given boundary
    /// element index.
-   int GetBdrElementFaceIndex(int be_idx) const { return be_to_face[be_idx]; }
+   int64_t GetBdrElementFaceIndex(int64_t be_idx) const { return be_to_face[be_idx]; }
 
    /// @}
 
@@ -1289,7 +1310,7 @@ public:
 
    const Table &ElementToEdgeTable() const;
 
-   Array<int> GetFaceToBdrElMap() const;
+   Array<int64_t> GetFaceToBdrElMap() const;
 
    ///@}
 
@@ -1372,13 +1393,13 @@ public:
       {
          ElementLocation location;
          ElementConformity conformity;
-         int index;
-         int local_face_id;
-         int orientation;
+         int64_t index;
+         int64_t local_face_id;
+         int64_t orientation;
       } element[2];
 
       FaceInfoTag tag;
-      int ncface;
+      int64_t ncface;
       const DenseMatrix* point_matrix;
 
       /** @brief Return true if the face is a local interior face which is NOT
@@ -1453,15 +1474,15 @@ public:
       operator Mesh::FaceInfo() const;
    };
 
-   /// Given a "face info int", return the face orientation. @sa FaceInfo.
-   static int DecodeFaceInfoOrientation(int info) { return info%64; }
+   /// Given a "face info int64_t", return the face orientation. @sa FaceInfo.
+   static int64_t DecodeFaceInfoOrientation(int64_t info) { return info%64; }
 
-   /// Given a "face info int", return the local face index. @sa FaceInfo.
-   static int DecodeFaceInfoLocalIndex(int info) { return info/64; }
+   /// Given a "face info int64_t", return the local face index. @sa FaceInfo.
+   static int64_t DecodeFaceInfoLocalIndex(int64_t info) { return info/64; }
 
    /// @brief Given @a local_face_index and @a orientation, return the
-   /// corresponding encoded "face info int". @sa FaceInfo.
-   static int EncodeFaceInfo(int local_face_index, int orientation)
+   /// corresponding encoded "face info int64_t". @sa FaceInfo.
+   static int64_t EncodeFaceInfo(int64_t local_face_index, int64_t orientation)
    { return orientation + local_face_index*64; }
 
    /// @name More advanced entity information access methods
@@ -1469,20 +1490,21 @@ public:
 
    /* Return point matrix of element i of dimension Dim X #v, where for every
       vertex we give its coordinates in space of dimension Dim. */
-   void GetPointMatrix(int i, DenseMatrix &pointmat) const;
+   void GetPointMatrix(int64_t i, DenseMatrix &pointmat) const;
 
    /* Return point matrix of boundary element i of dimension Dim X #v, where for
       every vertex we give its coordinates in space of dimension Dim. */
-   void GetBdrPointMatrix(int i, DenseMatrix &pointmat) const;
+   void GetBdrPointMatrix(int64_t i, DenseMatrix &pointmat) const;
 
    /** This method aims to provide face information in a deciphered format, i.e.
        Mesh::FaceInformation, compared to the raw encoded information returned
        by Mesh::GetFaceElements() and Mesh::GetFaceInfos(). */
-   FaceInformation GetFaceInformation(int f) const;
+   FaceInformation GetFaceInformation(int64_t f) const;
 
-   void GetFaceElements (int Face, int *Elem1, int *Elem2) const;
-   void GetFaceInfos (int Face, int *Inf1, int *Inf2) const;
-   void GetFaceInfos (int Face, int *Inf1, int *Inf2, int *NCFace) const;
+   void GetFaceElements (int64_t Face, int64_t *Elem1, int64_t *Elem2) const;
+   void GetFaceInfos (int64_t Face, int64_t *Inf1, int64_t *Inf2) const;
+   void GetFaceInfos (int64_t Face, int64_t *Inf1, int64_t *Inf2,
+                      int64_t *NCFace) const;
 
    /// @}
 
@@ -1490,11 +1512,11 @@ public:
    /// @{
 
    /// @note The returned array should be deleted by the caller.
-   int *CartesianPartitioning(int nxyz[]);
+   int64_t *CartesianPartitioning(int64_t nxyz[]);
    /// @note The returned array should be deleted by the caller.
-   int *GeneratePartitioning(int nparts, int part_method = 1);
+   int64_t *GeneratePartitioning(int64_t nparts, int64_t part_method = 1);
    /// @todo This method needs a proper description
-   void CheckPartitioning(int *partitioning_);
+   void CheckPartitioning(int64_t *partitioning_);
 
    /// @}
 
@@ -1508,7 +1530,7 @@ public:
 
    /// Save the mesh to a file using Mesh::Print. The given @a precision will be
    /// used for ASCII output.
-   virtual void Save(const std::string &fname, int precision=16) const;
+   virtual void Save(const std::string &fname, int64_t precision=16) const;
 };
 
 /** Overload operator<< for std::ostream and Mesh; valid also for the derived
@@ -1539,35 +1561,35 @@ std::ostream& operator<<(std::ostream &os, const Mesh::FaceInformation& info);
 class MeshPart
 {
 protected:
-   struct Entity { int geom; int num_verts; const int *verts; };
+   struct Entity { int64_t geom; int64_t num_verts; const int64_t *verts; };
    struct EntityHelper
    {
-      int dim, num_entities;
-      int geom_offsets[Geometry::NumGeom+1];
-      typedef const Array<int> entity_to_vertex_type[Geometry::NumGeom];
+      int64_t dim, num_entities;
+      int64_t geom_offsets[Geometry::NumGeom+1];
+      typedef const Array<int64_t> entity_to_vertex_type[Geometry::NumGeom];
       entity_to_vertex_type &entity_to_vertex;
 
-      EntityHelper(int dim_,
-                   const Array<int> (&entity_to_vertex_)[Geometry::NumGeom]);
-      Entity FindEntity(int bytype_entity_id);
+      EntityHelper(int64_t dim_,
+                   const Array<int64_t> (&entity_to_vertex_)[Geometry::NumGeom]);
+      Entity FindEntity(int64_t bytype_entity_id);
    };
 
 public:
    /// Reference space dimension of the elements
-   int dimension;
+   int64_t dimension;
 
    /// Dimension of the physical space into which the MeshPart is embedded.
-   int space_dimension;
+   int64_t space_dimension;
 
    /// Number of vertices
-   int num_vertices;
+   int64_t num_vertices;
 
    /// Number of elements with reference space dimension equal to 'dimension'.
-   int num_elements;
+   int64_t num_elements;
 
    /** @brief Number of boundary elements with reference space dimension equal
        to 'dimension'-1. */
-   int num_bdr_elements;
+   int64_t num_bdr_elements;
 
    /**
       Each 'entity_to_vertex[geom]' describes the entities of Geometry::Type
@@ -1589,11 +1611,11 @@ public:
       Also, note that lower dimesional entities ('dimension'-2 and lower) are
       NOT described by the respective array, i.e. the array will be empty.
    */
-   Array<int> entity_to_vertex[Geometry::NumGeom];
+   Array<int64_t> entity_to_vertex[Geometry::NumGeom];
 
    /** @brief Store the refinement flags for tetraheral elements. If all tets
        have zero refinement flags then this array is empty, i.e. has size 0. */
-   Array<int> tet_refine_flags;
+   Array<int64_t> tet_refine_flags;
 
    /**
       Terminology: "by-type" element/boundary ordering: ordered by
@@ -1610,23 +1632,23 @@ public:
       The size of the array is either 'num_elements' or 0 when no re-ordering is
       needed (then "by-type" id == "natural" id).
    */
-   Array<int> element_map;
+   Array<int64_t> element_map;
 
    /// Optional re-ordering for the boundary elements, similar to 'element_map'.
-   Array<int> boundary_map;
+   Array<int64_t> boundary_map;
 
    /**
       Element attributes. Ordered using the "natural" element ordering defined
       by the array 'element_map'. The size of this array is 'num_elements'.
    */
-   Array<int> attributes;
+   Array<int64_t> attributes;
 
    /**
       Boundary element attributes. Ordered using the "natural" boundary element
       ordering defined by the array 'boundary_map'. The size of this array is
       'num_bdr_elements'.
    */
-   Array<int> bdr_attributes;
+   Array<int64_t> bdr_attributes;
 
    /**
       Optional vertex coordinates. The size of the array is either
@@ -1650,11 +1672,11 @@ public:
    ///@{
 
    /// Total number of MeshParts
-   int num_parts;
+   int64_t num_parts;
 
    /** @brief Index of the part described by this MeshPart:
        0 <= 'my_part_id' < 'num_parts' */
-   int my_part_id;
+   int64_t my_part_id;
 
    /**
       A group G is a subset of the set { 0, 1, ..., 'num_parts'-1 } for which
@@ -1714,11 +1736,11 @@ public:
     \code
        // The array 'partitioning' can be obtained e.g. from
        // mesh->GeneratePartitioning():
-       void usage1(Mesh *mesh, int num_parts, int *partitioning)
+       void usage1(Mesh *mesh, int64_t num_parts, int64_t *partitioning)
        {
           MeshPartitioner partitioner(*mesh, num_parts, partitioning);
           MeshPart mesh_part;
-          for (int i = 0; i < num_parts; i++)
+          for (int64_t i = 0; i < num_parts; i++)
           {
              partitioner.ExtractPart(i, mesh_part);
              ofstream omesh(MakeParFilename("my-mesh.", i));
@@ -1732,12 +1754,12 @@ public:
     \code
        // The array 'partitioning' can be obtained e.g. from
        // mesh->GeneratePartitioning():
-       void usage2(Mesh *mesh, int num_parts, int *partitioning,
+       void usage2(Mesh *mesh, int64_t num_parts, int64_t *partitioning,
                    GridFunction *gf)
        {
           MeshPartitioner partitioner(*mesh, num_parts, partitioning);
           MeshPart mesh_part;
-          for (int i = 0; i < num_parts; i++)
+          for (int64_t i = 0; i < num_parts; i++)
           {
              partitioner.ExtractPart(i, mesh_part);
              ofstream omesh(MakeParFilename("my-mesh.", i));
@@ -1754,7 +1776,7 @@ class MeshPartitioner
 {
 protected:
    Mesh &mesh;
-   Array<int> partitioning;
+   Array<int64_t> partitioning;
    Table part_to_element;
    Table part_to_boundary;
    Table edge_to_element;
@@ -1773,8 +1795,8 @@ public:
                                 Mesh::GeneratePartitioning() when the provided
                                 input partitioning is NULL.
    */
-   MeshPartitioner(Mesh &mesh_, int num_parts_,
-                   const int *partitioning_ = nullptr, int part_method = 1);
+   MeshPartitioner(Mesh &mesh_, int64_t num_parts_,
+                   const int64_t *partitioning_ = nullptr, int64_t part_method = 1);
 
    /** @brief Construct a MeshPart corresponding to the given @a part_id.
 
@@ -1784,13 +1806,13 @@ public:
                               overwritten, while potentially reusing existing
                               dynamic memory allocations.
    */
-   void ExtractPart(int part_id, MeshPart &mesh_part) const;
+   void ExtractPart(int64_t part_id, MeshPart &mesh_part) const;
 };
 
 // shift cyclically 3 integers left-to-right
-inline void ShiftRight(int &a, int &b, int &c)
+inline void ShiftRight(int64_t &a, int64_t &b, int64_t &c)
 {
-   int t = a;
+   int64_t t = a;
    a = c;  c = b;  b = t;
 }
 

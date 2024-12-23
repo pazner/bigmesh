@@ -21,7 +21,7 @@ namespace mfem
 class Point : public Element
 {
 protected:
-   int indices[1];
+   int64_t indices[1];
 
 public:
    typedef Geometry::Constants<Geometry::POINT> geom_t;
@@ -29,34 +29,34 @@ public:
    Point() : Element(Geometry::POINT) {}
 
    /// Constructs point by specifying the indices and the attribute.
-   Point(const int *ind, int attr = 1);
+   Point(const int64_t *ind, int64_t attr = 1);
 
    /// Return element's type.
    Type GetType() const override { return Element::POINT; }
 
    /// Get the indices defining the vertices
-   void GetVertices(Array<int> &v) const override;
+   void GetVertices(Array<int64_t> &v) const override;
 
    /// Set the indices defining the vertices
-   void SetVertices(const Array<int> &v) override;
+   void SetVertices(const Array<int64_t> &v) override;
 
    /// @note The returned array should NOT be deleted by the caller.
-   int *GetVertices() override { return indices; }
+   int64_t *GetVertices() override { return indices; }
 
    /// Set the vertices according to the given input.
-   void SetVertices(const int *ind) override;
+   void SetVertices(const int64_t *ind) override;
 
-   int GetNVertices() const override { return 1; }
+   int64_t GetNVertices() const override { return 1; }
 
-   int GetNEdges() const override { return (0); }
+   int64_t GetNEdges() const override { return (0); }
 
-   const int *GetEdgeVertices(int ei) const override { return NULL; }
+   const int64_t *GetEdgeVertices(int64_t ei) const override { return NULL; }
 
-   int GetNFaces() const override { return 0; }
+   int64_t GetNFaces() const override { return 0; }
 
-   int GetNFaceVertices(int) const override { return 0; }
+   int64_t GetNFaceVertices(int64_t) const override { return 0; }
 
-   const int *GetFaceVertices(int fi) const override { return NULL; }
+   const int64_t *GetFaceVertices(int64_t fi) const override { return NULL; }
 
    Element *Duplicate(Mesh *m) const override
    { return new Point(indices, attribute); }

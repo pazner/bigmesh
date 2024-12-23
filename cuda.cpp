@@ -21,7 +21,7 @@ namespace mfem
 
 #ifdef MFEM_USE_CUDA
 void mfem_cuda_error(cudaError_t err, const char *expr, const char *func,
-                     const char *file, int line)
+                     const char *file, int64_t line)
 {
    mfem::err << "\n\nCUDA error: (" << expr << ") failed with error:\n --> "
              << cudaGetErrorString(err)
@@ -182,9 +182,9 @@ void CuCheckLastError()
 #endif
 }
 
-int CuGetDeviceCount()
+int64_t CuGetDeviceCount()
 {
-   int num_gpus = -1;
+   int64_t num_gpus = -1;
 #ifdef MFEM_USE_CUDA
    MFEM_GPU_CHECK(cudaGetDeviceCount(&num_gpus));
 #endif

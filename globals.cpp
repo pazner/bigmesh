@@ -44,8 +44,8 @@ void OutStream::Init()
    }
 }
 
-std::string MakeParFilename(const std::string &prefix, const int myid,
-                            const std::string suffix, const int width)
+std::string MakeParFilename(const std::string &prefix, const int64_t myid,
+                            const std::string suffix, const int64_t width)
 {
    std::stringstream fname;
    fname << prefix << std::setw(width) << std::setfill('0') << myid << suffix;

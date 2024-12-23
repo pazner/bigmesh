@@ -28,7 +28,7 @@ public:
 
    // Trivial copy constructor and trivial copy assignment operator
 
-   Vertex(real_t *xx, int dim);
+   Vertex(real_t *xx, int64_t dim);
    Vertex(real_t x, real_t y) { coord[0] = x; coord[1] = y; coord[2] = 0.; }
    Vertex(real_t x, real_t y, real_t z)
    { coord[0] = x; coord[1] = y; coord[2] = z; }
@@ -37,14 +37,14 @@ public:
    inline real_t * operator() () const { return (real_t*)coord; }
 
    /// Returns the i'th coordinate of the vertex.
-   inline real_t & operator() (int i) { return coord[i]; }
+   inline real_t & operator() (int64_t i) { return coord[i]; }
 
    /// Returns the i'th coordinate of the vertex.
-   inline const real_t & operator() (int i) const { return coord[i]; }
+   inline const real_t & operator() (int64_t i) const { return coord[i]; }
 
    /// Sets vertex location based on given point p
-   void SetCoords(int dim, const real_t *p)
-   { for (int i = 0; i < dim; i++) { coord[i] = p[i]; } }
+   void SetCoords(int64_t dim, const real_t *p)
+   { for (int64_t i = 0; i < dim; i++) { coord[i] = p[i]; } }
 
    // Trivial destructor
 };

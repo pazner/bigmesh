@@ -15,32 +15,32 @@
 namespace mfem
 {
 
-const int VTKGeometry::Map[Geometry::NUM_GEOMETRIES] =
+const int64_t VTKGeometry::Map[Geometry::NUM_GEOMETRIES] =
 {
    POINT, SEGMENT, TRIANGLE, SQUARE, TETRAHEDRON, CUBE, PRISM, PYRAMID
 };
 
-const int VTKGeometry::QuadraticMap[Geometry::NUM_GEOMETRIES] =
+const int64_t VTKGeometry::QuadraticMap[Geometry::NUM_GEOMETRIES] =
 {
    POINT, QUADRATIC_SEGMENT, QUADRATIC_TRIANGLE, BIQUADRATIC_SQUARE,
    QUADRATIC_TETRAHEDRON, TRIQUADRATIC_CUBE, BIQUADRATIC_QUADRATIC_PRISM,
    QUADRATIC_PYRAMID
 };
 
-const int VTKGeometry::HighOrderMap[Geometry::NUM_GEOMETRIES] =
+const int64_t VTKGeometry::HighOrderMap[Geometry::NUM_GEOMETRIES] =
 {
    POINT, LAGRANGE_SEGMENT, LAGRANGE_TRIANGLE, LAGRANGE_SQUARE,
    LAGRANGE_TETRAHEDRON, LAGRANGE_CUBE, LAGRANGE_PRISM, LAGRANGE_PYRAMID
 };
 
-const int VTKGeometry::PrismMap[6] = {0, 2, 1, 3, 5, 4};
+const int64_t VTKGeometry::PrismMap[6] = {0, 2, 1, 3, 5, 4};
 
-const int *VTKGeometry::VertexPermutation[Geometry::NUM_GEOMETRIES] =
+const int64_t *VTKGeometry::VertexPermutation[Geometry::NUM_GEOMETRIES] =
 {
    NULL, NULL, NULL, NULL, NULL, NULL, VTKGeometry::PrismMap, NULL
 };
 
-Geometry::Type VTKGeometry::GetMFEMGeometry(int vtk_geom)
+Geometry::Type VTKGeometry::GetMFEMGeometry(int64_t vtk_geom)
 {
    switch (vtk_geom)
    {
@@ -79,18 +79,18 @@ Geometry::Type VTKGeometry::GetMFEMGeometry(int vtk_geom)
    }
 }
 
-bool VTKGeometry::IsLagrange(int vtk_geom)
+bool VTKGeometry::IsLagrange(int64_t vtk_geom)
 {
    return vtk_geom >= LAGRANGE_SEGMENT && vtk_geom <= LAGRANGE_PYRAMID;
 }
 
-bool VTKGeometry::IsQuadratic(int vtk_geom)
+bool VTKGeometry::IsQuadratic(int64_t vtk_geom)
 {
    return vtk_geom >= QUADRATIC_SEGMENT
           && vtk_geom <= BIQUADRATIC_QUADRATIC_PRISM;
 }
 
-int VTKGeometry::GetOrder(int vtk_geom, int npoints)
+int64_t VTKGeometry::GetOrder(int64_t vtk_geom, int64_t npoints)
 {
    if (IsQuadratic(vtk_geom))
    {
@@ -103,9 +103,9 @@ int VTKGeometry::GetOrder(int vtk_geom, int npoints)
          case LAGRANGE_SEGMENT:
             return npoints - 1;
          case LAGRANGE_TRIANGLE:
-            return static_cast<int>(std::sqrt(8*npoints + 1) - 3)/2;
+            return static_cast<int64_t>(std::sqrt(8*npoints + 1) - 3)/2;
          case LAGRANGE_SQUARE:
-            return static_cast<int>(std::round(std::sqrt(npoints))) - 1;
+            return static_cast<int64_t>(std::round(std::sqrt(npoints))) - 1;
          case LAGRANGE_TETRAHEDRON:
             switch (npoints)
             {
@@ -123,8 +123,8 @@ int VTKGeometry::GetOrder(int vtk_geom, int npoints)
                case 286: return 10;
                default:
                {
-                  constexpr int max_order = 20;
-                  int order = 11, npoints_order;
+                  constexpr int64_t max_order = 20;
+                  int64_t order = 11, npoints_order;
                   for (; order<max_order; ++order)
                   {
                      npoints_order = (order + 1)*(order + 2)*(order + 3)/6;
@@ -135,7 +135,7 @@ int VTKGeometry::GetOrder(int vtk_geom, int npoints)
                }
             }
          case LAGRANGE_CUBE:
-            return static_cast<int>(std::round(std::cbrt(npoints))) - 1;
+            return static_cast<int64_t>(std::round(std::cbrt(npoints))) - 1;
          case LAGRANGE_PRISM:
          {
             const double n = npoints;
@@ -145,7 +145,7 @@ int VTKGeometry::GetOrder(int vtk_geom, int npoints)
             const double term =
                std::cbrt(third*sqrt(third)*sqrt((27.0*n - 2.0)*n) + n
                          - twentyseventh);
-            return static_cast<int>(std::round(term + ninth / term - 4*third));
+            return static_cast<int64_t>(std::round(term + ninth / term - 4*third));
          }
          case LAGRANGE_PYRAMID:
             MFEM_ABORT("Lagrange pyramids not currently supported in VTK.");
@@ -155,13 +155,13 @@ int VTKGeometry::GetOrder(int vtk_geom, int npoints)
    return 1;
 }
 
-int BarycentricToVTKTriangle(int *b, int ref)
+int64_t BarycentricToVTKTriangle(int64_t *b, int64_t ref)
 {
    // Cf. https://git.io/JvW8f
-   int max = ref;
-   int min = 0;
-   int bmin = std::min(std::min(b[0], b[1]), b[2]);
-   int idx = 0;
+   int64_t max = ref;
+   int64_t min = 0;
+   int64_t bmin = std::min(std::min(b[0], b[1]), b[2]);
+   int64_t idx = 0;
 
    // scope into the correct triangle
    while (bmin > min)
@@ -171,7 +171,7 @@ int BarycentricToVTKTriangle(int *b, int ref)
       ++min;
       ref -= 3;
    }
-   for (int d=0; d<3; ++d)
+   for (int64_t d=0; d<3; ++d)
    {
       if (b[(d+2)%3] == max)
       {
@@ -180,7 +180,7 @@ int BarycentricToVTKTriangle(int *b, int ref)
       }
       ++idx;
    }
-   for (int d=0; d<3; ++d)
+   for (int64_t d=0; d<3; ++d)
    {
       if (b[(d+1)%3] == min)
       {
@@ -192,15 +192,15 @@ int BarycentricToVTKTriangle(int *b, int ref)
    return idx;
 }
 
-int BarycentricToVTKTetra(int *b, int ref)
+int64_t BarycentricToVTKTetra(int64_t *b, int64_t ref)
 {
    // Cf. https://git.io/JvW8c
-   int idx = 0;
+   int64_t idx = 0;
 
-   int max = ref;
-   int min = 0;
+   int64_t max = ref;
+   int64_t min = 0;
 
-   int bmin = std::min(std::min(std::min(b[0], b[1]), b[2]), b[3]);
+   int64_t bmin = std::min(std::min(std::min(b[0], b[1]), b[2]), b[3]);
 
    // scope into the correct tetra
    while (bmin > min)
@@ -214,29 +214,29 @@ int BarycentricToVTKTetra(int *b, int ref)
    // When a linearized tetra vertex is cast into barycentric coordinates, one of
    // its coordinates is maximal and the other three are minimal. These are the
    // indices of the maximal barycentric coordinate for each vertex.
-   static const int VertexMaxCoords[4] = {3,0,1,2};
+   static const int64_t VertexMaxCoords[4] = {3,0,1,2};
    // Each linearized tetra edge holds two barycentric tetra coordinates constant
    // and varies the other two. These are the coordinates that are held constant
    // for each edge.
-   static const int EdgeMinCoords[6][2] = {{1,2},{2,3},{0,2}, {0,1},{1,3},{0,3}};
+   static const int64_t EdgeMinCoords[6][2] = {{1,2},{2,3},{0,2}, {0,1},{1,3},{0,3}};
    // The coordinate that increments when traversing an edge (i.e. the coordinate
    // of the nonzero component of the second vertex of the edge).
-   static const int EdgeCountingCoord[6] = {0,1,3,2,2,2};
+   static const int64_t EdgeCountingCoord[6] = {0,1,3,2,2,2};
    // When describing a linearized tetra face, there is a mapping between the
    // four-component barycentric tetra system and the three-component barycentric
    // triangle system. These are the constant indices within the four-component
    // system for each face (e.g. face 0 holds barycentric tetra coordinate 1
    // constant).
-   static const int FaceMinCoord[4] = {1,3,0,2};
+   static const int64_t FaceMinCoord[4] = {1,3,0,2};
    // When describing a linearized tetra face, there is a mapping between the
    // four-component barycentric tetra system and the three-component barycentric
    // triangle system. These are the relevant indices within the four-component
    // system for each face (e.g. face 0 varies across the barycentric tetra
    // coordinates 0, 2 and 3).
-   static const int FaceBCoords[4][3] = {{0,2,3}, {2,0,1}, {2,1,3}, {1,0,3}};
+   static const int64_t FaceBCoords[4][3] = {{0,2,3}, {2,0,1}, {2,1,3}, {1,0,3}};
 
 
-   for (int vertex = 0; vertex < 4; vertex++)
+   for (int64_t vertex = 0; vertex < 4; vertex++)
    {
       if (b[VertexMaxCoords[vertex]] == max)
       {
@@ -246,7 +246,7 @@ int BarycentricToVTKTetra(int *b, int ref)
       idx++;
    }
 
-   for (int edge = 0; edge < 6; edge++)
+   for (int64_t edge = 0; edge < 6; edge++)
    {
       if (b[EdgeMinCoords[edge][0]] == min && b[EdgeMinCoords[edge][1]] == min)
       {
@@ -256,13 +256,13 @@ int BarycentricToVTKTetra(int *b, int ref)
       idx += max - (min + 1);
    }
 
-   for (int face = 0; face < 4; face++)
+   for (int64_t face = 0; face < 4; face++)
    {
       if (b[FaceMinCoord[face]] == min)
       {
          // we are on a face
-         int projectedb[3];
-         for (int i = 0; i < 3; i++)
+         int64_t projectedb[3];
+         for (int64_t i = 0; i < 3; i++)
          {
             projectedb[i] = b[FaceBCoords[face][i]] - min;
          }
@@ -275,21 +275,21 @@ int BarycentricToVTKTetra(int *b, int ref)
    return idx;
 }
 
-int VTKTriangleDOFOffset(int ref, int i, int j)
+int64_t VTKTriangleDOFOffset(int64_t ref, int64_t i, int64_t j)
 {
    return i + ref*(j - 1) - (j*(j + 1))/2;
 }
 
-int CartesianToVTKPrism(int i, int j, int k, int ref)
+int64_t CartesianToVTKPrism(int64_t i, int64_t j, int64_t k, int64_t ref)
 {
    // Cf. https://git.io/JvW0M
-   int om1 = ref - 1;
-   int ibdr = (i == 0);
-   int jbdr = (j == 0);
-   int ijbdr = (i + j == ref);
-   int kbdr = (k == 0 || k == ref);
+   int64_t om1 = ref - 1;
+   int64_t ibdr = (i == 0);
+   int64_t jbdr = (j == 0);
+   int64_t ijbdr = (i + j == ref);
+   int64_t kbdr = (k == 0 || k == ref);
    // How many boundaries do we lie on at once?
-   int nbdr = ibdr + jbdr + ijbdr + kbdr;
+   int64_t nbdr = ibdr + jbdr + ijbdr + kbdr;
 
    // Return an invalid index given invalid coordinates
    if (i < 0 || i > ref || j < 0 || j > ref || i + j > ref || k < 0 || k > ref)
@@ -303,7 +303,7 @@ int CartesianToVTKPrism(int i, int j, int k, int ref)
       return (ibdr && jbdr ? 0 : (jbdr && ijbdr ? 1 : 2)) + (k ? 3 : 0);
    }
 
-   int offset = 6;
+   int64_t offset = 6;
    if (nbdr == 2) // Edge DOF
    {
       if (!kbdr)
@@ -336,8 +336,8 @@ int CartesianToVTKPrism(int i, int j, int k, int ref)
    offset += 9*om1; // Skip all the edges
 
    // Number of points on a triangular face (but not on edge/corner):
-   int ntfdof = (om1 - 1)*om1/2;
-   int nqfdof = om1*om1;
+   int64_t ntfdof = (om1 - 1)*om1/2;
+   int64_t nqfdof = om1*om1;
    if (nbdr == 1) // Face DOF
    {
       if (kbdr)
@@ -375,9 +375,9 @@ int CartesianToVTKPrism(int i, int j, int k, int ref)
    // (i - 1) + (ref-1)*((j - 1) + (ref - 1)*(k - 1)));
 }
 
-int CartesianToVTKTensor(int idx_in, int ref, Geometry::Type geom)
+int64_t CartesianToVTKTensor(int64_t idx_in, int64_t ref, Geometry::Type geom)
 {
-   int n = ref + 1;
+   int64_t n = ref + 1;
    switch (geom)
    {
       case Geometry::POINT:
@@ -391,8 +391,8 @@ int CartesianToVTKTensor(int idx_in, int ref, Geometry::Type geom)
       case Geometry::SQUARE:
       {
          // Cf: https://git.io/JvZLT
-         int i = idx_in % n;
-         int j = idx_in / n;
+         int64_t i = idx_in % n;
+         int64_t j = idx_in / n;
          // Do we lie on any of the edges
          bool ibdr = (i == 0 || i == ref);
          bool jbdr = (j == 0 || j == ref);
@@ -400,7 +400,7 @@ int CartesianToVTKTensor(int idx_in, int ref, Geometry::Type geom)
          {
             return (i ? (j ? 2 : 1) : (j ? 3 : 0));
          }
-         int offset = 4;
+         int64_t offset = 4;
          if (jbdr) // Edge DOF on j==0 or j==ref
          {
             return (i - 1) + (j ? ref - 1 + ref - 1 : 0) + offset;
@@ -418,21 +418,21 @@ int CartesianToVTKTensor(int idx_in, int ref, Geometry::Type geom)
       case Geometry::CUBE:
       {
          // Cf: https://git.io/JvZLe
-         int i = idx_in % n;
-         int j = (idx_in / n) % n;
-         int k = idx_in / (n*n);
+         int64_t i = idx_in % n;
+         int64_t j = (idx_in / n) % n;
+         int64_t k = idx_in / (n*n);
          bool ibdr = (i == 0 || i == ref);
          bool jbdr = (j == 0 || j == ref);
          bool kbdr = (k == 0 || k == ref);
          // How many boundaries do we lie on at once?
-         int nbdr = (ibdr ? 1 : 0) + (jbdr ? 1 : 0) + (kbdr ? 1 : 0);
+         int64_t nbdr = (ibdr ? 1 : 0) + (jbdr ? 1 : 0) + (kbdr ? 1 : 0);
          if (nbdr == 3) // Vertex DOF
          {
             // ijk is a corner node. Return the proper index (in [0,7])
             return (i ? (j ? 2 : 1) : (j ? 3 : 0)) + (k ? 4 : 0);
          }
 
-         int offset = 8;
+         int64_t offset = 8;
          if (nbdr == 2) // Edge DOF
          {
             if (!ibdr)
@@ -491,16 +491,17 @@ int CartesianToVTKTensor(int idx_in, int ref, Geometry::Type geom)
    }
 }
 
-void CreateVTKElementConnectivity(Array<int> &con, Geometry::Type geom, int ref)
+void CreateVTKElementConnectivity(Array<int64_t> &con, Geometry::Type geom,
+                                  int64_t ref)
 {
    MFEM_ABORT("");
    // RefinedGeometry *RefG = GlobGeometryRefiner.Refine(geom, ref, 1);
-   // int nnodes = RefG->RefPts.GetNPoints();
+   // int64_t nnodes = RefG->RefPts.GetNPoints();
    // con.SetSize(nnodes);
    // if (geom == Geometry::TRIANGLE)
    // {
-   //    int b[3];
-   //    int idx = 0;
+   //    int64_t b[3];
+   //    int64_t idx = 0;
    //    for (b[1]=0; b[1]<=ref; ++b[1])
    //    {
    //       for (b[0]=0; b[0]<=ref-b[1]; ++b[0])
@@ -512,8 +513,8 @@ void CreateVTKElementConnectivity(Array<int> &con, Geometry::Type geom, int ref)
    // }
    // else if (geom == Geometry::TETRAHEDRON)
    // {
-   //    int idx = 0;
-   //    int b[4];
+   //    int64_t idx = 0;
+   //    int64_t b[4];
    //    for (b[2]=0; b[2]<=ref; b[2]++)
    //    {
    //       for (b[1]=0; b[1]<=ref-b[2]; b[1]++)
@@ -528,12 +529,12 @@ void CreateVTKElementConnectivity(Array<int> &con, Geometry::Type geom, int ref)
    // }
    // else if (geom == Geometry::PRISM)
    // {
-   //    int idx = 0;
-   //    for (int k=0; k<=ref; k++)
+   //    int64_t idx = 0;
+   //    for (int64_t k=0; k<=ref; k++)
    //    {
-   //       for (int j=0; j<=ref; j++)
+   //       for (int64_t j=0; j<=ref; j++)
    //       {
-   //          for (int i=0; i<=ref-j; i++)
+   //          for (int64_t i=0; i<=ref-j; i++)
    //          {
    //             con[CartesianToVTKPrism(i, j, k, ref)] = idx++;
    //          }
@@ -546,7 +547,7 @@ void CreateVTKElementConnectivity(Array<int> &con, Geometry::Type geom, int ref)
    // }
    // else
    // {
-   //    for (int idx=0; idx<nnodes; ++idx)
+   //    for (int64_t idx=0; idx<nnodes; ++idx)
    //    {
    //       con[CartesianToVTKTensor(idx, ref, geom)] = idx;
    //    }
@@ -554,7 +555,7 @@ void CreateVTKElementConnectivity(Array<int> &con, Geometry::Type geom, int ref)
 }
 
 void WriteVTKEncodedCompressed(std::ostream &os, const void *bytes,
-                               uint32_t nbytes, int compression_level)
+                               uint32_t nbytes, int64_t compression_level)
 {
    if (compression_level == 0)
    {
@@ -615,7 +616,7 @@ void WriteBinaryOrASCII<uint8_t>(std::ostream &os, std::vector<char> &buf,
                                  const uint8_t &val, const char *suffix,
                                  VTKFormat format)
 {
-   if (format == VTKFormat::ASCII) { os << static_cast<int>(val) << suffix; }
+   if (format == VTKFormat::ASCII) { os << static_cast<int64_t>(val) << suffix; }
    else { bin_io::AppendBytes(buf, val); }
 }
 
@@ -649,14 +650,14 @@ void WriteBinaryOrASCII<float>(std::ostream &os, std::vector<char> &buf,
 }
 
 void WriteBase64WithSizeAndClear(std::ostream &os, std::vector<char> &buf,
-                                 int compression_level)
+                                 int64_t compression_level)
 {
    WriteVTKEncodedCompressed(os, buf.data(), buf.size(), compression_level);
    os << '\n';
    buf.clear();
 }
 
-std::string VTKComponentLabels(int vdim)
+std::string VTKComponentLabels(int64_t vdim)
 {
    if (vdim == 1)
    {
@@ -665,7 +666,7 @@ std::string VTKComponentLabels(int vdim)
    else
    {
       std::stringstream s;
-      for (int i = 0; i < vdim; ++i)
+      for (int64_t i = 0; i < vdim; ++i)
       {
          s << "ComponentName" << i << "=\"" << i << "\"";
          if (i < vdim - 1) { s << " "; }

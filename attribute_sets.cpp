@@ -14,7 +14,7 @@
 namespace mfem
 {
 
-AttributeSets::AttributeSets(const Array<int> &attr)
+AttributeSets::AttributeSets(const Array<int64_t> &attr)
    : attributes(attr)
 {}
 
@@ -38,7 +38,7 @@ bool AttributeSets::AttributeSetExists(const std::string &name) const
    return attr_sets.EntryExists(name);
 }
 
-Array<int> & AttributeSets::CreateAttributeSet(const std::string &set_name)
+Array<int64_t> & AttributeSets::CreateAttributeSet(const std::string &set_name)
 {
    return attr_sets.CreateArray(set_name);
 }
@@ -49,7 +49,7 @@ void AttributeSets::DeleteAttributeSet(const std::string &set_name)
 }
 
 void AttributeSets::SetAttributeSet(const std::string &set_name,
-                                    const Array<int> &attr)
+                                    const Array<int64_t> &attr)
 {
    if (!attr_sets.EntryExists(set_name))
    {
@@ -60,7 +60,7 @@ void AttributeSets::SetAttributeSet(const std::string &set_name,
    attr_sets[set_name].Unique();
 }
 
-void AttributeSets::AddToAttributeSet(const std::string &set_name, int attr)
+void AttributeSets::AddToAttributeSet(const std::string &set_name, int64_t attr)
 {
    attr_sets[set_name].Append(attr);
    attr_sets[set_name].Sort();
@@ -68,7 +68,7 @@ void AttributeSets::AddToAttributeSet(const std::string &set_name, int attr)
 }
 
 void AttributeSets::AddToAttributeSet(const std::string &set_name,
-                                      const Array<int> &attr)
+                                      const Array<int64_t> &attr)
 {
    attr_sets[set_name].Append(attr);
    attr_sets[set_name].Sort();
@@ -76,7 +76,7 @@ void AttributeSets::AddToAttributeSet(const std::string &set_name,
 }
 
 void AttributeSets::RemoveFromAttributeSet(const std::string &set_name,
-                                           int attr)
+                                           int64_t attr)
 {
    if (!attr_sets.EntryExists(set_name))
    {
@@ -84,31 +84,33 @@ void AttributeSets::RemoveFromAttributeSet(const std::string &set_name,
                 << "\" in AttributeSets::RemoveFromAttributeSet" << std::endl;
    }
 
-   Array<int> &attr_set = attr_sets[set_name];
+   Array<int64_t> &attr_set = attr_sets[set_name];
 
    attr_set.DeleteFirst(attr);
 }
 
-void AttributeSets::Print(std::ostream &os, int width) const
+void AttributeSets::Print(std::ostream &os, int64_t width) const
 {
    attr_sets.Print(os, width > 0 ? width : def_width);
 }
 
-Array<int> & AttributeSets::GetAttributeSet(const std::string & set_name)
+Array<int64_t> & AttributeSets::GetAttributeSet(const std::string & set_name)
 {
    return attr_sets[set_name];
 }
 
-Array<int> AttributeSets::GetAttributeSetMarker(const std::string & set_name)
+Array<int64_t> AttributeSets::GetAttributeSetMarker(const std::string &
+                                                    set_name)
 {
    return AttrToMarker(attributes.Max(), GetAttributeSet(set_name));
 }
 
-Array<int> AttributeSets::AttrToMarker(int max_attr, const Array<int> &attrs)
+Array<int64_t> AttributeSets::AttrToMarker(int64_t max_attr,
+                                           const Array<int64_t> &attrs)
 {
    MFEM_ASSERT(attrs.Max() <= max_attr, "Invalid attribute number present.");
 
-   Array<int> marker(max_attr);
+   Array<int64_t> marker(max_attr);
    marker = 0;
    for (auto const &attr : attrs)
    {

@@ -10,5 +10,5 @@ partition: $(OBJECTS)
 	c++ -O0 -g -std=c++11 $< -c -o $@
 
 clean:
-	rm $(OBJECTS)
-	rm partition
+	rm -f $(OBJECTS)
+	rm -f partition

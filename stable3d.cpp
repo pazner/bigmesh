@@ -18,9 +18,9 @@ using namespace std;
 namespace mfem
 {
 
-STable3D::STable3D (int nr)
+STable3D::STable3D (int64_t nr)
 {
-   int i;
+   int64_t i;
 
    Size = nr;
    Rows = new STable3DNode *[nr];
@@ -31,9 +31,9 @@ STable3D::STable3D (int nr)
    NElem = 0;
 }
 
-inline void Sort3 (int &r, int &c, int &f)
+inline void Sort3 (int64_t &r, int64_t &c, int64_t &f)
 {
-   int t;
+   int64_t t;
 
    if (r > c)
       if (c > f)
@@ -61,7 +61,7 @@ inline void Sort3 (int &r, int &c, int &f)
    }
 }
 
-int STable3D::Push (int r, int c, int f)
+int64_t STable3D::Push (int64_t r, int64_t c, int64_t f)
 {
    STable3DNode *node;
 
@@ -94,7 +94,7 @@ int STable3D::Push (int r, int c, int f)
    return (NElem-1);
 }
 
-int STable3D::operator() (int r, int c, int f) const
+int64_t STable3D::operator() (int64_t r, int64_t c, int64_t f) const
 {
    STable3DNode *node;
 
@@ -114,7 +114,7 @@ int STable3D::operator() (int r, int c, int f) const
    return 0;
 }
 
-int STable3D::Index (int r, int c, int f) const
+int64_t STable3D::Index (int64_t r, int64_t c, int64_t f) const
 {
    STable3DNode *node;
 
@@ -137,13 +137,13 @@ int STable3D::Index (int r, int c, int f) const
    return -1;
 }
 
-int STable3D::Push4 (int r, int c, int f, int t)
+int64_t STable3D::Push4 (int64_t r, int64_t c, int64_t f, int64_t t)
 {
    MFEM_ASSERT(r != c && r != f && r != t && c != f && c != t && f != t,
                " r = " << r << ", c = " << c << ", f = " << f << ", t = " << t);
 
-   int i = 0;
-   int max = r;
+   int64_t i = 0;
+   int64_t max = r;
 
    if (max < c) { max = c, i = 1; }
    if (max < f) { max = f, i = 2; }
@@ -164,10 +164,10 @@ int STable3D::Push4 (int r, int c, int f, int t)
    return -1;
 }
 
-int STable3D::operator() (int r, int c, int f, int t) const
+int64_t STable3D::operator() (int64_t r, int64_t c, int64_t f, int64_t t) const
 {
-   int i = 0;
-   int max = r;
+   int64_t i = 0;
+   int64_t max = r;
 
    if (max < c) { max = c, i = 1; }
    if (max < f) { max = f, i = 2; }
@@ -193,7 +193,7 @@ STable3D::~STable3D ()
 #ifdef MFEM_USE_MEMALLOC
    // NodesMem.Clear();  // this is done implicitly
 #else
-   for (int i = 0; i < Size; i++)
+   for (int64_t i = 0; i < Size; i++)
    {
       STable3DNode *aux, *node_p = Rows[i];
       while (node_p != NULL)
@@ -210,7 +210,7 @@ STable3D::~STable3D ()
 void STable3D::Print(std::ostream & os) const
 {
    os << NElem << endl;
-   for (int row = 0; row < Size; row++)
+   for (int64_t row = 0; row < Size; row++)
    {
       STable3DNode *node_p = Rows[row];
       while (node_p != NULL)

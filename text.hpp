@@ -50,17 +50,17 @@ inline void filter_dos(std::string &line)
 }
 
 /// Convert an integer to a 0-padded string with the given number of @a digits
-inline std::string to_padded_string(int i, int digits)
+inline std::string to_padded_string(int64_t i, int64_t digits)
 {
    std::ostringstream oss;
    oss << std::setw(digits) << std::setfill('0') << i;
    return oss.str();
 }
 
-/// Convert a string to an int
-inline int to_int(const std::string& str)
+/// Convert a string to an int64_t
+inline int64_t to_int(const std::string& str)
 {
-   int i;
+   int64_t i;
    std::stringstream(str) >> i;
    return i;
 }

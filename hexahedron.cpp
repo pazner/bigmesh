@@ -15,19 +15,19 @@
 namespace mfem
 {
 
-Hexahedron::Hexahedron(const int *ind, int attr)
+Hexahedron::Hexahedron(const int64_t *ind, int64_t attr)
    : Element(Geometry::CUBE)
 {
    attribute = attr;
-   for (int i = 0; i < 8; i++)
+   for (int64_t i = 0; i < 8; i++)
    {
       indices[i] = ind[i];
    }
 }
 
-Hexahedron::Hexahedron(int ind1, int ind2, int ind3, int ind4,
-                       int ind5, int ind6, int ind7, int ind8,
-                       int attr) : Element(Geometry::CUBE)
+Hexahedron::Hexahedron(int64_t ind1, int64_t ind2, int64_t ind3, int64_t ind4,
+                       int64_t ind5, int64_t ind6, int64_t ind7, int64_t ind8,
+                       int64_t attr) : Element(Geometry::CUBE)
 {
    attribute  = attr;
    indices[0] = ind1;
@@ -40,19 +40,19 @@ Hexahedron::Hexahedron(int ind1, int ind2, int ind3, int ind4,
    indices[7] = ind8;
 }
 
-void Hexahedron::GetVertices(Array<int> &v) const
+void Hexahedron::GetVertices(Array<int64_t> &v) const
 {
    v.SetSize(8);
    std::copy(indices, indices + 8, v.begin());
 }
 
-void Hexahedron::SetVertices(const Array<int> &v)
+void Hexahedron::SetVertices(const Array<int64_t> &v)
 {
    MFEM_ASSERT(v.Size() == 8, "!");
    std::copy(v.begin(), v.end(), indices);
 }
 
-void Hexahedron::SetVertices(const int *ind)
+void Hexahedron::SetVertices(const int64_t *ind)
 {
    std::copy(ind, ind + 8, indices);
 }

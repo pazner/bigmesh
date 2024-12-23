@@ -16,18 +16,19 @@
 namespace mfem
 {
 
-Wedge::Wedge(const int *ind, int attr)
+Wedge::Wedge(const int64_t *ind, int64_t attr)
    : Element(Geometry::PRISM)
 {
    attribute = attr;
-   for (int i = 0; i < 6; i++)
+   for (int64_t i = 0; i < 6; i++)
    {
       indices[i] = ind[i];
    }
 }
 
-Wedge::Wedge(int ind1, int ind2, int ind3, int ind4, int ind5, int ind6,
-             int attr)
+Wedge::Wedge(int64_t ind1, int64_t ind2, int64_t ind3, int64_t ind4,
+             int64_t ind5, int64_t ind6,
+             int64_t attr)
    : Element(Geometry::PRISM)
 {
    attribute  = attr;
@@ -39,21 +40,21 @@ Wedge::Wedge(int ind1, int ind2, int ind3, int ind4, int ind5, int ind6,
    indices[5] = ind6;
 }
 
-void Wedge::SetVertices(const int *ind)
+void Wedge::SetVertices(const int64_t *ind)
 {
-   for (int i = 0; i < 6; i++)
+   for (int64_t i = 0; i < 6; i++)
    {
       indices[i] = ind[i];
    }
 }
 
-void Wedge::GetVertices(Array<int> &v) const
+void Wedge::GetVertices(Array<int64_t> &v) const
 {
    v.SetSize(6);
    std::copy(indices, indices + 6, v.begin());
 }
 
-void Wedge::SetVertices(const Array<int> &v)
+void Wedge::SetVertices(const Array<int64_t> &v)
 {
    MFEM_ASSERT(v.Size() == 6, "!");
    std::copy(v.begin(), v.end(), indices);

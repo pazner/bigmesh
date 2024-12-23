@@ -30,28 +30,28 @@ class Matrix : public Operator
 public:
 
    /// Creates a square matrix of size s.
-   explicit Matrix(int s) : Operator(s) { }
+   explicit Matrix(int64_t s) : Operator(s) { }
 
    /// Creates a matrix of the given height and width.
-   explicit Matrix(int h, int w) : Operator(h, w) { }
+   explicit Matrix(int64_t h, int64_t w) : Operator(h, w) { }
 
    /// Returns whether the matrix is a square matrix.
    bool IsSquare() const { return (height == width); }
 
    /// Returns reference to a_{ij}.
-   virtual real_t &Elem(int i, int j) = 0;
+   virtual real_t &Elem(int64_t i, int64_t j) = 0;
 
    /// Returns constant reference to a_{ij}.
-   virtual const real_t &Elem(int i, int j) const = 0;
+   virtual const real_t &Elem(int64_t i, int64_t j) const = 0;
 
    /// Returns a pointer to (an approximation) of the matrix inverse.
    virtual MatrixInverse *Inverse() const = 0;
 
    /// Finalizes the matrix initialization.
-   virtual void Finalize(int) { }
+   virtual void Finalize(int64_t) { }
 
    /// Prints matrix to stream out.
-   virtual void Print(std::ostream & out = mfem::out, int width_ = 4) const;
+   virtual void Print(std::ostream & out = mfem::out, int64_t width_ = 4) const;
 
    /// Destroys matrix.
    virtual ~Matrix() { }
@@ -74,19 +74,20 @@ class AbstractSparseMatrix : public Matrix
 {
 public:
    /// Creates a square matrix of the given size.
-   explicit AbstractSparseMatrix(int s = 0) : Matrix(s) { }
+   explicit AbstractSparseMatrix(int64_t s = 0) : Matrix(s) { }
 
    /// Creates a matrix of the given height and width.
-   explicit AbstractSparseMatrix(int h, int w) : Matrix(h, w) { }
+   explicit AbstractSparseMatrix(int64_t h, int64_t w) : Matrix(h, w) { }
 
    /// Returns the number of non-zeros in a matrix
-   virtual int NumNonZeroElems() const = 0;
+   virtual int64_t NumNonZeroElems() const = 0;
 
    /// Gets the columns indexes and values for row *row*.
    /** Returns:
        - 0 if @a cols and @a srow are copies of the values in the matrix.
        - 1 if @a cols and @a srow are views of the values in the matrix. */
-   virtual int GetRow(const int row, Array<int> &cols, Vector &srow) const = 0;
+   virtual int64_t GetRow(const int64_t row, Array<int64_t> &cols,
+                          Vector &srow) const = 0;
 
    /** @brief If the matrix is square, this method will place 1 on the diagonal
        (i,i) if row i has "almost" zero l1-norm.

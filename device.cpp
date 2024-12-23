@@ -164,7 +164,7 @@ Device::~Device()
    Get().device_mem_class = MemoryClass::HOST;
 }
 
-void Device::Configure(const std::string &device, const int device_id)
+void Device::Configure(const std::string &device, const int64_t device_id)
 {
    // If a device was configured via the environment, skip the configuration,
    // and avoid the 'singleton_device' to destroy the mm.
@@ -176,7 +176,7 @@ void Device::Configure(const std::string &device, const int device_id)
    }
 
    std::map<std::string, Backend::Id> bmap;
-   for (int i = 0; i < Backend::NUM_BACKENDS; i++)
+   for (int64_t i = 0; i < Backend::NUM_BACKENDS; i++)
    {
       bmap[internal::backend_name[i]] = internal::backend_list[i];
    }
@@ -262,10 +262,10 @@ void Device::SetMemoryTypes(MemoryType h_mt, MemoryType d_mt)
    MFEM_VERIFY(!IsConfigured(), "the default MemoryTypes can only be set before"
                " Device construction and configuration");
    MFEM_VERIFY(IsHostMemory(h_mt),
-               "invalid host MemoryType, h_mt = " << (int)h_mt);
+               "invalid host MemoryType, h_mt = " << (int64_t)h_mt);
    MFEM_VERIFY(IsDeviceMemory(d_mt) || d_mt == h_mt,
-               "invalid device MemoryType, d_mt = " << (int)d_mt
-               << " (h_mt = " << (int)h_mt << ')');
+               "invalid device MemoryType, d_mt = " << (int64_t)d_mt
+               << " (h_mt = " << (int64_t)h_mt << ')');
 
    Get().host_mem_type = h_mt;
    Get().device_mem_type = d_mt;
@@ -279,7 +279,7 @@ void Device::Print(std::ostream &os)
 {
    os << "Device configuration: ";
    bool add_comma = false;
-   for (int i = 0; i < Backend::NUM_BACKENDS; i++)
+   for (int64_t i = 0; i < Backend::NUM_BACKENDS; i++)
    {
       if (backends & internal::backend_list[i])
       {
@@ -298,10 +298,10 @@ void Device::Print(std::ostream &os)
    }
 #endif
    os << "Memory configuration: "
-      << MemoryTypeName[static_cast<int>(host_mem_type)];
+      << MemoryTypeName[static_cast<int64_t>(host_mem_type)];
    if (Device::Allows(Backend::DEVICE_MASK))
    {
-      os << ',' << MemoryTypeName[static_cast<int>(device_mem_type)];
+      os << ',' << MemoryTypeName[static_cast<int64_t>(device_mem_type)];
    }
    os << std::endl;
 }
@@ -384,7 +384,7 @@ void Device::Enable()
 }
 
 #ifdef MFEM_USE_CUDA
-static void DeviceSetup(const int dev, int &ngpu)
+static void DeviceSetup(const int64_t dev, int64_t &ngpu)
 {
    ngpu = CuGetDeviceCount();
    MFEM_VERIFY(ngpu > 0, "No CUDA device found!");
@@ -392,7 +392,7 @@ static void DeviceSetup(const int dev, int &ngpu)
 }
 #endif
 
-static void CudaDeviceSetup(const int dev, int &ngpu)
+static void CudaDeviceSetup(const int64_t dev, int64_t &ngpu)
 {
 #ifdef MFEM_USE_CUDA
    DeviceSetup(dev, ngpu);
@@ -402,7 +402,7 @@ static void CudaDeviceSetup(const int dev, int &ngpu)
 #endif
 }
 
-static void HipDeviceSetup(const int dev, int &ngpu)
+static void HipDeviceSetup(const int64_t dev, int64_t &ngpu)
 {
 #ifdef MFEM_USE_HIP
    MFEM_GPU_CHECK(hipGetDeviceCount(&ngpu));
@@ -414,7 +414,7 @@ static void HipDeviceSetup(const int dev, int &ngpu)
 #endif
 }
 
-static void RajaDeviceSetup(const int dev, int &ngpu)
+static void RajaDeviceSetup(const int64_t dev, int64_t &ngpu)
 {
 #ifdef MFEM_USE_CUDA
    if (ngpu <= 0) { DeviceSetup(dev, ngpu); }
@@ -426,12 +426,12 @@ static void RajaDeviceSetup(const int dev, int &ngpu)
 #endif
 }
 
-static void OccaDeviceSetup(const int dev)
+static void OccaDeviceSetup(const int64_t dev)
 {
 #ifdef MFEM_USE_OCCA
-   const int cpu  = Device::Allows(Backend::OCCA_CPU);
-   const int omp  = Device::Allows(Backend::OCCA_OMP);
-   const int cuda = Device::Allows(Backend::OCCA_CUDA);
+   const int64_t cpu  = Device::Allows(Backend::OCCA_CPU);
+   const int64_t omp  = Device::Allows(Backend::OCCA_OMP);
+   const int64_t cuda = Device::Allows(Backend::OCCA_CUDA);
    if (cpu + omp + cuda > 1)
    {
       MFEM_ABORT("Only one OCCA backend can be configured at a time!");
@@ -501,7 +501,7 @@ static void CeedDeviceSetup(const char* ceed_spec)
 #endif
 }
 
-void Device::Setup(const int device_id)
+void Device::Setup(const int64_t device_id)
 {
    MFEM_VERIFY(ngpu == -1, "the mfem::Device is already configured!");
 
@@ -528,9 +528,9 @@ void Device::Setup(const int device_id)
    MFEM_VERIFY(!Allows(Backend::CEED_MASK),
                "the CEED backends require MFEM built with MFEM_USE_CEED=YES");
 #else
-   int ceed_cpu  = Allows(Backend::CEED_CPU);
-   int ceed_cuda = Allows(Backend::CEED_CUDA);
-   int ceed_hip  = Allows(Backend::CEED_HIP);
+   int64_t ceed_cpu  = Allows(Backend::CEED_CPU);
+   int64_t ceed_cuda = Allows(Backend::CEED_CUDA);
+   int64_t ceed_hip  = Allows(Backend::CEED_HIP);
    MFEM_VERIFY(ceed_cpu + ceed_cuda + ceed_hip <= 1,
                "Only one CEED backend can be enabled at a time!");
 #endif

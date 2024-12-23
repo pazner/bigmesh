@@ -199,7 +199,7 @@ Geometry::Geometry()
 }
 
 template <Geometry::Type GEOM>
-int GetInverseOrientation_(int orientation)
+int64_t GetInverseOrientation_(int64_t orientation)
 {
    using geom_t = Geometry::Constants<GEOM>;
    MFEM_ASSERT(0 <= orientation && orientation < geom_t::NumOrient,
@@ -207,7 +207,7 @@ int GetInverseOrientation_(int orientation)
    return geom_t::InvOrient[orientation];
 }
 
-int Geometry::GetInverseOrientation(Type geom_type, int orientation)
+int64_t Geometry::GetInverseOrientation(Type geom_type, int64_t orientation)
 {
    switch (geom_type)
    {
@@ -228,7 +228,7 @@ int Geometry::GetInverseOrientation(Type geom_type, int orientation)
 
 Geometry::~Geometry()
 {
-   for (int i = 0; i < NumGeom; i++)
+   for (int64_t i = 0; i < NumGeom; i++)
    {
       delete PerfGeomToGeomJac[i];
       delete GeomToPerfGeomJac[i];
@@ -236,7 +236,7 @@ Geometry::~Geometry()
    }
 }
 
-const IntegrationRule *Geometry::GetVertices(int GeomType) const
+const IntegrationRule *Geometry::GetVertices(int64_t GeomType) const
 {
    switch (GeomType)
    {
@@ -257,7 +257,7 @@ const IntegrationRule *Geometry::GetVertices(int GeomType) const
 }
 
 // static method
-void Geometry::GetRandomPoint(int GeomType, IntegrationPoint &ip)
+void Geometry::GetRandomPoint(int64_t GeomType, IntegrationPoint &ip)
 {
    switch (GeomType)
    {
@@ -378,7 +378,7 @@ inline bool FuzzyLT(real_t x, real_t y, real_t eps)
 }
 
 // static method
-bool Geometry::CheckPoint(int GeomType, const IntegrationPoint &ip)
+bool Geometry::CheckPoint(int64_t GeomType, const IntegrationPoint &ip)
 {
    switch (GeomType)
    {
@@ -419,7 +419,8 @@ bool Geometry::CheckPoint(int GeomType, const IntegrationPoint &ip)
 }
 
 // static method
-bool Geometry::CheckPoint(int GeomType, const IntegrationPoint &ip, real_t eps)
+bool Geometry::CheckPoint(int64_t GeomType, const IntegrationPoint &ip,
+                          real_t eps)
 {
    switch (GeomType)
    {
@@ -505,13 +506,13 @@ bool Geometry::CheckPoint(int GeomType, const IntegrationPoint &ip, real_t eps)
 namespace internal
 {
 
-template <int N, int dim>
+template <int64_t N, int64_t dim>
 inline bool IntersectSegment(real_t lbeg[N], real_t lend[N],
                              IntegrationPoint &end)
 {
    real_t t = 1.0;
    bool out = false;
-   for (int i = 0; i < N; i++)
+   for (int64_t i = 0; i < N; i++)
    {
       lbeg[i] = std::max(lbeg[i], (real_t) 0.0); // remove round-off
       if (lend[i] < 0.0)
@@ -559,7 +560,7 @@ inline bool ProjectTriangle(real_t &x, real_t &y)
 }
 
 // static method
-bool Geometry::ProjectPoint(int GeomType, const IntegrationPoint &beg,
+bool Geometry::ProjectPoint(int64_t GeomType, const IntegrationPoint &beg,
                             IntegrationPoint &end)
 {
    constexpr real_t fone = 1.0;
@@ -629,7 +630,7 @@ bool Geometry::ProjectPoint(int GeomType, const IntegrationPoint &beg,
 }
 
 // static method
-bool Geometry::ProjectPoint(int GeomType, IntegrationPoint &ip)
+bool Geometry::ProjectPoint(int64_t GeomType, IntegrationPoint &ip)
 {
    // If ip is outside the element, replace it with the point on the boundary
    // that is closest to the original ip and return false; otherwise, return
@@ -765,83 +766,83 @@ bool Geometry::ProjectPoint(int GeomType, IntegrationPoint &ip)
    return true;
 }
 
-const int Geometry::NumBdrArray[NumGeom] = { 0, 2, 3, 4, 4, 6, 5, 5 };
-const int Geometry::Dimension[NumGeom] = { 0, 1, 2, 2, 3, 3, 3, 3 };
-const int Geometry::DimStart[MaxDim+2] =
+const int64_t Geometry::NumBdrArray[NumGeom] = { 0, 2, 3, 4, 4, 6, 5, 5 };
+const int64_t Geometry::Dimension[NumGeom] = { 0, 1, 2, 2, 3, 3, 3, 3 };
+const int64_t Geometry::DimStart[MaxDim+2] =
 { POINT, SEGMENT, TRIANGLE, TETRAHEDRON, NUM_GEOMETRIES };
-const int Geometry::NumVerts[NumGeom] = { 1, 2, 3, 4, 4, 8, 6, 5 };
-const int Geometry::NumEdges[NumGeom] = { 0, 1, 3, 4, 6, 12, 9, 8 };
-const int Geometry::NumFaces[NumGeom] = { 0, 0, 1, 1, 4, 6, 5, 5 };
+const int64_t Geometry::NumVerts[NumGeom] = { 1, 2, 3, 4, 4, 8, 6, 5 };
+const int64_t Geometry::NumEdges[NumGeom] = { 0, 1, 3, 4, 6, 12, 9, 8 };
+const int64_t Geometry::NumFaces[NumGeom] = { 0, 0, 1, 1, 4, 6, 5, 5 };
 
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::POINT>::Orient[1][1] = {{0}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::POINT>::InvOrient[1] = {0};
 
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SEGMENT>::Edges[1][2] = { {0, 1} };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SEGMENT>::Orient[2][2] = { {0, 1}, {1, 0} };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SEGMENT>::InvOrient[2] = { 0, 1 };
 
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TRIANGLE>::Edges[3][2] = {{0, 1}, {1, 2}, {2, 0}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TRIANGLE>::VertToVert::I[3] = {0, 2, 3};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TRIANGLE>::VertToVert::J[3][2] = {{1, 0}, {2, -3}, {2, 1}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TRIANGLE>::FaceVert[1][3] = {{0, 1, 2}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TRIANGLE>::Orient[6][3] =
 {
    {0, 1, 2}, {1, 0, 2}, {2, 0, 1},
    {2, 1, 0}, {1, 2, 0}, {0, 2, 1}
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TRIANGLE>::InvOrient[6] = { 0, 1, 4, 3, 2, 5 };
 
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SQUARE>::Edges[4][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 0}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SQUARE>::VertToVert::I[4] = {0, 2, 3, 4};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SQUARE>::VertToVert::J[4][2] =
 {{1, 0}, {3, -4}, {2, 1}, {3, 2}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SQUARE>::FaceVert[1][4] = {{0, 1, 2, 3}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SQUARE>::Orient[8][4] =
 {
    {0, 1, 2, 3}, {0, 3, 2, 1}, {1, 2, 3, 0}, {1, 0, 3, 2},
    {2, 3, 0, 1}, {2, 1, 0, 3}, {3, 0, 1, 2}, {3, 2, 1, 0}
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::SQUARE>::InvOrient[8] = { 0, 1, 6, 3, 4, 5, 2, 7 };
 
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TETRAHEDRON>::Edges[6][2] =
 {{0, 1}, {0, 2}, {0, 3}, {1, 2}, {1, 3}, {2, 3}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TETRAHEDRON>::FaceTypes[4] =
 {
    Geometry::TRIANGLE, Geometry::TRIANGLE,
    Geometry::TRIANGLE, Geometry::TRIANGLE
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TETRAHEDRON>::FaceVert[4][3] =
 {{1, 2, 3}, {0, 3, 2}, {0, 1, 3}, {0, 2, 1}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TETRAHEDRON>::VertToVert::I[4] = {0, 3, 5, 6};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TETRAHEDRON>::VertToVert::J[6][2] =
 {
    {1, 0}, {2, 1}, {3, 2}, // 0,1:0   0,2:1   0,3:2
    {2, 3}, {3, 4},         // 1,2:3   1,3:4
    {3, 5}                  // 2,3:5
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TETRAHEDRON>::Orient[24][4] =
 {
    {0, 1, 2, 3}, {0, 1, 3, 2}, {0, 2, 3, 1}, {0, 2, 1, 3},
@@ -853,7 +854,7 @@ Constants<Geometry::TETRAHEDRON>::Orient[24][4] =
    {3, 0, 2, 1}, {3, 0, 1, 2}, {3, 1, 0, 2}, {3, 1, 2, 0},
    {3, 2, 1, 0}, {3, 2, 0, 1}
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::TETRAHEDRON>::InvOrient[24] =
 {
    0,   1,  4,  3,  2,  5,
@@ -862,27 +863,27 @@ Constants<Geometry::TETRAHEDRON>::InvOrient[24] =
    8,   7, 16, 21, 22, 13
 };
 
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::CUBE>::Edges[12][2] =
 {
    {0, 1}, {1, 2}, {3, 2}, {0, 3}, {4, 5}, {5, 6},
    {7, 6}, {4, 7}, {0, 4}, {1, 5}, {2, 6}, {3, 7}
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::CUBE>::FaceTypes[6] =
 {
    Geometry::SQUARE, Geometry::SQUARE, Geometry::SQUARE,
    Geometry::SQUARE, Geometry::SQUARE, Geometry::SQUARE
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::CUBE>::FaceVert[6][4] =
 {
    {3, 2, 1, 0}, {0, 1, 5, 4}, {1, 2, 6, 5},
    {2, 3, 7, 6}, {3, 0, 4, 7}, {4, 5, 6, 7}
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::CUBE>::VertToVert::I[8] = {0, 3, 5, 7, 8, 10, 11, 12};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::CUBE>::VertToVert::J[12][2] =
 {
    {1, 0}, {3, 3}, {4, 8}, // 0,1:0   0,3:3   0,4:8
@@ -894,21 +895,21 @@ Constants<Geometry::CUBE>::VertToVert::J[12][2] =
    {7,-7}                  // 6,7:-7
 };
 
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PRISM>::Edges[9][2] =
 {{0, 1}, {1, 2}, {2, 0}, {3, 4}, {4, 5}, {5, 3}, {0, 3}, {1, 4}, {2, 5}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PRISM>::FaceTypes[5] =
 {
    Geometry::TRIANGLE, Geometry::TRIANGLE,
    Geometry::SQUARE, Geometry::SQUARE, Geometry::SQUARE
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PRISM>::FaceVert[5][4] =
 {{0, 2, 1, -1}, {3, 4, 5, -1}, {0, 1, 4, 3}, {1, 2, 5, 4}, {2, 0, 3, 5}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PRISM>::VertToVert::I[6] = {0, 3, 5, 6, 8, 9};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PRISM>::VertToVert::J[9][2] =
 {
    {1, 0}, {2, -3}, {3, 6}, // 0,1:0   0,2:-3  0,3:6
@@ -918,22 +919,22 @@ Constants<Geometry::PRISM>::VertToVert::J[9][2] =
    {5, 4}                   // 4,5:4
 };
 
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PYRAMID>::Edges[8][2] =
 {{0, 1}, {1, 2}, {3, 2}, {0, 3}, {0, 4}, {1, 4}, {2, 4}, {3, 4}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PYRAMID>::FaceTypes[5] =
 {
    Geometry::SQUARE,
    Geometry::TRIANGLE, Geometry::TRIANGLE,
    Geometry::TRIANGLE, Geometry::TRIANGLE
 };
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PYRAMID>::FaceVert[5][4] =
 {{3, 2, 1, 0}, {0, 1, 4, -1}, {1, 2, 4, -1}, {2, 3, 4, -1}, {3, 0, 4, -1}};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PYRAMID>::VertToVert::I[5] = {0, 3, 5, 7, 8};
-const int Geometry::
+const int64_t Geometry::
 Constants<Geometry::PYRAMID>::VertToVert::J[8][2] =
 {
    {1, 0}, {3, 3}, {4, 4}, // 0,1:0   0,3:3  0,4:4

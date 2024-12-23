@@ -63,7 +63,7 @@ public:
    ArraysByName(ArraysByName &&src) noexcept = default;
 
    /// Return the number of named arrays in the container
-   int Size() const { return static_cast<int>(data.size()); }
+   int64_t Size() const { return static_cast<int64_t>(data.size()); }
 
    /// Return an STL set of strings giving the names of the arrays
    inline std::set<std::string> GetNames() const;
@@ -119,7 +119,7 @@ public:
    /// one line, the length of the associated array, lastly the array contents
    /// with @a width entries per line. A specific number of entries per line
    /// can be used by changing the @a width argument.
-   inline void Print(std::ostream &out = mfem::out, int width = -1) const;
+   inline void Print(std::ostream &out = mfem::out, int64_t width = -1) const;
 
    /// @brief Load the contents of the container from an input stream
    ///
@@ -241,7 +241,7 @@ inline void ArraysByName<T>::UniqueAll()
 }
 
 template <class T>
-inline void ArraysByName<T>::Print(std::ostream &os, int width) const
+inline void ArraysByName<T>::Print(std::ostream &os, int64_t width) const
 {
    os << data.size() << '\n';
    for (auto const &it : data)
@@ -254,11 +254,11 @@ inline void ArraysByName<T>::Print(std::ostream &os, int width) const
 template <class T>
 void ArraysByName<T>::Load(std::istream &in)
 {
-   int NumArrays;
+   int64_t NumArrays;
    in >> NumArrays;
 
    std::string ArrayLine, ArrayName;
-   for (int i=0; i < NumArrays; i++)
+   for (int64_t i=0; i < NumArrays; i++)
    {
       in >> std::ws;
       getline(in, ArrayLine);

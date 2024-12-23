@@ -21,7 +21,7 @@ namespace mfem
 class Tetrahedron : public Element
 {
 protected:
-   int indices[4];
+   int64_t indices[4];
 
    /** The refinement flag keeps (in order) :
        1. Two marked edges given with local index (0..5) for the two faces
@@ -31,7 +31,7 @@ protected:
        CreateRefinementFlag and ParseRefinementFlag.
        2. Type of the element, stored in the next 3 bits.
        3. The rest is free for now. **/
-   int refinement_flag;
+   int64_t refinement_flag;
 
    unsigned transform;
 
@@ -45,70 +45,73 @@ public:
    { refinement_flag = 0; transform = 0; }
 
    /// Constructs tetrahedron by specifying the indices and the attribute.
-   Tetrahedron(const int *ind, int attr = 1);
+   Tetrahedron(const int64_t *ind, int64_t attr = 1);
 
    /// Constructs tetrahedron by specifying the indices and the attribute.
-   Tetrahedron(int ind1, int ind2, int ind3, int ind4, int attr = 1);
+   Tetrahedron(int64_t ind1, int64_t ind2, int64_t ind3, int64_t ind4,
+               int64_t attr = 1);
 
    /// Initialize the vertex indices and the attribute of a Tetrahedron.
-   void Init(int ind1, int ind2, int ind3, int ind4, int attr = 1,
-             int ref_flag = 0);
+   void Init(int64_t ind1, int64_t ind2, int64_t ind3, int64_t ind4,
+             int64_t attr = 1,
+             int64_t ref_flag = 0);
 
    /// Return element's type.
    Type GetType() const override { return Element::TETRAHEDRON; }
 
-   void  ParseRefinementFlag(int refinement_edges[2], int &type,
-                             int &flag) const;
-   void CreateRefinementFlag(int refinement_edges[2], int  type, int  flag = 0);
+   void  ParseRefinementFlag(int64_t refinement_edges[2], int64_t &type,
+                             int64_t &flag) const;
+   void CreateRefinementFlag(int64_t refinement_edges[2], int64_t  type,
+                             int64_t  flag = 0);
 
-   void GetMarkedFace(const int face, int *fv) const;
+   void GetMarkedFace(const int64_t face, int64_t *fv) const;
 
-   int GetRefinementFlag() const { return refinement_flag; }
+   int64_t GetRefinementFlag() const { return refinement_flag; }
 
-   void SetRefinementFlag(int rf) { refinement_flag = rf; }
+   void SetRefinementFlag(int64_t rf) { refinement_flag = rf; }
 
    /// Return 1 if the element needs refinement in order to get conforming mesh.
-   int NeedRefinement(HashTable<Hashed2> &v_to_v) const override;
+   int64_t NeedRefinement(HashTable<Hashed2> &v_to_v) const override;
 
    /** Reorder the vertices so that the longest edge is from vertex 0
        to vertex 1. If called it should be once from the mesh constructor,
        because the order may be used later for setting the edges. **/
-   void MarkEdge(const DSTable &v_to_v, const int *length) override;
+   void MarkEdge(const DSTable &v_to_v, const int64_t *length) override;
 
-   void ResetTransform(int tr) override { transform = tr; }
+   void ResetTransform(int64_t tr) override { transform = tr; }
    unsigned GetTransform() const override { return transform; }
 
    /// Add 'tr' to the current chain of coarse-fine transformations.
-   void PushTransform(int tr) override
+   void PushTransform(int64_t tr) override
    { transform = (transform << 3) | (tr + 1); }
 
    /// Calculate point matrix corresponding to a chain of transformations.
    static void GetPointMatrix(unsigned transform, DenseMatrix &pm);
 
    /// Get the indices defining the vertices.
-   void GetVertices(Array<int> &v) const override;
+   void GetVertices(Array<int64_t> &v) const override;
 
    /// Set the indices defining the vertices.
-   void SetVertices(const Array<int> &v) override;
+   void SetVertices(const Array<int64_t> &v) override;
 
    /// @note The returned array should NOT be deleted by the caller.
-   int * GetVertices () override { return indices; }
+   int64_t * GetVertices () override { return indices; }
 
    /// Set the indices defining the vertices.
-   void SetVertices(const int *ind) override;
+   void SetVertices(const int64_t *ind) override;
 
-   int GetNVertices() const override { return 4; }
+   int64_t GetNVertices() const override { return 4; }
 
-   int GetNEdges() const override { return (6); }
+   int64_t GetNEdges() const override { return (6); }
 
-   const int *GetEdgeVertices(int ei) const override
+   const int64_t *GetEdgeVertices(int64_t ei) const override
    { return geom_t::Edges[ei]; }
 
-   int GetNFaces() const override { return 4; }
+   int64_t GetNFaces() const override { return 4; }
 
-   int GetNFaceVertices(int) const override { return 3; }
+   int64_t GetNFaceVertices(int64_t) const override { return 3; }
 
-   const int *GetFaceVertices(int fi) const override
+   const int64_t *GetFaceVertices(int64_t fi) const override
    { return geom_t::FaceVert[fi]; }
 
    Element *Duplicate(Mesh *m) const override;

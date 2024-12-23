@@ -80,7 +80,7 @@ namespace internal
 extern bool mfem_out_initialized, mfem_err_initialized;
 }
 
-void mfem_backtrace(int mode, int depth)
+void mfem_backtrace(int64_t mode, int64_t depth)
 {
 #ifdef MFEM_USE_LIBUNWIND
    char name[UNW_NAME_LEN];
@@ -89,7 +89,7 @@ void mfem_backtrace(int mode, int depth)
    unw_word_t ip, offp;
    std::ostream &merr = internal::mfem_err_initialized ? mfem::err : std::cerr;
 
-   int err_flag = unw_getcontext(&uc);
+   int64_t err_flag = unw_getcontext(&uc);
    err_flag = err_flag ? err_flag : unw_init_local(&cursor, &uc);
 
    Array<unw_word_t> addrs(MemoryType::HOST);
@@ -100,7 +100,7 @@ void mfem_backtrace(int mode, int depth)
       err_flag = err_flag ? err_flag : unw_get_reg(&cursor, UNW_REG_IP, &ip);
       if (err_flag) { break; }
       char *name_p = name;
-      int demangle_status;
+      int64_t demangle_status;
 
       // __cxa_demangle is not standard, but works with GCC, Intel, PGI, Clang
       char *name_demangle =
@@ -124,7 +124,7 @@ void mfem_backtrace(int mode, int depth)
    {
       merr << "\nLookup backtrace source lines:";
       const char *fname = NULL;
-      for (int i = 0; i < addrs.Size(); i++)
+      for (int64_t i = 0; i < addrs.Size(); i++)
       {
          Dl_info info;
          err_flag = !dladdr((void*)addrs[i], &info);
@@ -176,7 +176,7 @@ void mfem_error(const char *msg)
 #endif
 
 #ifdef MFEM_USE_MPI
-   int init_flag, fin_flag;
+   int64_t init_flag, fin_flag;
    MPI_Initialized(&init_flag);
    MPI_Finalized(&fin_flag);
    if (init_flag && !fin_flag) { MPI_Abort(GetGlobalMPI_Comm(), 1); }

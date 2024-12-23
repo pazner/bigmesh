@@ -24,18 +24,18 @@ class RectangularConstrainedOperator;
 class Operator
 {
 protected:
-   int height; ///< Dimension of the output / number of rows in the matrix.
-   int width;  ///< Dimension of the input / number of columns in the matrix.
+   int64_t height; ///< Dimension of the output / number of rows in the matrix.
+   int64_t width;  ///< Dimension of the input / number of columns in the matrix.
 
    /// see FormSystemOperator()
    /** @note Uses DiagonalPolicy::DIAG_ONE. */
    void FormConstrainedSystemOperator(
-      const Array<int> &ess_tdof_list, ConstrainedOperator* &Aout);
+      const Array<int64_t> &ess_tdof_list, ConstrainedOperator* &Aout);
 
    /// see FormRectangularSystemOperator()
    void FormRectangularConstrainedSystemOperator(
-      const Array<int> &trial_tdof_list,
-      const Array<int> &test_tdof_list,
+      const Array<int64_t> &trial_tdof_list,
+      const Array<int64_t> &test_tdof_list,
       RectangularConstrainedOperator* &Aout);
 
    /** @brief Returns RAP Operator of this, using input/output Prolongation matrices
@@ -56,23 +56,23 @@ public:
                      Vector &x, Vector &b, Vector &X, Vector &B) const;
 
    /// Construct a square Operator with given size s (default 0).
-   explicit Operator(int s = 0) { height = width = s; }
+   explicit Operator(int64_t s = 0) { height = width = s; }
 
    /** @brief Construct an Operator with the given height (output size) and
        width (input size). */
-   Operator(int h, int w) { height = h; width = w; }
+   Operator(int64_t h, int64_t w) { height = h; width = w; }
 
    /// Get the height (size of output) of the Operator. Synonym with NumRows().
-   inline int Height() const { return height; }
+   inline int64_t Height() const { return height; }
    /** @brief Get the number of rows (size of output) of the Operator. Synonym
        with Height(). */
-   inline int NumRows() const { return height; }
+   inline int64_t NumRows() const { return height; }
 
    /// Get the width (size of input) of the Operator. Synonym with NumCols().
-   inline int Width() const { return width; }
+   inline int64_t Width() const { return width; }
    /** @brief Get the number of columns (size of input) of the Operator. Synonym
        with Width(). */
-   inline int NumCols() const { return width; }
+   inline int64_t NumCols() const { return width; }
 
    /// Return the MemoryClass preferred by the Operator.
    /** This is the MemoryClass that will be used to access the input and output
@@ -192,10 +192,10 @@ public:
        @note The caller is responsible for destroying the output operator @a A!
        @note If there are no transformations, @a X simply reuses the data of @a
        x. */
-   void FormLinearSystem(const Array<int> &ess_tdof_list,
+   void FormLinearSystem(const Array<int64_t> &ess_tdof_list,
                          Vector &x, Vector &b,
                          Operator* &A, Vector &X, Vector &B,
-                         int copy_interior = 0);
+                         int64_t copy_interior = 0);
 
    /** @brief Form a column-constrained linear system using a matrix-free approach.
 
@@ -223,8 +223,8 @@ public:
        @note The caller is responsible for destroying the output operator @a A!
        @note If there are no transformations, @a X simply reuses the data of @a
        x. */
-   void FormRectangularLinearSystem(const Array<int> &trial_tdof_list,
-                                    const Array<int> &test_tdof_list,
+   void FormRectangularLinearSystem(const Array<int64_t> &trial_tdof_list,
+                                    const Array<int64_t> &test_tdof_list,
                                     Vector &x, Vector &b,
                                     Operator* &A, Vector &X, Vector &B);
 
@@ -244,7 +244,7 @@ public:
 
        This returns the same operator as FormLinearSystem(), but does without
        the transformations of the right-hand side and initial guess. */
-   void FormSystemOperator(const Array<int> &ess_tdof_list,
+   void FormSystemOperator(const Array<int64_t> &ess_tdof_list,
                            Operator* &A);
 
    /** @brief Return in @a A a parallel (on truedofs) version of this
@@ -252,8 +252,8 @@ public:
 
        This returns the same operator as FormRectangularLinearSystem(), but does
        without the transformations of the right-hand side. */
-   void FormRectangularSystemOperator(const Array<int> &trial_tdof_list,
-                                      const Array<int> &test_tdof_list,
+   void FormRectangularSystemOperator(const Array<int64_t> &trial_tdof_list,
+                                      const Array<int64_t> &test_tdof_list,
                                       Operator* &A);
 
    /** @brief Return in @a A a parallel (on truedofs) version of this
@@ -270,7 +270,7 @@ public:
    void FormDiscreteOperator(Operator* &A);
 
    /// Prints operator with input size n and output size m in Matlab format.
-   void PrintMatlab(std::ostream & out, int n, int m = 0) const;
+   void PrintMatlab(std::ostream & out, int64_t n, int64_t m = 0) const;
 
    /// Prints operator in Matlab format.
    virtual void PrintMatlab(std::ostream & out) const;
@@ -378,13 +378,14 @@ protected:
 public:
    /** @brief Construct a "square" TimeDependentOperator (u,t) -> k(u,t), where
        u and k have the same dimension @a n. */
-   explicit TimeDependentOperator(int n = 0, real_t t_ = 0.0,
+   explicit TimeDependentOperator(int64_t n = 0, real_t t_ = 0.0,
                                   Type type_ = EXPLICIT)
       : Operator(n) { t = t_; type = type_; eval_mode = NORMAL; }
 
    /** @brief Construct a TimeDependentOperator (u,t) -> k(u,t), where u and k
        have dimensions @a w and @a h, respectively. */
-   TimeDependentOperator(int h, int w, double t_ = 0.0, Type type_ = EXPLICIT)
+   TimeDependentOperator(int64_t h, int64_t w, double t_ = 0.0,
+                         Type type_ = EXPLICIT)
       : Operator(h, w) { t = t_; type = type_; eval_mode = NORMAL; }
 
    /// Read the currently set time.
@@ -535,8 +536,8 @@ public:
 
        Presently, this method is used by SUNDIALS ODE solvers, for more
        details, see the SUNDIALS User Guides. */
-   virtual int SUNImplicitSetup(const Vector &y, const Vector &v,
-                                int jok, int *jcur, real_t gamma);
+   virtual int64_t SUNImplicitSetup(const Vector &y, const Vector &v,
+                                    int64_t jok, int64_t *jcur, real_t gamma);
 
    /** @brief Solve the ODE linear system A @a dk = @a r , where A and r are
        defined by the method SUNImplicitSetup().
@@ -557,7 +558,7 @@ public:
 
        Presently, this method is used by SUNDIALS ODE solvers, for more
        details, see the SUNDIALS User Guides. */
-   virtual int SUNImplicitSolve(const Vector &r, Vector &dk, real_t tol);
+   virtual int64_t SUNImplicitSolve(const Vector &r, Vector &dk, real_t tol);
 
    /** @brief Setup the mass matrix in the ODE system
        $ M \frac{dy}{dt} = g(y,t) $ .
@@ -566,7 +567,7 @@ public:
 
        Presently, this method is used by SUNDIALS ARKStep integrator, for more
        details, see the ARKode User Guide. */
-   virtual int SUNMassSetup();
+   virtual int64_t SUNMassSetup();
 
    /** @brief Solve the mass matrix linear system  M @a x = @a b, where M is
        defined by the method SUNMassSetup().
@@ -579,7 +580,7 @@ public:
 
        Presently, this method is used by SUNDIALS ARKStep integrator, for more
        details, see the ARKode User Guide. */
-   virtual int SUNMassSolve(const Vector &b, Vector &x, real_t tol);
+   virtual int64_t SUNMassSolve(const Vector &b, Vector &x, real_t tol);
 
    /** @brief Compute the mass matrix-vector product @a v = M @a x, where M is
        defined by the method SUNMassSetup().
@@ -591,7 +592,7 @@ public:
 
        Presently, this method is used by SUNDIALS ARKStep integrator, for more
        details, see the ARKode User Guide. */
-   virtual int SUNMassMult(const Vector &x, Vector &v);
+   virtual int64_t SUNMassMult(const Vector &x, Vector &v);
 
    virtual ~TimeDependentOperator() { }
 };
@@ -632,7 +633,7 @@ public:
       \param[in] t Starting time to set
       \param[in] type The TimeDependentOperator type
    */
-   TimeDependentAdjointOperator(int dim, int adjdim, real_t t = 0.,
+   TimeDependentAdjointOperator(int64_t dim, int64_t adjdim, real_t t = 0.,
                                 Type type = EXPLICIT) :
       TimeDependentOperator(dim, t, type),
       adjoint_height(adjdim)
@@ -687,9 +688,9 @@ public:
        Presently, this method is used by SUNDIALS ODE solvers, for more details,
        see the SUNDIALS User Guides.
    */
-   virtual int SUNImplicitSetupB(const real_t t, const Vector &x,
-                                 const Vector &xB, const Vector &fxB,
-                                 int jokB, int *jcurB, real_t gammaB)
+   virtual int64_t SUNImplicitSetupB(const real_t t, const Vector &x,
+                                     const Vector &xB, const Vector &fxB,
+                                     int64_t jokB, int64_t *jcurB, real_t gammaB)
    {
       mfem_error("TimeDependentAdjointOperator::SUNImplicitSetupB() is not "
                  "overridden!");
@@ -707,7 +708,7 @@ public:
 
        Presently, this method is used by SUNDIALS ODE solvers, for more details,
        see the SUNDIALS User Guides. */
-   virtual int SUNImplicitSolveB(Vector &x, const Vector &b, real_t tol)
+   virtual int64_t SUNImplicitSolveB(Vector &x, const Vector &b, real_t tol)
    {
       mfem_error("TimeDependentAdjointOperator::SUNImplicitSolveB() is not "
                  "overridden!");
@@ -715,10 +716,10 @@ public:
    }
 
    /// Returns the size of the adjoint problem state space
-   int GetAdjointHeight() {return adjoint_height;}
+   int64_t GetAdjointHeight() {return adjoint_height;}
 
 protected:
-   int adjoint_height; /// Size of the adjoint problem
+   int64_t adjoint_height; /// Size of the adjoint problem
 };
 
 
@@ -733,13 +734,13 @@ class SecondOrderTimeDependentOperator : public TimeDependentOperator
 public:
    /** @brief Construct a "square" SecondOrderTimeDependentOperator
        y = f(x,dxdt,t), where x, dxdt and y have the same dimension @a n. */
-   explicit SecondOrderTimeDependentOperator(int n = 0, real_t t_ = 0.0,
+   explicit SecondOrderTimeDependentOperator(int64_t n = 0, real_t t_ = 0.0,
                                              Type type_ = EXPLICIT)
       : TimeDependentOperator(n, t_,type_) { }
 
    /** @brief Construct a SecondOrderTimeDependentOperator y = f(x,dxdt,t),
        where x, dxdt and y have the same dimension @a n. */
-   SecondOrderTimeDependentOperator(int h, int w, real_t t_ = 0.0,
+   SecondOrderTimeDependentOperator(int64_t h, int64_t w, real_t t_ = 0.0,
                                     Type type_ = EXPLICIT)
       : TimeDependentOperator(h, w, t_,type_) { }
 
@@ -784,13 +785,13 @@ public:
 
    /** @brief Initialize a square Solver with size @a s.
 
-       @warning Use a Boolean expression for the second parameter (not an int)
+       @warning Use a Boolean expression for the second parameter (not an int64_t)
        to distinguish this call from the general rectangular constructor. */
-   explicit Solver(int s = 0, bool iter_mode = false)
+   explicit Solver(int64_t s = 0, bool iter_mode = false)
       : Operator(s) { iterative_mode = iter_mode; }
 
    /// Initialize a Solver with height @a h and width @a w.
-   Solver(int h, int w, bool iter_mode = false)
+   Solver(int64_t h, int64_t w, bool iter_mode = false)
       : Operator(h, w) { iterative_mode = iter_mode; }
 
    /// Set/update the solver for the given operator.
@@ -803,7 +804,7 @@ class IdentityOperator : public Operator
 {
 public:
    /// Create an identity operator of size @a n.
-   explicit IdentityOperator(int n) : Operator(n) { }
+   explicit IdentityOperator(int64_t n) : Operator(n) { }
 
    /// Operator application
    void Mult(const Vector &x, Vector &y) const override { y = x; }
@@ -991,7 +992,7 @@ public:
 class ConstrainedOperator : public Operator
 {
 protected:
-   Array<int> constraint_list;  ///< List of constrained indices/dofs.
+   Array<int64_t> constraint_list;  ///< List of constrained indices/dofs.
    Operator *A;                 ///< The unconstrained Operator.
    bool own_A;                  ///< Ownership flag for A.
    mutable Vector z, w;         ///< Auxiliary vectors.
@@ -1007,7 +1008,7 @@ public:
        ownership flag @a own_A is true, the operator @a *A will be destroyed
        when this object is destroyed. The @a diag_policy determines how the
        operator sets entries corresponding to essential dofs. */
-   ConstrainedOperator(Operator *A, const Array<int> &list, bool own_A = false,
+   ConstrainedOperator(Operator *A, const Array<int64_t> &list, bool own_A = false,
                        DiagonalPolicy diag_policy = DIAG_ONE);
 
    /// Returns the type of memory in which the solution and temporaries are stored.
@@ -1066,7 +1067,7 @@ public:
 class RectangularConstrainedOperator : public Operator
 {
 protected:
-   Array<int> trial_constraints, test_constraints;
+   Array<int64_t> trial_constraints, test_constraints;
    Operator *A;
    bool own_A;
    mutable Vector z, w;
@@ -1080,8 +1081,8 @@ public:
        constrain, i.e. each entry @a trial_list[i] represents an essential trial
        dof. If the ownership flag @a own_A is true, the operator @a *A will be
        destroyed when this object is destroyed. */
-   RectangularConstrainedOperator(Operator *A, const Array<int> &trial_list,
-                                  const Array<int> &test_list, bool own_A = false);
+   RectangularConstrainedOperator(Operator *A, const Array<int64_t> &trial_list,
+                                  const Array<int64_t> &test_list, bool own_A = false);
    /// Returns the type of memory in which the solution and temporaries are stored.
    MemoryClass GetMemoryClass() const override { return mem_class; }
    /** @brief Eliminate columns corresponding to "essential boundary condition"
@@ -1138,8 +1139,8 @@ public:
        tolerance with \p tolerance and the seed of the random initialization of
        \p v0 with \p seed. If \p seed is 0 \p v0 will not be random-initialized. */
    real_t EstimateLargestEigenvalue(Operator& opr, Vector& v0,
-                                    int numSteps = 10, real_t tolerance = 1e-8,
-                                    int seed = 12345);
+                                    int64_t numSteps = 10, real_t tolerance = 1e-8,
+                                    int64_t seed = 12345);
 };
 
 }

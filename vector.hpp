@@ -37,7 +37,7 @@ namespace mfem
 
 /** Count the number of entries in an array of doubles for which isfinite
     is false, i.e. the entry is a NaN or +/-Inf. */
-inline int CheckFinite(const real_t *v, const int n);
+inline int64_t CheckFinite(const real_t *v, const int64_t n);
 
 /// Define a shortcut for std::numeric_limits<double>::infinity()
 #ifndef __CYGWIN__
@@ -80,7 +80,7 @@ class Vector
 protected:
 
    Memory<real_t> data;
-   int size;
+   int64_t size;
 
 public:
 
@@ -96,30 +96,30 @@ public:
 
    /// @brief Creates vector of size s.
    /// @warning Entries are not initialized to zero!
-   explicit Vector(int s);
+   explicit Vector(int64_t s);
 
    /// Creates a vector referencing an array of doubles, owned by someone else.
    /** The pointer @a data_ can be NULL. The data array can be replaced later
        with SetData(). */
-   Vector(real_t *data_, int size_)
+   Vector(real_t *data_, int64_t size_)
    { data.Wrap(data_, size_, false); size = size_; }
 
    /** @brief Create a Vector referencing a sub-vector of the Vector @a base
        starting at the given offset, @a base_offset, and size @a size_. */
-   Vector(Vector &base, int base_offset, int size_)
+   Vector(Vector &base, int64_t base_offset, int64_t size_)
       : data(base.data, base_offset, size_), size(size_) { }
 
    /// Create a Vector of size @a size_ using MemoryType @a mt.
-   Vector(int size_, MemoryType mt)
+   Vector(int64_t size_, MemoryType mt)
       : data(size_, mt), size(size_) { }
 
    /** @brief Create a Vector of size @a size_ using host MemoryType @a h_mt and
        device MemoryType @a d_mt. */
-   Vector(int size_, MemoryType h_mt, MemoryType d_mt)
+   Vector(int64_t size_, MemoryType h_mt, MemoryType d_mt)
       : data(size_, h_mt, d_mt), size(size_) { }
 
    /// Create a vector from a statically sized C-style array of convertible type
-   template <typename CT, int N>
+   template <typename CT, int64_t N>
    explicit Vector(const CT (&values)[N]) : Vector(N)
    { std::copy(values, values + N, begin()); }
 
@@ -144,13 +144,13 @@ public:
    virtual bool UseDevice() const { return data.UseDevice(); }
 
    /// Reads a vector from multiple files
-   void Load(std::istream ** in, int np, int * dim);
+   void Load(std::istream ** in, int64_t np, int64_t * dim);
 
    /// Load a vector from an input stream.
-   void Load(std::istream &in, int Size);
+   void Load(std::istream &in, int64_t Size);
 
    /// Load a vector from an input stream, reading the size from the stream.
-   void Load(std::istream &in) { int s; in >> s; Load(in, s); }
+   void Load(std::istream &in) { int64_t s; in >> s; Load(in, s); }
 
    /// @brief Resize the vector to size @a s.
    /** If the new size is less than or equal to Capacity() then the internal
@@ -160,13 +160,13 @@ public:
        @warning In the second case above (new size greater than current one),
        the vector will allocate new data array, even if it did not own the
        original data! Also, new entries are not initialized! */
-   void SetSize(int s);
+   void SetSize(int64_t s);
 
    /// Resize the vector to size @a s using MemoryType @a mt.
-   void SetSize(int s, MemoryType mt);
+   void SetSize(int64_t s, MemoryType mt);
 
    /// Resize the vector to size @a s using the MemoryType of @a v.
-   void SetSize(int s, const Vector &v) { SetSize(s, v.GetMemory().GetMemoryType()); }
+   void SetSize(int64_t s, const Vector &v) { SetSize(s, v.GetMemory().GetMemoryType()); }
 
    /// Set the Vector data.
    /// @warning This method should be called only when OwnsData() is false.
@@ -177,13 +177,13 @@ public:
        also used as the new Capacity().
        @warning This method should be called only when OwnsData() is false.
        @sa NewDataAndSize(). */
-   void SetDataAndSize(real_t *d, int s) { data.Wrap(d, s, false); size = s; }
+   void SetDataAndSize(real_t *d, int64_t s) { data.Wrap(d, s, false); size = s; }
 
    /// Set the Vector data and size, deleting the old data, if owned.
    /** The Vector does not assume ownership of the new data. The new size is
        also used as the new Capacity().
        @sa SetDataAndSize(). */
-   void NewDataAndSize(real_t *d, int s)
+   void NewDataAndSize(real_t *d, int64_t s)
    {
       data.Delete();
       SetDataAndSize(d, s);
@@ -198,14 +198,15 @@ public:
        the Vector object takes ownership of all pointers owned by @a mem.
 
        @sa NewDataAndSize(). */
-   inline void NewMemoryAndSize(const Memory<real_t> &mem, int s, bool own_mem);
+   inline void NewMemoryAndSize(const Memory<real_t> &mem, int64_t s,
+                                bool own_mem);
 
    /// Reset the Vector to be a reference to a sub-vector of @a base.
-   inline void MakeRef(Vector &base, int offset, int size);
+   inline void MakeRef(Vector &base, int64_t offset, int64_t size);
 
    /** @brief Reset the Vector to be a reference to a sub-vector of @a base
        without changing its current size. */
-   inline void MakeRef(Vector &base, int offset);
+   inline void MakeRef(Vector &base, int64_t offset);
 
    /// Set the Vector data (host pointer) ownership flag.
    void MakeDataOwner() const { data.SetHostPtrOwner(true); }
@@ -220,11 +221,11 @@ public:
    { data.DeleteDevice(copy_to_host); }
 
    /// Returns the size of the vector.
-   inline int Size() const { return size; }
+   inline int64_t Size() const { return size; }
 
    /// Return the size of the currently allocated data array.
    /** It is always true that Capacity() >= Size(). */
-   inline int Capacity() const { return data.Capacity(); }
+   inline int64_t Capacity() const { return data.Capacity(); }
 
    /// Return a pointer to the beginning of the Vector data.
    /** @warning This method should be used with caution as it gives write access
@@ -269,26 +270,26 @@ public:
    inline real_t *StealData() { real_t *p; StealData(&p); return p; }
 
    /// Access Vector entries. Index i = 0 .. size-1.
-   real_t &Elem(int i);
+   real_t &Elem(int64_t i);
 
    /// Read only access to Vector entries. Index i = 0 .. size-1.
-   const real_t &Elem(int i) const;
+   const real_t &Elem(int64_t i) const;
 
    /// Access Vector entries using () for 0-based indexing.
    /** @note If MFEM_DEBUG is enabled, bounds checking is performed. */
-   inline real_t &operator()(int i);
+   inline real_t &operator()(int64_t i);
 
    /// Read only access to Vector entries using () for 0-based indexing.
    /** @note If MFEM_DEBUG is enabled, bounds checking is performed. */
-   inline const real_t &operator()(int i) const;
+   inline const real_t &operator()(int64_t i) const;
 
    /// Access Vector entries using [] for 0-based indexing.
    /** @note If MFEM_DEBUG is enabled, bounds checking is performed. */
-   inline real_t &operator[](int i) { return (*this)(i); }
+   inline real_t &operator[](int64_t i) { return (*this)(i); }
 
    /// Read only access to Vector entries using [] for 0-based indexing.
    /** @note If MFEM_DEBUG is enabled, bounds checking is performed. */
-   inline const real_t &operator[](int i) const { return (*this)(i); }
+   inline const real_t &operator[](int64_t i) const { return (*this)(i); }
 
    /// Dot product with a `double *` array.
    real_t operator*(const real_t *) const;
@@ -334,9 +335,9 @@ public:
    /// (*this) = a * x
    Vector &Set(const real_t a, const Vector &x);
 
-   void SetVector(const Vector &v, int offset);
+   void SetVector(const Vector &v, int64_t offset);
 
-   void AddSubVector(const Vector &v, int offset);
+   void AddSubVector(const Vector &v, int64_t offset);
 
    /// (*this) = -(*this)
    void Neg();
@@ -377,49 +378,49 @@ public:
    /// Extract entries listed in @a dofs to the output Vector @a elemvect.
    /** Negative dof values cause the -dof-1 position in @a elemvect to receive
        the -val in from this Vector. */
-   void GetSubVector(const Array<int> &dofs, Vector &elemvect) const;
+   void GetSubVector(const Array<int64_t> &dofs, Vector &elemvect) const;
 
    /// Extract entries listed in @a dofs to the output array @a elem_data.
    /** Negative dof values cause the -dof-1 position in @a elem_data to receive
        the -val in from this Vector. */
-   void GetSubVector(const Array<int> &dofs, real_t *elem_data) const;
+   void GetSubVector(const Array<int64_t> &dofs, real_t *elem_data) const;
 
    /// Set the entries listed in @a dofs to the given @a value.
    /** Negative dof values cause the -dof-1 position in this Vector to receive
        the -value. */
-   void SetSubVector(const Array<int> &dofs, const real_t value);
+   void SetSubVector(const Array<int64_t> &dofs, const real_t value);
 
    /** @brief Set the entries listed in @a dofs to the values given in the @a
        elemvect Vector. Negative dof values cause the -dof-1 position in this
        Vector to receive the -val from @a elemvect. */
-   void SetSubVector(const Array<int> &dofs, const Vector &elemvect);
+   void SetSubVector(const Array<int64_t> &dofs, const Vector &elemvect);
 
    /** @brief Set the entries listed in @a dofs to the values given the @a ,
        elem_data array. Negative dof values cause the -dof-1 position in this
        Vector to receive the -val from @a elem_data. */
-   void SetSubVector(const Array<int> &dofs, real_t *elem_data);
+   void SetSubVector(const Array<int64_t> &dofs, real_t *elem_data);
 
    /** @brief Add elements of the @a elemvect Vector to the entries listed in @a
        dofs. Negative dof values cause the -dof-1 position in this Vector to add
        the -val from @a elemvect. */
-   void AddElementVector(const Array<int> & dofs, const Vector & elemvect);
+   void AddElementVector(const Array<int64_t> & dofs, const Vector & elemvect);
 
    /** @brief Add elements of the @a elem_data array to the entries listed in @a
        dofs. Negative dof values cause the -dof-1 position in this Vector to add
        the -val from @a elem_data. */
-   void AddElementVector(const Array<int> & dofs, real_t *elem_data);
+   void AddElementVector(const Array<int64_t> & dofs, real_t *elem_data);
 
    /** @brief Add @a times the elements of the @a elemvect Vector to the entries
        listed in @a dofs. Negative dof values cause the -dof-1 position in this
        Vector to add the -a*val from @a elemvect. */
-   void AddElementVector(const Array<int> & dofs, const real_t a,
+   void AddElementVector(const Array<int64_t> & dofs, const real_t a,
                          const Vector & elemvect);
 
    /// Set all vector entries NOT in the @a dofs Array to the given @a val.
-   void SetSubVectorComplement(const Array<int> &dofs, const real_t val);
+   void SetSubVectorComplement(const Array<int64_t> &dofs, const real_t val);
 
    /// Prints vector to stream out.
-   void Print(std::ostream &out = mfem::out, int width = 8) const;
+   void Print(std::ostream &out = mfem::out, int64_t width = 8) const;
 
 #ifdef MFEM_USE_ADIOS2
    /// Prints vector to stream out.
@@ -445,7 +446,7 @@ public:
    void PrintHash(std::ostream &out) const;
 
    /// Set random values in the vector.
-   void Randomize(int seed = 0);
+   void Randomize(int64_t seed = 0);
    /// Returns the l2 norm of the vector.
    real_t Norml2() const;
    /// Returns the l_infinity norm of the vector.
@@ -471,7 +472,7 @@ public:
 
    /** @brief Count the number of entries in the Vector for which isfinite
        is false, i.e. the entry is a NaN or +/-Inf. */
-   int CheckFinite() const { return mfem::CheckFinite(HostRead(), size); }
+   int64_t CheckFinite() const { return mfem::CheckFinite(HostRead(), size); }
 
    /// Destroys vector.
    virtual ~Vector();
@@ -521,17 +522,17 @@ inline bool IsFinite(const real_t &val)
 #endif
 }
 
-inline int CheckFinite(const real_t *v, const int n)
+inline int64_t CheckFinite(const real_t *v, const int64_t n)
 {
-   int bad = 0;
-   for (int i = 0; i < n; i++)
+   int64_t bad = 0;
+   for (int64_t i = 0; i < n; i++)
    {
       if (!IsFinite(v[i])) { bad++; }
    }
    return bad;
 }
 
-inline Vector::Vector(int s)
+inline Vector::Vector(int64_t s)
 {
    MFEM_ASSERT(s>=0,"Unexpected negative size.");
    size = s;
@@ -541,7 +542,7 @@ inline Vector::Vector(int s)
    }
 }
 
-inline void Vector::SetSize(int s)
+inline void Vector::SetSize(int64_t s)
 {
    if (s == size)
    {
@@ -561,7 +562,7 @@ inline void Vector::SetSize(int s)
    data.UseDevice(use_dev);
 }
 
-inline void Vector::SetSize(int s, MemoryType mt)
+inline void Vector::SetSize(int64_t s, MemoryType mt)
 {
    if (mt == data.GetMemoryType())
    {
@@ -590,7 +591,7 @@ inline void Vector::SetSize(int s, MemoryType mt)
    data.UseDevice(use_dev);
 }
 
-inline void Vector::NewMemoryAndSize(const Memory<real_t> &mem, int s,
+inline void Vector::NewMemoryAndSize(const Memory<real_t> &mem, int64_t s,
                                      bool own_mem)
 {
    data.Delete();
@@ -605,14 +606,14 @@ inline void Vector::NewMemoryAndSize(const Memory<real_t> &mem, int s,
    }
 }
 
-inline void Vector::MakeRef(Vector &base, int offset, int s)
+inline void Vector::MakeRef(Vector &base, int64_t offset, int64_t s)
 {
    data.Delete();
    size = s;
    data.MakeAlias(base.GetMemory(), offset, s);
 }
 
-inline void Vector::MakeRef(Vector &base, int offset)
+inline void Vector::MakeRef(Vector &base, int64_t offset)
 {
    data.Delete();
    data.MakeAlias(base.GetMemory(), offset, size);
@@ -627,7 +628,7 @@ inline void Vector::Destroy()
    data.UseDevice(use_dev);
 }
 
-inline real_t &Vector::operator()(int i)
+inline real_t &Vector::operator()(int64_t i)
 {
    MFEM_ASSERT(data && i >= 0 && i < size,
                "index [" << i << "] is out of range [0," << size << ")");
@@ -635,7 +636,7 @@ inline real_t &Vector::operator()(int i)
    return data[i];
 }
 
-inline const real_t &Vector::operator()(int i) const
+inline const real_t &Vector::operator()(int64_t i) const
 {
    MFEM_ASSERT(data && i >= 0 && i < size,
                "index [" << i << "] is out of range [0," << size << ")");
@@ -660,11 +661,11 @@ inline Vector::~Vector()
    data.Delete();
 }
 
-inline real_t DistanceSquared(const real_t *x, const real_t *y, const int n)
+inline real_t DistanceSquared(const real_t *x, const real_t *y, const int64_t n)
 {
    real_t d = 0.0;
 
-   for (int i = 0; i < n; i++)
+   for (int64_t i = 0; i < n; i++)
    {
       d += (x[i]-y[i])*(x[i]-y[i]);
    }
@@ -672,7 +673,7 @@ inline real_t DistanceSquared(const real_t *x, const real_t *y, const int n)
    return d;
 }
 
-inline real_t Distance(const real_t *x, const real_t *y, const int n)
+inline real_t Distance(const real_t *x, const real_t *y, const int64_t n)
 {
    return std::sqrt(DistanceSquared(x, y, n));
 }
