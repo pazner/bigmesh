@@ -11,6 +11,7 @@
 
 #include "sets.hpp"
 
+#include <cstdint>
 
 namespace mfem
 {
