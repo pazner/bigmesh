@@ -12,6 +12,9 @@
 #ifndef MFEM_GLOBALS_HPP
 #define MFEM_GLOBALS_HPP
 
+#define MFEM_USE_METIS YES
+#define MFEM_USE_METIS_5 YES
+
 #include <iostream>
 
 namespace mfem

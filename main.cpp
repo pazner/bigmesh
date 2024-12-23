@@ -27,9 +27,8 @@ void SavePartitionedMesh(const string &prefix, Mesh &mesh, int np,
 
 int main(int argc, char *argv[])
 {
-   string mesh_file =
-      "/Users/pazner/Documents/portland_state/10_research/13_meshes/bone_72k.mesh";
-   string dir = "Voxel";
+   string mesh_file = "";
+   string dir = "PartitionedMesh";
    int np = 1;
 
    OptionsParser args(argc, argv);
@@ -37,6 +36,8 @@ int main(int argc, char *argv[])
    args.AddOption(&np, "-np", "--n-partitions", "Number of mesh partitions.");
    args.AddOption(&dir, "-d", "--dir", "Data directory.");
    args.ParseCheck();
+
+   MFEM_VERIFY(!mesh_file.empty(), "Must provide input mesh file.");
 
    int err_flag = mkdir(dir.c_str(), 0777);
    err_flag = (err_flag && (errno != EEXIST)) ? 1 : 0;
