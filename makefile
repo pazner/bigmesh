@@ -11,7 +11,7 @@ LDFLAGS = -L$(METIS_DIR)/lib -lmetis
 all: partition
 
 partition: $(OBJECTS)
-	c++ $(LDFLAGS) $(OBJECTS) -o partition
+	c++ $(OBJECTS) $(LDFLAGS) -o partition
 
 %.o: %.cpp
 	c++ $(CPPFLAGS) $< -c -o $@
