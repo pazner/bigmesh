@@ -6357,4 +6357,26 @@ void MeshPartitioner::ExtractPart(int64_t part_id, MeshPart &mesh_part) const
    }
 }
 
+void Mesh::GetBoundingBox(Vector &min, Vector &max, int ref) const
+{
+   min.SetSize(spaceDim);
+   max.SetSize(spaceDim);
+
+   for (int d = 0; d < spaceDim; d++)
+   {
+      min(d) = infinity();
+      max(d) = -infinity();
+   }
+
+   for (int i = 0; i < NumOfVertices; i++)
+   {
+      const real_t *coord = GetVertex(i);
+      for (int d = 0; d < spaceDim; d++)
+      {
+         if (coord[d] < min(d)) { min(d) = coord[d]; }
+         if (coord[d] > max(d)) { max(d) = coord[d]; }
+      }
+   }
+}
+
 }

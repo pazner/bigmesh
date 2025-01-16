@@ -8,14 +8,18 @@ OBJECTS = $(patsubst %.cpp,%.o,$(SOURCES))
 CPPFLAGS = -std=c++11 -O0 -g -I$(METIS_DIR)/include
 LDFLAGS = -L$(METIS_DIR)/lib -lmetis
 
-all: partition
+LIB = libbigmesh.a
 
-partition: $(OBJECTS)
-	c++ $(OBJECTS) $(LDFLAGS) -o partition
+APPS = partition/partition
+
+$(LIB): $(OBJECTS)
+	ar -rcs $@ $^
+
+$(APPS): %: %.cpp $(LIB)
+	c++ $(CPPFLAGS) -I. $(LDFLAGS) $(LIB) -o $@ $<
 
 %.o: %.cpp
 	c++ $(CPPFLAGS) $< -c -o $@
 
 clean:
 	rm -f $(OBJECTS)
-	rm -f partition

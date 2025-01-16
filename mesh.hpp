@@ -933,6 +933,8 @@ public:
 
    /// @}
 
+   void GetBoundingBox(Vector &min, Vector &max, int ref) const;
+
    /// @name Information about the mesh as a whole
    /// @{
 
@@ -1171,7 +1173,21 @@ public:
 
    real_t GetElementVolume(int64_t i);
 
-   void GetElementCenter(int64_t i, Vector &center);
+   void GetElementCenter(int64_t i, Vector &center)
+   {
+      Array<int64_t> verts;
+      GetElementVertices(i, verts);
+      center.SetSize(spaceDim);
+      center = 0.0;
+      for (int d = 0; d < spaceDim; ++d)
+      {
+         for (int iv = 0; iv < verts.Size(); ++iv)
+         {
+            center[d] += vertices[verts[iv]](d);
+         }
+         center[d] /= real_t(verts.Size());
+      }
+   }
 
    /** Compute the Jacobian of the transformation from the perfect
        reference element at the given integration point (defaults to the

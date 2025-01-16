@@ -1,4 +1,8 @@
 PartitionedMesh
 Make.user
-partition
 *.o
+*.dSYM
+libbigmesh.a
+partition/partition
+voxel/preprocess
+voxel/Voxel
