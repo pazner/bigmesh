@@ -4,6 +4,9 @@
 #include "mesh.hpp"
 #include "lex.hpp"
 
+#include <unordered_map>
+#include <cstdint>
+
 namespace mfem
 {
 
